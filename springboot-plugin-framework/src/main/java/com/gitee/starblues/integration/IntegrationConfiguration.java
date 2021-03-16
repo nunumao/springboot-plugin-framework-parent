@@ -9,7 +9,7 @@ import java.util.Set;
 /**
  * 插件集成时的配置接口。插件集成的配置接口
  * @author starBlues
- * @version 2.4.0
+ * @version 2.4.2
  */
 public interface IntegrationConfiguration {
 
@@ -105,5 +105,11 @@ public interface IntegrationConfiguration {
      * @return true or false
      */
     boolean exactVersionAllowed();
+
+    /**
+     * 是否启用webSocket功能. 如需启用, 则需要引入springboot支持的WebSocket依赖
+     * @return 启用返回true, 不启用返回false
+     */
+    boolean enableWebSocket();
 
 }

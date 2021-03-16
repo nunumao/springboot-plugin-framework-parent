@@ -3,6 +3,9 @@ package com.gitee.starblues.utils;
 import org.springframework.util.ReflectionUtils;
 
 import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * 类工具类
@@ -13,6 +16,15 @@ public class ClassUtils {
 
     private ClassUtils(){
 
+    }
+
+    public static List<Field> getAllFields(Class<?> clazz) {
+        List<Field> fieldList = new ArrayList<>();
+        while (clazz != null){
+            fieldList.addAll(new ArrayList<>(Arrays.asList(clazz.getDeclaredFields())));
+            clazz = clazz.getSuperclass();
+        }
+        return fieldList;
     }
 
     /**
@@ -27,6 +39,7 @@ public class ClassUtils {
         if(o == null){
             return null;
         }
+
         Field templateResolversField = ReflectionUtils.findField(o.getClass(),
                 fieldName);
         return getReflectionField(templateResolversField, o);
