@@ -1,6 +1,7 @@
 package com.gitee.starblues.extension.mybatis;
 
 import com.gitee.starblues.factory.PluginRegistryInfo;
+import com.gitee.starblues.factory.SpringBeanRegister;
 import com.gitee.starblues.factory.process.pipe.bean.PluginBeanRegistrarExtend;
 import com.gitee.starblues.utils.SpringBeanUtils;
 import org.apache.ibatis.io.Resources;
@@ -92,6 +93,7 @@ public class MybatisProcessor implements PluginBeanRegistrarExtend {
             mapperHandler.processMapper(pluginRegistryInfo, (holder, mapperClass) -> {
                 mapperHandler.commonProcessMapper(holder, mapperClass, sqlSessionFactory, sqlSessionTemplate);
             });
+            CommonRegister.commonRegister(pluginRegistryInfo, sqlSessionFactory, sqlSessionTemplate);
         } finally {
             Resources.setDefaultClassLoader(defaultClassLoader);
         }
