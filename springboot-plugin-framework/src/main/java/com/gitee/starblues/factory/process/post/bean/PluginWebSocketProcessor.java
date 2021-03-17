@@ -26,6 +26,7 @@ import org.springframework.web.socket.server.standard.ServerEndpointExporter;
  * 插件中websocket处理者
  *
  * @author sousouki
+ * @version 2.4.2
  */
 public class PluginWebSocketProcessor implements PluginPostProcessor {
 
