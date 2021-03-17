@@ -2,10 +2,14 @@ package com.gitee.starblues.utils;
 
 import org.springframework.util.ReflectionUtils;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Proxy;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 类工具类
@@ -80,6 +84,19 @@ public class ClassUtils {
         }
         Object fieldObject = field.get(o);
         return (T) fieldObject;
+    }
+
+    /**
+     * 得到注解修改者
+     * @param annotation 注解
+     * @return 修改者集合
+     * @throws Exception 异常
+     */
+    public static Map<String, Object> getAnnotationsUpdater(Object annotation) throws Exception {
+        InvocationHandler invocationHandler = Proxy.getInvocationHandler(annotation);
+        Field field = invocationHandler.getClass().getDeclaredField("memberValues");
+        field.setAccessible(true);
+        return (Map<String, Object>) field.get(invocationHandler);
     }
 
 }
