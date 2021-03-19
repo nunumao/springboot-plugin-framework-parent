@@ -1,7 +1,6 @@
 package com.gitee.starblues.extension.mybatis;
 
 import com.gitee.starblues.factory.PluginRegistryInfo;
-import com.gitee.starblues.factory.SpringBeanRegister;
 import com.gitee.starblues.factory.process.pipe.bean.PluginBeanRegistrarExtend;
 import com.gitee.starblues.utils.SpringBeanUtils;
 import org.apache.ibatis.io.Resources;
