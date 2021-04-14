@@ -11,6 +11,17 @@
 
     <description>spring boot 插件开发集成包</description>
 
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <maven.compiler.encoding>UTF-8</maven.compiler.encoding>
+        <encoding>UTF-8</encoding>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
+        <java.version>1.8</java.version>
+        <jdk.version>1.8</jdk.version>
+    </properties>
+
     <modules>
         <module>springboot-plugin-framework</module>
         <module>springboot-plugin-framework-extension</module>
