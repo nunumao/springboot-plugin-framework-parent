@@ -61,12 +61,8 @@ QQ交流群: 859570617
 
 ### 支持 | Support
 如果您觉得框架使用起来不错的, 或者想支持本框架继续维护, 开源不易, 您可以通过如下方式进行支持:
-- 对本框架进行`star`
+- 对本框架进行`Star`
 - 将本框架[spring-brick](https://gitee.com/starblues/springboot-plugin-framework-parent)分享给您的朋友
-- 通过如下方式进行捐赠，请作者吃点零食
-1. 进入[框架首页](https://gitee.com/starblues/springboot-plugin-framework-parent)
-2. 点击**捐赠**按钮
-![捐赠 mybatis-plus](img/spring-brick_index.jpg "支持一下spring-brick")
-3. 进行捐赠
-![捐赠 mybatis-plus](img/spring_brick_donation.jpg "支持一下spring-brick")
+- 进入[框架首页](https://gitee.com/starblues/springboot-plugin-framework-parent), 点击**捐赠**按钮, 请作者吃点零食
+![捐赠 spring-brick](img/spring-brick_index.jpg "支持一下spring-brick")
  
