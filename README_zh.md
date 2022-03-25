@@ -64,5 +64,5 @@ QQ交流群: 859570617
 - 对本框架进行`Star`
 - 将本框架[spring-brick](https://gitee.com/starblues/springboot-plugin-framework-parent)分享给您的朋友
 - 进入[框架首页](https://gitee.com/starblues/springboot-plugin-framework-parent), 点击**捐赠**按钮, 请作者吃点零食
-![捐赠 spring-brick](img/spring-brick_index.jpg "支持一下spring-brick")
+![捐赠 spring-brick](img/spring_brick_donation.jpg "支持一下spring-brick")
  
