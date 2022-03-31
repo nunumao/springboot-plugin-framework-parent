@@ -90,12 +90,8 @@ public class DefaultPluginOperator implements PluginOperator {
                return true;
             }
             initBeforeLogPrint();
-            // 触发插件初始化监听器
-            pluginInitializerListenerFactory.before();
             if(!configuration.enable()){
                 log.info("插件功能已被禁用!");
-                // 如果禁用的话, 直接返回
-                pluginInitializerListenerFactory.complete();
                 return false;
             }
             // 开始加载插件
@@ -103,6 +99,8 @@ public class DefaultPluginOperator implements PluginOperator {
             if(ObjectUtils.isEmpty(pluginInfos)){
                 return false;
             }
+            // 触发插件初始化监听器
+            pluginInitializerListenerFactory.before();
             boolean isFoundException = false;
             for (PluginInfo pluginInfo : pluginInfos) {
                 try {

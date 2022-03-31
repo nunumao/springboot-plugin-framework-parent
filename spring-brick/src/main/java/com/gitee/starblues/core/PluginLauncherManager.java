@@ -89,7 +89,7 @@ public class PluginLauncherManager extends DefaultPluginManager{
 
     @Override
     protected void start(PluginInsideInfo pluginInsideInfo) throws Exception {
-        super.start(pluginInsideInfo);
+        launcherChecker.checkCanStart(pluginInsideInfo);
         try {
             InsidePluginDescriptor pluginDescriptor = pluginInsideInfo.getPluginDescriptor();
             PluginInteractive pluginInteractive = new DefaultPluginInteractive(pluginDescriptor,
@@ -98,6 +98,8 @@ public class PluginLauncherManager extends DefaultPluginManager{
             SpringPluginHook springPluginHook = pluginLauncher.run();
             RegistryPluginInfo registryPluginInfo = new RegistryPluginInfo(pluginDescriptor, springPluginHook);
             registryInfo.put(pluginDescriptor.getPluginId(), registryPluginInfo);
+            pluginInsideInfo.setPluginState(PluginState.STARTED);
+            super.startFinish(pluginInsideInfo);
         } catch (Exception e){
             // 启动失败, 进行停止
             pluginInsideInfo.setPluginState(PluginState.STARTED_FAILURE);
@@ -125,6 +127,7 @@ public class PluginLauncherManager extends DefaultPluginManager{
             throw e;
         }
     }
+
 
     static class RegistryPluginInfo{
         private final PluginDescriptor descriptor;
