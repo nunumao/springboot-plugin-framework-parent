@@ -117,7 +117,7 @@ public class DefaultPluginManager implements PluginManager{
     @Override
     public synchronized List<PluginInfo> loadPlugins() {
         if(loaded.get()){
-            throw new RuntimeException("已经加载过了插件, 不能在重复调用: loadPlugins");
+            throw new PluginException("不能重复调用: loadPlugins");
         }
         try {
             if(ObjectUtils.isEmpty(pluginRootDirs)){
@@ -126,18 +126,7 @@ public class DefaultPluginManager implements PluginManager{
             }
             List<Path> scanPluginPaths = provider.getPluginScanner().scan(pluginRootDirs);
             if(ObjectUtils.isEmpty(scanPluginPaths)){
-                StringBuilder warn = new StringBuilder("以下路径未发现插件: \n");
-                for (int i = 0; i < pluginRootDirs.size(); i++) {
-                    warn.append(i + 1).append(". ").append(pluginRootDirs.get(i)).append("\n");
-                }
-                warn.append("请检查路径是否合适.\n");
-                warn.append("请检查配置[plugin.runMode]是否合适.\n");
-                if(provider.getRuntimeMode() == RuntimeMode.DEV){
-                    warn.append("请检查插件包是否编译.\n");
-                } else {
-                    warn.append("请检查插件是否合法.\n");
-                }
-                log.warn(warn.toString());
+                printOfNotFoundPlugins();
                 return Collections.emptyList();
             }
             pluginListenerFactory = createPluginListenerFactory();
@@ -155,6 +144,9 @@ public class DefaultPluginManager implements PluginManager{
                     pluginListenerFactory.loadFailure(path, e);
                     log.error("加载插件包失败: {}. {}", path, e.getMessage(), e);
                 }
+            }
+            if(pluginInfoMap.isEmpty()){
+                printOfNotFoundPlugins();
             }
             return getSortPlugin(pluginInfoMap);
         } finally {
@@ -228,8 +220,13 @@ public class DefaultPluginManager implements PluginManager{
     @Override
     public synchronized void unLoad(String pluginId) {
         Assert.isNotNull(pluginId, "参数pluginId不能为空");
-        PluginInsideInfo pluginInsideInfo = resolvedPlugins.remove(pluginId);
+        PluginInsideInfo pluginInsideInfo = resolvedPlugins.get(pluginId);
+        if(!resolvedPlugins.containsKey(pluginId)){
+            throw new PluginException("没有发现插件: " + pluginId);
+        }
+        resolvedPlugins.remove(pluginId);
         pluginListenerFactory.unLoadSuccess(pluginInsideInfo.toPluginInfo());
+        LogUtils.info(log, pluginInsideInfo.getPluginDescriptor(), "卸载成功");
     }
 
     @Override
@@ -515,12 +512,21 @@ public class DefaultPluginManager implements PluginManager{
      */
     protected void start(PluginInsideInfo pluginInsideInfo) throws Exception{
         Assert.isNotNull(pluginInsideInfo, "pluginInsideInfo 参数不能为空");
-        String pluginId = pluginInsideInfo.getPluginId();
         launcherChecker.checkCanStart(pluginInsideInfo);
         pluginInsideInfo.setPluginState(PluginState.STARTED);
+        startFinish(pluginInsideInfo);
+    }
+
+    /**
+     * 启动完成后的操作
+     * @param pluginInsideInfo pluginInsideInfo
+     */
+    protected void startFinish(PluginInsideInfo pluginInsideInfo){
+        String pluginId = pluginInsideInfo.getPluginId();
         startedPlugins.put(pluginId, pluginInsideInfo);
         resolvedPlugins.remove(pluginId);
     }
+
 
     /**
      * 统一停止插件操作
@@ -529,8 +535,16 @@ public class DefaultPluginManager implements PluginManager{
      */
     protected void stop(PluginInsideInfo pluginInsideInfo) throws Exception{
         launcherChecker.checkCanStop(pluginInsideInfo);
-        String pluginId = pluginInsideInfo.getPluginId();
         pluginInsideInfo.setPluginState(PluginState.STOPPED);
+        stopFinish(pluginInsideInfo);
+    }
+
+    /**
+     * 停止完成操作
+     * @param pluginInsideInfo pluginInsideInfo
+     */
+    protected void stopFinish(PluginInsideInfo pluginInsideInfo){
+        String pluginId = pluginInsideInfo.getPluginId();
         resolvedPlugins.put(pluginId, pluginInsideInfo);
         startedPlugins.remove(pluginId);
     }
@@ -541,6 +555,9 @@ public class DefaultPluginManager implements PluginManager{
      * @return 排序的插件信息
      */
     protected List<PluginInfo> getSortPlugin(Map<String, PluginInfo> pluginInfos){
+        if(ObjectUtils.isEmpty(pluginInfos)){
+            return Collections.emptyList();
+        }
         if (ObjectUtils.isEmpty(sortedPluginIds)) {
             return new ArrayList<>(pluginInfos.values());
         }
@@ -605,6 +622,29 @@ public class DefaultPluginManager implements PluginManager{
                     .map(p->FilesUtils.resolveRelativePath(absolutePath, p))
                     .collect(Collectors.toList());
         }
+    }
+
+    /**
+     * 没有扫描到插件时的日志打印
+     */
+    private void printOfNotFoundPlugins(){
+        StringBuilder warn = new StringBuilder();
+        warn.append("以下路径未发现插件: \n");
+        if(pluginRootDirs.size() == 1){
+            warn.append(pluginRootDirs.get(0)).append("\n");
+        } else {
+            for (int i = 0; i < pluginRootDirs.size(); i++) {
+                warn.append(i + 1).append(". ").append(pluginRootDirs.get(i)).append("\n");
+            }
+        }
+        warn.append("请检查路径是否合适.\n");
+        warn.append("请检查配置[plugin.runMode]是否合适.\n");
+        if(provider.getRuntimeMode() == RuntimeMode.DEV){
+            warn.append("请检查插件包是否编译.\n");
+        } else {
+            warn.append("请检查插件是否合法.\n");
+        }
+        log.warn(warn.toString());
     }
 
 

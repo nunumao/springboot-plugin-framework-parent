@@ -16,6 +16,8 @@
 
 package com.gitee.starblues.spring;
 
+import com.gitee.starblues.loader.classloader.GenericClassLoader;
+
 import java.util.Map;
 
 /**
@@ -31,5 +33,11 @@ public interface MainApplicationContext extends ApplicationContext {
      * @return 主程序配置的 env 集合
      */
     Map<String, Map<String, Object>> getConfigurableEnvironment();
+
+    /**
+     * 得到主程序的 ClassLoader
+     * @return ClassLoader
+     */
+    ClassLoader getClassLoader();
 
 }

@@ -78,7 +78,7 @@ public class PluginLauncher extends AbstractLauncher<SpringPluginHook> {
     }
 
     protected GenericClassLoader getParentClassLoader() throws Exception {
-        ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
+        ClassLoader contextClassLoader = pluginInteractive.getMainApplicationContext().getClassLoader();
         if(contextClassLoader instanceof GenericClassLoader){
             return (GenericClassLoader) contextClassLoader;
         } else {

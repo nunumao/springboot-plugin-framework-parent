@@ -16,6 +16,7 @@
 
 package com.gitee.starblues.spring;
 
+import com.gitee.starblues.loader.classloader.GenericClassLoader;
 import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.EnumerablePropertySource;
@@ -35,15 +36,18 @@ import java.util.Map;
 public class MainApplicationContextProxy extends ApplicationContextProxy implements MainApplicationContext{
 
     private final GenericApplicationContext applicationContext;
+    private final ClassLoader classLoader;
 
     public MainApplicationContextProxy(GenericApplicationContext applicationContext) {
         super(applicationContext.getBeanFactory());
         this.applicationContext = applicationContext;
+        this.classLoader = Thread.currentThread().getContextClassLoader();
     }
 
     public MainApplicationContextProxy(GenericApplicationContext applicationContext, AutoCloseable autoCloseable) {
         super(applicationContext.getBeanFactory(), autoCloseable);
         this.applicationContext = applicationContext;
+        this.classLoader = Thread.currentThread().getContextClassLoader();
     }
 
     @Override
@@ -66,5 +70,10 @@ public class MainApplicationContextProxy extends ApplicationContextProxy impleme
             }
         }
         return environmentMap;
+    }
+
+    @Override
+    public ClassLoader getClassLoader() {
+        return classLoader;
     }
 }

@@ -27,17 +27,13 @@ public abstract class AbstractLauncher<R> implements Launcher<R> {
     public R run(String... args) throws Exception {
         ClassLoader classLoader = createClassLoader(args);
         Thread thread = Thread.currentThread();
-        ClassLoader oldClassLoader = thread.getContextClassLoader();
-        try {
-            thread.setContextClassLoader(classLoader);
-            return launch(classLoader, args);
-        } finally {
-            thread.setContextClassLoader(oldClassLoader);
-        }
+        thread.setContextClassLoader(classLoader);
+        return launch(classLoader, args);
     }
 
     /**
      * 创建classloader
+     * @param args 参数
      * @return ClassLoader
      * @throws Exception 创建异常
      */

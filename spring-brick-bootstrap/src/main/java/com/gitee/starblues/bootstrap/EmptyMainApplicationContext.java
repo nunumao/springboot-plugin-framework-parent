@@ -18,12 +18,6 @@ package com.gitee.starblues.bootstrap;
 
 import com.gitee.starblues.spring.MainApplicationContext;
 import com.gitee.starblues.spring.SpringBeanFactory;
-import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.NoSuchBeanDefinitionException;
-import org.springframework.beans.factory.ObjectProvider;
-import org.springframework.core.ResolvableType;
-
-import java.lang.annotation.Annotation;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
@@ -51,4 +45,11 @@ public class EmptyMainApplicationContext implements MainApplicationContext {
     public Map<String, Map<String, Object>> getConfigurableEnvironment() {
         return Collections.emptyMap();
     }
+
+    @Override
+    public ClassLoader getClassLoader() {
+        return EmptyMainApplicationContext.class.getClassLoader();
+    }
+
+
 }
