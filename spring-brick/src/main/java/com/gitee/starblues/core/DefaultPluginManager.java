@@ -299,7 +299,7 @@ public class DefaultPluginManager implements PluginManager{
         }
         // 检查插件版本
         PluginDescriptor upgradePluginDescriptor = upgradePlugin.getPluginDescriptor();
-        checkVersion(oldPlugin.getPluginDescriptor().getPluginVersion(), upgradePluginDescriptor.getPluginVersion());
+        checkVersion(oldPlugin.getPluginDescriptor(), upgradePluginDescriptor);
         if(oldPlugin.getPluginState() == PluginState.STARTED){
             // 如果插件被启动, 则卸载旧的插件
             uninstall(pluginId);
@@ -408,6 +408,8 @@ public class DefaultPluginManager implements PluginManager{
         if(resolvedPlugins.containsKey(pluginId)){
             throw new PluginException(pluginInsideInfo.getPluginDescriptor(), "已经被加载");
         }
+        // 检查当前插件版本号是否合法
+        provider.getVersionInspector().check(pluginInsideInfo.getPluginDescriptor().getPluginVersion());
         resolvedPlugins.put(pluginId, pluginInsideInfo);
         LogUtils.info(log, pluginInsideInfo.getPluginDescriptor(), "加载成功");
         return pluginInsideInfo;
@@ -600,14 +602,15 @@ public class DefaultPluginManager implements PluginManager{
 
     /**
      * 检查比较插件版本
-     * @param oldPluginVersion 旧插件版本
-     * @param newPluginVersion 新插件版本
+     * @param oldPlugin 旧插件信息
+     * @param newPlugin 新插件信息
      */
-    protected void checkVersion(String oldPluginVersion, String newPluginVersion){
-        int compareVersion = provider.getVersionInspector().compareTo(oldPluginVersion, newPluginVersion);
-        if(compareVersion <= 0){
-            throw new PluginException("插件包版本[" + newPluginVersion + "]必须大于:"
-                    + oldPluginVersion);
+    protected void checkVersion(PluginDescriptor oldPlugin, PluginDescriptor newPlugin){
+        int compareVersion = provider.getVersionInspector().compareTo(oldPlugin.getPluginVersion(),
+                newPlugin.getPluginVersion());
+        if(compareVersion >= 0){
+            throw new PluginException("新插件包版本[" + MsgUtils.getPluginUnique(newPlugin) + "]必须大于" +
+                    "旧插件版本[" + MsgUtils.getPluginUnique(oldPlugin) + "]");
         }
     }
 
