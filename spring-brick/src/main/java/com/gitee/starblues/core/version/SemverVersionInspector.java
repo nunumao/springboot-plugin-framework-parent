@@ -16,6 +16,9 @@
 
 package com.gitee.starblues.core.version;
 
+import com.gitee.starblues.core.exception.PluginException;
+import com.gitee.starblues.utils.ObjectUtils;
+import com.github.zafarkhaja.semver.UnexpectedCharacterException;
 import com.github.zafarkhaja.semver.Version;
 
 /**
@@ -26,7 +29,25 @@ import com.github.zafarkhaja.semver.Version;
 public class SemverVersionInspector implements VersionInspector{
 
     @Override
+    public void check(String version) throws PluginException {
+        try {
+            Version.valueOf(version);
+        } catch (Throwable e){
+            String message = e.toString();
+            if(ObjectUtils.isEmpty(message)){
+                message = "";
+            } else {
+                message = ": " + message;
+            }
+            throw new PluginException("版本号[" + version + "]非法" + message);
+        }
+    }
+
+    @Override
     public int compareTo(String version1, String version2) {
+        check(version1);
+        check(version2);
+
         Version v1 = Version.valueOf(version1);
         Version v2 = Version.valueOf(version2);
         return v1.compareTo(v2);
