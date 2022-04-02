@@ -183,4 +183,29 @@ public class AutoIntegrationConfiguration extends DefaultIntegrationConfiguratio
         }
     }
 
+    @Override
+    public Set<String> enablePluginIds() {
+        return enablePluginIds;
+    }
+
+    @Override
+    public Set<String> disablePluginIds() {
+        return disablePluginIds;
+    }
+
+    @Override
+    public List<String> sortInitPluginIds() {
+        return sortInitPluginIds;
+    }
+
+    @Override
+    public String version() {
+        return version;
+    }
+
+    @Override
+    public boolean exactVersion() {
+        return exactVersion;
+    }
+
 }
