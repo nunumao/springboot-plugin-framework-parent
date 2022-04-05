@@ -19,9 +19,11 @@ package com.gitee.starblues.core.descriptor;
 
 import com.gitee.starblues.common.ManifestKey;
 import com.gitee.starblues.common.PackageStructure;
+import com.gitee.starblues.core.descriptor.decrypt.PluginDescriptorDecrypt;
 import com.gitee.starblues.utils.PropertiesUtils;
 import com.gitee.starblues.utils.ObjectUtils;
 import org.apache.commons.io.IOUtils;
+import org.springframework.context.ApplicationContext;
 
 import java.io.InputStream;
 import java.nio.file.Path;
@@ -45,7 +47,8 @@ public class ProdPackagePluginDescriptorLoader extends AbstractPluginDescriptorL
 
     private PluginResourcesConfig pluginResourcesConfig;
 
-    public ProdPackagePluginDescriptorLoader() {
+    public ProdPackagePluginDescriptorLoader(PluginDescriptorDecrypt pluginDescriptorDecrypt) {
+        super(pluginDescriptorDecrypt);
     }
 
     @Override
@@ -62,7 +65,7 @@ public class ProdPackagePluginDescriptorLoader extends AbstractPluginDescriptorL
             if(jarEntry == null){
                 return null;
             }
-            Properties properties = super.getProperties(jarFile.getInputStream(jarEntry));
+            Properties properties = super.getDecryptProperties(jarFile.getInputStream(jarEntry));
             if(properties.isEmpty()){
                 return null;
             }

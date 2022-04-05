@@ -16,6 +16,7 @@
 
 package com.gitee.starblues.integration;
 
+import com.gitee.starblues.integration.decrypt.DecryptConfiguration;
 import com.gitee.starblues.utils.Assert;
 
 import java.util.ArrayList;
@@ -88,6 +89,13 @@ public abstract class DefaultIntegrationConfiguration implements IntegrationConf
     @Override
     public boolean exactVersion() {
         return false;
+    }
+
+    @Override
+    public DecryptConfiguration decrypt() {
+        DecryptConfiguration decryptConfiguration = new DecryptConfiguration();
+        decryptConfiguration.setEnable(false);
+        return decryptConfiguration;
     }
 
     /**

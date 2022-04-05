@@ -99,6 +99,38 @@
       "sourceType": "com.gitee.starblues.integration.AutoIntegrationConfiguration",
       "description": "是否完全匹配版本。设置为true表示插件设置的requires的版本号完全匹配version版本号才可允许插件安装, 即: requires=x.y.z; 设置为false表示插件设置的requires的版本号小于等于version值, 插件就可安装, 即requires<=x.y.z",
       "defaultValue": false
+    },
+    {
+      "name": "plugin.decrypt",
+      "type": "com.gitee.starblues.integration.decrypt.DecryptConfiguration",
+      "sourceType": "com.gitee.starblues.integration.AutoIntegrationConfiguration",
+      "description": "对插件启动时进行解密校验配置。默认为不启用"
+    },
+    {
+      "name": "plugin.decrypt.enable",
+      "type": "java.lang.Boolean",
+      "sourceType": "com.gitee.starblues.integration.decrypt.DecryptConfiguration",
+      "description": "解密校验配置是否启用。默认为启用",
+      "defaultValue": true
+    },
+    {
+      "name": "plugin.decrypt.className",
+      "type": "java.lang.String",
+      "sourceType": "com.gitee.starblues.integration.decrypt.DecryptConfiguration",
+      "description": "解密实现类名称。默认: com.gitee.starblues.common.cipher.RsaPluginCipher",
+      "defaultValue": "com.gitee.starblues.common.cipher.RsaPluginCipher"
+    },
+    {
+      "name": "plugin.decrypt.props",
+      "type": "java.lang.Map",
+      "sourceType": "com.gitee.starblues.integration.decrypt.DecryptConfiguration",
+      "description": "总配置"
+    },
+    {
+      "name": "plugin.decrypt.plugins",
+      "type": "java.lang.List",
+      "sourceType": "com.gitee.starblues.integration.decrypt.DecryptConfiguration",
+      "description": "指定可生效的插件. 如果不配置, 则默认对全部插件生效"
     }
   ]
 }

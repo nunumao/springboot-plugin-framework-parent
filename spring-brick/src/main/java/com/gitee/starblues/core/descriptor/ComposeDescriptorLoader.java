@@ -17,7 +17,11 @@
 package com.gitee.starblues.core.descriptor;
 
 import com.gitee.starblues.core.checker.PluginBasicChecker;
+import com.gitee.starblues.core.descriptor.decrypt.EmptyPluginDescriptorDecrypt;
+import com.gitee.starblues.core.descriptor.decrypt.PluginDescriptorDecrypt;
 import com.gitee.starblues.core.exception.PluginException;
+import com.gitee.starblues.utils.SpringBeanUtils;
+import org.springframework.context.ApplicationContext;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -31,19 +35,32 @@ import java.util.List;
 public class ComposeDescriptorLoader implements PluginDescriptorLoader{
     
     private final List<PluginDescriptorLoader> pluginDescriptorLoaders = new ArrayList<>();
-    
+
+    private final ApplicationContext applicationContext;
     private final PluginBasicChecker pluginChecker;
 
-    public ComposeDescriptorLoader(PluginBasicChecker pluginChecker) {
+
+    public ComposeDescriptorLoader(ApplicationContext applicationContext, PluginBasicChecker pluginChecker) {
+        this.applicationContext = applicationContext;
         this.pluginChecker = pluginChecker;
         addDefaultLoader();
     }
 
     protected void addDefaultLoader(){
-        addLoader(new DevPluginDescriptorLoader());
-        addLoader(new ProdPluginDescriptorLoader());
+        PluginDescriptorDecrypt pluginDescriptorDecrypt = getPluginDescriptorDecrypt(applicationContext);
+        addLoader(new DevPluginDescriptorLoader(pluginDescriptorDecrypt));
+        addLoader(new ProdPluginDescriptorLoader(pluginDescriptorDecrypt));
     }
 
+    protected PluginDescriptorDecrypt getPluginDescriptorDecrypt(ApplicationContext applicationContext){
+        PluginDescriptorDecrypt pluginDescriptorDecrypt =
+                SpringBeanUtils.getExistBean(applicationContext, PluginDescriptorDecrypt.class);
+        if(pluginDescriptorDecrypt != null){
+            return pluginDescriptorDecrypt;
+        } else {
+            return new EmptyPluginDescriptorDecrypt();
+        }
+    }
 
     public void addLoader(PluginDescriptorLoader descriptorLoader){
         if(descriptorLoader != null){

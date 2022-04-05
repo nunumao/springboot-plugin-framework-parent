@@ -133,6 +133,14 @@
                     <editable>true</editable>
                     <description>加载到主程序的依赖</description>
                 </parameter>
+                <parameter>
+                    <name>encryptConfig</name>
+                    <type>com.gitee.starblues.plugin.pack.encrypt.EncryptConfig</type>
+                    <since>3.0.1</since>
+                    <required>false</required>
+                    <editable>true</editable>
+                    <description>加密配置</description>
+                </parameter>
             </parameters>
             <configuration>
                 <project implementation="org.apache.maven.project.MavenProject" default-value="${project}"/>

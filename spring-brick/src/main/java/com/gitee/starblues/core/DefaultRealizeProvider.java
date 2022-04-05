@@ -63,7 +63,7 @@ public class DefaultRealizeProvider implements RealizeProvider {
         }
         setPluginScanner(basePluginScanner);
         setPluginBasicChecker(new ComposePluginBasicChecker(applicationContext));
-        setPluginDescriptorLoader(new ComposeDescriptorLoader(pluginBasicChecker));
+        setPluginDescriptorLoader(new ComposeDescriptorLoader(applicationContext, pluginBasicChecker));
         setVersionInspector(new SemverVersionInspector());
     }
 
