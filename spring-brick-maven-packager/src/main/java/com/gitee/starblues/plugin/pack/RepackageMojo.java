@@ -19,6 +19,9 @@ package com.gitee.starblues.plugin.pack;
 import com.gitee.starblues.common.Constants;
 import com.gitee.starblues.plugin.pack.dev.DevConfig;
 import com.gitee.starblues.plugin.pack.dev.DevRepackager;
+import com.gitee.starblues.plugin.pack.encrypt.EncryptConfig;
+import com.gitee.starblues.plugin.pack.encrypt.RsaConfig;
+import com.gitee.starblues.plugin.pack.encrypt.RsaEncryptPlugin;
 import com.gitee.starblues.plugin.pack.main.MainConfig;
 import com.gitee.starblues.plugin.pack.main.MainRepackager;
 import com.gitee.starblues.plugin.pack.prod.ProdConfig;
@@ -61,12 +64,20 @@ public class RepackageMojo extends AbstractPackagerMojo {
     @Parameter(property = "spring-brick-packager.mainLoad")
     private LoadToMain loadToMain;
 
+    @Parameter(property = "spring-brick-packager.encryptConfig")
+    private EncryptConfig encryptConfig;
+
     private final Set<String> loadToMainSet = new HashSet<>();
 
     @Override
     protected void pack() throws MojoExecutionException, MojoFailureException {
         initLoadToMainSet();
         String mode = getMode();
+        try {
+            encrypt();
+        } catch (Exception e) {
+            throw new MojoExecutionException("encrypt failed: " + e.getMessage());
+        }
         if(Constant.MODE_PROD.equalsIgnoreCase(mode)){
             new ProdRepackager(this).repackage();
         } else if(Constant.MODE_DEV.equalsIgnoreCase(mode)){
@@ -99,6 +110,26 @@ public class RepackageMojo extends AbstractPackagerMojo {
         }
         for (Dependency dependency : dependencies) {
             loadToMainSet.add(dependency.getGroupId() + dependency.getArtifactId());
+        }
+    }
+
+    /**
+     * 加密
+     * @throws Exception 加密异常
+     */
+    private void encrypt() throws Exception {
+        if(encryptConfig == null){
+            return;
+        }
+        RsaConfig rsa = encryptConfig.getRsa();
+        if(rsa != null){
+            String publicKey = rsa.getPublicKey();
+            if(ObjectUtils.isEmpty(publicKey)){
+                throw new MojoExecutionException("encryptConfig.rsa.publicKey can't be empty");
+            }
+            RsaEncryptPlugin rsaEncryptPlugin = new RsaEncryptPlugin(publicKey);
+            PluginInfo encryptPluginInfo = rsaEncryptPlugin.encrypt(getPluginInfo());
+            setPluginInfo(encryptPluginInfo);
         }
     }
 
