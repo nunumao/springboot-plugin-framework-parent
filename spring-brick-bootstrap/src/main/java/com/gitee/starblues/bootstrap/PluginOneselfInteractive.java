@@ -20,6 +20,7 @@ import com.gitee.starblues.common.PackageStructure;
 import com.gitee.starblues.core.descriptor.DevPluginDescriptorLoader;
 import com.gitee.starblues.core.descriptor.InsidePluginDescriptor;
 import com.gitee.starblues.core.descriptor.PluginDescriptorLoader;
+import com.gitee.starblues.core.descriptor.decrypt.EmptyPluginDescriptorDecrypt;
 import com.gitee.starblues.core.launcher.plugin.PluginInteractive;
 import com.gitee.starblues.integration.AutoIntegrationConfiguration;
 import com.gitee.starblues.integration.IntegrationConfiguration;
@@ -80,7 +81,8 @@ public class PluginOneselfInteractive implements PluginInteractive {
     }
 
     private InsidePluginDescriptor createPluginDescriptor(){
-        try (PluginDescriptorLoader pluginDescriptorLoader = new DevPluginDescriptorLoader()){
+        EmptyPluginDescriptorDecrypt descriptorDecrypt = new EmptyPluginDescriptorDecrypt();
+        try (PluginDescriptorLoader pluginDescriptorLoader = new DevPluginDescriptorLoader(descriptorDecrypt)){
             Path classesPath = Paths.get(this.getClass().getResource("/").toURI()).getParent();
             String metaInf = FilesUtils.joiningFilePath(classesPath.toString(), PackageStructure.META_INF_NAME);
             InsidePluginDescriptor pluginDescriptor = pluginDescriptorLoader.load(Paths.get(metaInf));

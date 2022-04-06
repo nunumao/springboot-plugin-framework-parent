@@ -18,7 +18,9 @@ package com.gitee.starblues.bootstrap.realize;
 
 import com.gitee.starblues.loader.utils.ObjectUtils;
 import com.gitee.starblues.spring.MainApplicationContext;
+import com.gitee.starblues.utils.MapValueGetter;
 
+import java.util.Collections;
 import java.util.Map;
 import java.util.function.Function;
 
@@ -54,57 +56,32 @@ public class DefaultMainEnvironmentProvider implements MainEnvironmentProvider{
 
     @Override
     public String getString(String name) {
-        return getValue(name, String::valueOf);
+        return getMapValueGetter(name).getString(name);
     }
 
     @Override
     public Integer getInteger(String name) {
-        return getValue(name, value -> {
-            if(value instanceof Integer){
-                return (Integer) value;
-            }
-            return Integer.parseInt(String.valueOf(value));
-        });
+        return getMapValueGetter(name).getInteger(name);
     }
 
     @Override
     public Long getLong(String name) {
-       return getValue(name, value -> {
-            if(value instanceof Long){
-                return (Long) value;
-            }
-            return Long.parseLong(String.valueOf(value));
-       });
+        return getMapValueGetter(name).getLong(name);
     }
 
     @Override
     public Double getDouble(String name) {
-        return getValue(name, value -> {
-            if(value instanceof Double){
-                return (Double) value;
-            }
-            return Double.parseDouble(String.valueOf(value));
-        });
+        return getMapValueGetter(name).getDouble(name);
     }
 
     @Override
     public Float getFloat(String name) {
-        return getValue(name, value -> {
-            if(value instanceof Float){
-                return (Float) value;
-            }
-            return Float.parseFloat(String.valueOf(value));
-        });
+        return getMapValueGetter(name).getFloat(name);
     }
 
     @Override
     public Boolean getBoolean(String name) {
-        return getValue(name, value -> {
-            if(value instanceof Boolean){
-                return (Boolean) value;
-            }
-            return Boolean.parseBoolean(String.valueOf(value));
-        });
+        return getMapValueGetter(name).getBoolean(name);
     }
 
     @Override
@@ -112,12 +89,19 @@ public class DefaultMainEnvironmentProvider implements MainEnvironmentProvider{
         return mainApplicationContext.getConfigurableEnvironment();
     }
 
-    private <T> T getValue(String name, Function<Object, T> function){
-        Object value = getValue(name);
-        if(value == null){
-            return null;
+    private MapValueGetter getMapValueGetter(String name) {
+        Map<String, Map<String, Object>> configurableEnvironment = mainApplicationContext.getConfigurableEnvironment();
+        if(ObjectUtils.isEmpty(configurableEnvironment)){
+            return new MapValueGetter(Collections.emptyMap());
         }
-        return function.apply(value);
+        for (Map.Entry<String, Map<String, Object>> entry : configurableEnvironment.entrySet()) {
+            Map<String, Object> value = entry.getValue();
+            if(value.containsKey(name)){
+                return new MapValueGetter(value);
+            }
+        }
+        return new MapValueGetter(Collections.emptyMap());
     }
+
 
 }
