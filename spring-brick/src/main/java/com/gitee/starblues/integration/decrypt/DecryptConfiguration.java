@@ -16,6 +16,7 @@
 
 package com.gitee.starblues.integration.decrypt;
 
+import com.gitee.starblues.common.cipher.AesPluginCipher;
 import com.gitee.starblues.common.cipher.RsaPluginCipher;
 import lombok.Data;
 
@@ -40,9 +41,12 @@ public class DecryptConfiguration {
     /**
      * 加解密实现类名称.
      * 通过类加载器加载, 然后从Spring容器中获取, 获取不到, 对其直接实例化
-     * 默认: {@link RsaPluginCipher}
+     * 默认: {@link AesPluginCipher}
+     * 可选:
+     * @see com.gitee.starblues.common.cipher.AesPluginCipher
+     * @see com.gitee.starblues.common.cipher.RsaPluginCipher
      */
-    private String className = RsaPluginCipher.class.getName();
+    private String className = AesPluginCipher.class.getName();
 
     /**
      * 总配置

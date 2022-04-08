@@ -19,6 +19,8 @@ package com.gitee.starblues.plugin.pack.encrypt;
 import com.gitee.starblues.common.cipher.AbstractPluginCipher;
 import com.gitee.starblues.common.cipher.RsaPluginCipher;
 import com.gitee.starblues.plugin.pack.PluginInfo;
+import com.gitee.starblues.utils.ObjectUtils;
+import org.apache.maven.plugin.MojoExecutionException;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -31,20 +33,24 @@ import java.util.Map;
  */
 public class RsaEncryptPlugin implements EncryptPlugin{
 
-    private final AbstractPluginCipher pluginCipher;
+    @Override
+    public PluginInfo encrypt(EncryptConfig encryptConfig, PluginInfo pluginInfo) throws Exception {
+        RsaConfig rsaConfig = encryptConfig.getRsa();
+        if(rsaConfig == null){
+            return null;
+        }
 
-    public RsaEncryptPlugin(String publicKey) {
-        this.pluginCipher = new RsaPluginCipher();
+        String publicKey = rsaConfig.getPublicKey();
+        if(ObjectUtils.isEmpty(publicKey)){
+            throw new MojoExecutionException("encryptConfig.rsa.publicKey can't be empty");
+        }
+        AbstractPluginCipher pluginCipher = new RsaPluginCipher();
         Map<String, Object> params = new HashMap<>();
         params.put(RsaPluginCipher.PUBLIC_KEY, publicKey);
-        this.pluginCipher.initParams(params);
-    }
+        pluginCipher.initParams(params);
 
-    @Override
-    public PluginInfo encrypt(PluginInfo pluginInfo) throws Exception {
         String bootstrapClass = pluginInfo.getBootstrapClass();
-        String encrypt = pluginCipher.encrypt(bootstrapClass);
-        pluginInfo.setBootstrapClass(encrypt);
+        pluginInfo.setBootstrapClass(pluginCipher.encrypt(bootstrapClass));
         return pluginInfo;
     }
 }

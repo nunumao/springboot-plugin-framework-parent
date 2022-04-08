@@ -18,22 +18,32 @@ package com.gitee.starblues.plugin.pack.encrypt;
 
 import com.gitee.starblues.plugin.pack.PluginInfo;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
- * 加密插件
+ * 加密插件工厂
  *
  * @author starBlues
  * @version 3.0.1
  */
-public interface EncryptPlugin {
+public class EncryptPluginFactory implements EncryptPlugin {
 
+    private final List<EncryptPlugin> encryptPlugins = new ArrayList<>();
 
-    /**
-     * 加密
-     * @param pluginInfo 当前插件信息
-     * @param encryptConfig 加密配置
-     * @return 加密后得字符
-     * @throws Exception 加密异常
-     */
-    PluginInfo encrypt(EncryptConfig encryptConfig, PluginInfo pluginInfo) throws Exception;
+    public EncryptPluginFactory(){
+        encryptPlugins.add(new AesEncryptPlugin());
+        encryptPlugins.add(new RsaEncryptPlugin());
+    }
 
+    @Override
+    public PluginInfo encrypt(EncryptConfig encryptConfig, PluginInfo pluginInfo) throws Exception{
+        for (EncryptPlugin encryptPlugin : encryptPlugins) {
+            PluginInfo encrypt = encryptPlugin.encrypt(encryptConfig, pluginInfo);
+            if(encrypt != null){
+                return encrypt;
+            }
+        }
+        return pluginInfo;
+    }
 }
