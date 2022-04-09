@@ -313,7 +313,8 @@ public class DefaultPluginManager implements PluginManager{
             log.info("更新插件[{}]成功", MsgUtils.getPluginUnique(upgradePluginDescriptor));
             return upgradePlugin;
         } catch (Exception e){
-            throw PluginException.getPluginException(e, ()-> new PluginException(upgradePluginDescriptor, "更新失败", e));
+            throw PluginException.getPluginException(e, ()->
+                    new PluginException(upgradePluginDescriptor, "更新失败", e));
         }
     }
 

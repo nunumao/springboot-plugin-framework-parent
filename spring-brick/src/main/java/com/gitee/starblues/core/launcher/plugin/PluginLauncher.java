@@ -23,8 +23,8 @@ import com.gitee.starblues.loader.classloader.GenericClassLoader;
 import com.gitee.starblues.loader.classloader.resource.loader.DefaultResourceLoaderFactory;
 import com.gitee.starblues.loader.classloader.resource.loader.ResourceLoaderFactory;
 import com.gitee.starblues.loader.launcher.AbstractLauncher;
-import com.gitee.starblues.loader.launcher.ResourceLoaderFactoryGetter;
 import com.gitee.starblues.spring.SpringPluginHook;
+import com.gitee.starblues.utils.MsgUtils;
 
 import java.util.Map;
 import java.util.WeakHashMap;
@@ -61,7 +61,8 @@ public class PluginLauncher extends AbstractLauncher<SpringPluginHook> {
 
     protected synchronized PluginClassLoader getPluginClassLoader() throws Exception {
         String pluginId = pluginDescriptor.getPluginId();
-        PluginClassLoader classLoader = CLASS_LOADER_CACHE.get(pluginId);
+        String key = MsgUtils.getPluginUnique(pluginDescriptor);
+        PluginClassLoader classLoader = CLASS_LOADER_CACHE.get(key);
         if(classLoader != null){
             return classLoader;
         }
@@ -69,7 +70,7 @@ public class PluginLauncher extends AbstractLauncher<SpringPluginHook> {
                 pluginId, getParentClassLoader(), mainResourcePatternDefiner,
                 getResourceLoaderFactory()
         );
-        CLASS_LOADER_CACHE.put(pluginId, pluginClassLoader);
+        CLASS_LOADER_CACHE.put(key, pluginClassLoader);
         return pluginClassLoader;
     }
 

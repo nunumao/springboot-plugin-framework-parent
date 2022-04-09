@@ -19,15 +19,14 @@ package com.gitee.starblues.plugin.pack.encrypt;
 import lombok.Data;
 
 /**
- * 加密配置
+ * aes 加密配置
  *
  * @author starBlues
  * @version 3.0.1
  */
 @Data
-public class EncryptConfig {
+public class AesConfig {
 
-    private RsaConfig rsa;
-    private AesConfig aes;
+    private String secretKey;
 
 }
