@@ -28,7 +28,6 @@ import java.security.interfaces.RSAPublicKey;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.Base64;
-import java.util.Map;
 
 /**
  * 非对称插件加解密
@@ -52,7 +51,6 @@ public class RsaPluginCipher extends AbstractPluginCipher{
         RSAPublicKey pubKey = (RSAPublicKey) KeyFactory
                 .getInstance("RSA")
                 .generatePublic(new X509EncodedKeySpec(decoded));
-        //RSA加密
         Cipher cipher = Cipher.getInstance("RSA");
         cipher.init(Cipher.ENCRYPT_MODE, pubKey);
         return Base64.getEncoder().encodeToString(cipher.doFinal(sourceStr.getBytes(StandardCharsets.UTF_8)));
@@ -62,12 +60,9 @@ public class RsaPluginCipher extends AbstractPluginCipher{
     protected String decryptImpl(String cryptoStr) throws Exception {
         String privateKey = super.parameters.getString(PRIVATE_KEY);
         Assert.isNotEmpty(privateKey, PRIVATE_KEY + " 不能为空");
-        //64位解码加密后的字符串
         byte[] inputByte = Base64.getDecoder().decode(cryptoStr.getBytes(StandardCharsets.UTF_8));
-        //base64编码的私钥
         byte[] decoded = Base64.getDecoder().decode(privateKey);
         RSAPrivateKey priKey = (RSAPrivateKey) KeyFactory.getInstance("RSA").generatePrivate(new PKCS8EncodedKeySpec(decoded));
-        //RSA解密
         Cipher cipher = Cipher.getInstance("RSA");
         cipher.init(Cipher.DECRYPT_MODE, priKey);
         return new String(cipher.doFinal(inputByte));

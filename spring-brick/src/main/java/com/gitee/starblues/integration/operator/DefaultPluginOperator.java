@@ -302,6 +302,8 @@ public class DefaultPluginOperator implements PluginOperator {
                 }
                 // 然后进入更新模式
                 pluginInfo = pluginManager.upgrade(tempFilePath, isUnpackPluginFile);
+                // 删除旧插件包
+                FileUtils.delete(oldPluginPath.toFile());
             } else {
                 // 不存在则进入安装插件模式
                 pluginInfo = pluginManager.install(tempFilePath, isUnpackPluginFile);

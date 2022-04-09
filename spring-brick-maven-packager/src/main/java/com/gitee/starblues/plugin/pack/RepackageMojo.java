@@ -19,9 +19,7 @@ package com.gitee.starblues.plugin.pack;
 import com.gitee.starblues.common.Constants;
 import com.gitee.starblues.plugin.pack.dev.DevConfig;
 import com.gitee.starblues.plugin.pack.dev.DevRepackager;
-import com.gitee.starblues.plugin.pack.encrypt.EncryptConfig;
-import com.gitee.starblues.plugin.pack.encrypt.RsaConfig;
-import com.gitee.starblues.plugin.pack.encrypt.RsaEncryptPlugin;
+import com.gitee.starblues.plugin.pack.encrypt.*;
 import com.gitee.starblues.plugin.pack.main.MainConfig;
 import com.gitee.starblues.plugin.pack.main.MainRepackager;
 import com.gitee.starblues.plugin.pack.prod.ProdConfig;
@@ -36,6 +34,7 @@ import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.annotations.ResolutionScope;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -121,15 +120,10 @@ public class RepackageMojo extends AbstractPackagerMojo {
         if(encryptConfig == null){
             return;
         }
-        RsaConfig rsa = encryptConfig.getRsa();
-        if(rsa != null){
-            String publicKey = rsa.getPublicKey();
-            if(ObjectUtils.isEmpty(publicKey)){
-                throw new MojoExecutionException("encryptConfig.rsa.publicKey can't be empty");
-            }
-            RsaEncryptPlugin rsaEncryptPlugin = new RsaEncryptPlugin(publicKey);
-            PluginInfo encryptPluginInfo = rsaEncryptPlugin.encrypt(getPluginInfo());
-            setPluginInfo(encryptPluginInfo);
+        EncryptPlugin encryptPlugin = new EncryptPluginFactory();
+        PluginInfo pluginInfo = encryptPlugin.encrypt(encryptConfig, getPluginInfo());
+        if(pluginInfo != null){
+            setPluginInfo(pluginInfo);
         }
     }
 
