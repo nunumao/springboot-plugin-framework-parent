@@ -32,7 +32,7 @@ import java.util.WeakHashMap;
 /**
  * 插件启动引导类
  * @author starBlues
- * @version 3.0.0
+ * @version 3.0.1
  */
 public class PluginLauncher extends AbstractLauncher<SpringPluginHook> {
 

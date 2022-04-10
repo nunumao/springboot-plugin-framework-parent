@@ -16,7 +16,6 @@
 
 package com.gitee.starblues.spring;
 
-import com.gitee.starblues.loader.classloader.GenericClassLoader;
 import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.EnumerablePropertySource;
@@ -24,14 +23,13 @@ import org.springframework.core.env.MutablePropertySources;
 import org.springframework.core.env.PropertySource;
 
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
  * 主程序 ApplicationContext 的实现
  * @author starBlues
- * @version 3.0.0
+ * @version 3.0.1
  */
 public class MainApplicationContextProxy extends ApplicationContextProxy implements MainApplicationContext{
 

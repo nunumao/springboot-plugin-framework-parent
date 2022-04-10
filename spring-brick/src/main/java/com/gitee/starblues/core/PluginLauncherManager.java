@@ -43,7 +43,7 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * 可引导启动的插件管理者
  * @author starBlues
- * @version 3.0.0
+ * @version 3.0.1
  */
 public class PluginLauncherManager extends DefaultPluginManager{
 

@@ -16,14 +16,12 @@
 
 package com.gitee.starblues.spring;
 
-import com.gitee.starblues.loader.classloader.GenericClassLoader;
-
 import java.util.Map;
 
 /**
  * 主程序 ApplicationContext 接口
  * @author starBlues
- * @version 3.0.0
+ * @version 3.0.1
  */
 public interface MainApplicationContext extends ApplicationContext {
 

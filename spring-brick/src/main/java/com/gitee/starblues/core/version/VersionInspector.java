@@ -21,7 +21,7 @@ import com.gitee.starblues.core.exception.PluginException;
 /**
  * 版本检查
  * @author starBlues
- * @version 3.0.0
+ * @version 3.0.1
  */
 public interface VersionInspector {
 

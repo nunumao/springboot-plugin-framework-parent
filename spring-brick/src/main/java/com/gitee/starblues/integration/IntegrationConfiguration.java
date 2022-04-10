@@ -29,7 +29,7 @@ import java.util.Set;
 /**
  * 插件集成时的配置接口。插件集成的配置接口
  * @author starBlues
- * @version 3.0.0
+ * @version 3.0.1
  */
 public interface IntegrationConfiguration {
 

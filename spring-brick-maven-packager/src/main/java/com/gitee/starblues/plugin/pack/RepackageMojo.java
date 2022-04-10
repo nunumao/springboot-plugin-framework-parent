@@ -42,7 +42,7 @@ import java.util.Set;
 /**
  * 重新打包 mojo
  * @author starBlues
- * @version 3.0.0
+ * @version 3.0.1
  */
 @Mojo(name = "repackage", defaultPhase = LifecyclePhase.PACKAGE, requiresProject = true, threadSafe = true,
         requiresDependencyResolution = ResolutionScope.COMPILE_PLUS_RUNTIME,

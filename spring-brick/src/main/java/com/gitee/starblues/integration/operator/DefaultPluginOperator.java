@@ -53,7 +53,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 /**
  * 默认的插件操作者
  * @author starBlues
- * @version 3.0.0
+ * @version 3.0.1
  */
 public class DefaultPluginOperator implements PluginOperator {
     protected final Logger log = LoggerFactory.getLogger(this.getClass());
