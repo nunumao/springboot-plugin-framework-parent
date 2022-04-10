@@ -19,8 +19,8 @@ package com.gitee.starblues.integration;
 
 import com.gitee.starblues.common.Constants;
 import com.gitee.starblues.core.RuntimeMode;
+import com.gitee.starblues.integration.decrypt.DecryptConfiguration;
 import com.gitee.starblues.utils.ObjectUtils;
-import org.springframework.http.CacheControl;
 
 import java.util.List;
 import java.util.Set;
@@ -29,7 +29,7 @@ import java.util.Set;
 /**
  * 插件集成时的配置接口。插件集成的配置接口
  * @author starBlues
- * @version 3.0.0
+ * @version 3.0.1
  */
 public interface IntegrationConfiguration {
 
@@ -117,6 +117,12 @@ public interface IntegrationConfiguration {
      * @return true or false
      */
     boolean exactVersion();
+
+    /**
+     * 解密配置
+     * @return DecryptConfiguration
+     */
+    DecryptConfiguration decrypt();
 
 
     /**

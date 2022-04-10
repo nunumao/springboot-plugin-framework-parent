@@ -17,13 +17,17 @@
 package com.gitee.starblues.core.descriptor;
 
 
-import com.gitee.starblues.common.*;
+import com.gitee.starblues.common.AbstractDependencyPlugin;
+import com.gitee.starblues.common.Constants;
+import com.gitee.starblues.common.DependencyPlugin;
+import com.gitee.starblues.core.descriptor.decrypt.PluginDescriptorDecrypt;
+import com.gitee.starblues.core.exception.PluginDecryptException;
 import com.gitee.starblues.core.exception.PluginException;
 import com.gitee.starblues.utils.FilesUtils;
-import com.gitee.starblues.utils.PropertiesUtils;
 import com.gitee.starblues.utils.ObjectUtils;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,34 +39,42 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
-import java.util.jar.Attributes;
-import java.util.jar.Manifest;
 
-import static com.gitee.starblues.common.PackageStructure.MANIFEST;
 import static com.gitee.starblues.common.PluginDescriptorKey.*;
 import static com.gitee.starblues.utils.PropertiesUtils.getValue;
 
 /**
  * 抽象的 PluginDescriptorLoader
  * @author starBlues
- * @version 3.0.0
+ * @version 3.0.1
  */
+@Slf4j
 public abstract class AbstractPluginDescriptorLoader implements PluginDescriptorLoader{
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
+    protected final PluginDescriptorDecrypt pluginDescriptorDecrypt;
+
+    protected AbstractPluginDescriptorLoader(PluginDescriptorDecrypt pluginDescriptorDecrypt) {
+        this.pluginDescriptorDecrypt = pluginDescriptorDecrypt;
+    }
 
     @Override
     public InsidePluginDescriptor load(Path location) throws PluginException {
         PluginMeta pluginMeta = null;
         try {
             pluginMeta = getPluginMetaInfo(location);
-            if(pluginMeta == null || pluginMeta.getPluginMetaInfo() == null){
+            if(pluginMeta == null || pluginMeta.getProperties() == null){
                 logger.debug("路径[{}]没有发现插件配置信息", location);
                 return null;
             }
             return create(pluginMeta, location);
         } catch (Exception e) {
+            if(e instanceof PluginDecryptException){
+                logger.error(e.getMessage(), e);
+            } else {
+                logger.debug(e.getMessage(), e);
+            }
             return null;
         }
     }
@@ -81,7 +93,7 @@ public abstract class AbstractPluginDescriptorLoader implements PluginDescriptor
     protected abstract PluginMeta getPluginMetaInfo(Path location) throws Exception;
 
     protected DefaultInsidePluginDescriptor create(PluginMeta pluginMeta, Path path) throws Exception{
-        Properties properties = pluginMeta.getPluginMetaInfo();
+        Properties properties = pluginMeta.getProperties();
         DefaultInsidePluginDescriptor descriptor = new DefaultInsidePluginDescriptor(
                 getValue(properties, PLUGIN_ID),
                 getValue(properties, PLUGIN_VERSION),
@@ -161,29 +173,20 @@ public abstract class AbstractPluginDescriptorLoader implements PluginDescriptor
         return pluginLibInfos;
     }
 
-    protected Manifest getManifest(InputStream inputStream) throws Exception{
-        Manifest manifest = new Manifest();
-        try {
-            manifest.read(inputStream);
-            return manifest;
-        } finally {
-            inputStream.close();
-        }
-    }
-
-    protected Properties getProperties(InputStream inputStream) throws Exception{
+    protected Properties getDecryptProperties(InputStream inputStream) throws Exception{
         Properties properties = new Properties();
         try (InputStreamReader reader = new InputStreamReader(inputStream, StandardCharsets.UTF_8);){
             properties.load(reader);
-            return properties;
         }
+        String pluginId = getValue(properties, PLUGIN_ID);
+        return pluginDescriptorDecrypt.decrypt(pluginId, properties);
     }
 
     @AllArgsConstructor
     @Getter
     public static class PluginMeta{
         private final String packageType;
-        private final Properties pluginMetaInfo;
+        private final Properties properties;
     }
 
 }

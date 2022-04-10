@@ -17,6 +17,7 @@
 package com.gitee.starblues.integration;
 
 import com.gitee.starblues.core.RuntimeMode;
+import com.gitee.starblues.integration.decrypt.DecryptConfiguration;
 import com.gitee.starblues.utils.ResourceUtils;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -31,7 +32,7 @@ import java.util.Set;
 /**
  * 自动集成的配置
  * @author starBlues
- * @version 3.0.0
+ * @version 3.0.1
  */
 @EqualsAndHashCode(callSuper = true)
 @Component
@@ -126,6 +127,11 @@ public class AutoIntegrationConfiguration extends DefaultIntegrationConfiguratio
     @Value("${exactVersion:false}")
     private Boolean exactVersion;
 
+    /**
+     * 对插件启动时进行解密校验配置。默认为不启用
+     */
+    private DecryptConfiguration decrypt;
+
     @Override
     public boolean enable() {
         if(enable == null){
@@ -183,4 +189,36 @@ public class AutoIntegrationConfiguration extends DefaultIntegrationConfiguratio
         }
     }
 
+    @Override
+    public Set<String> enablePluginIds() {
+        return enablePluginIds;
+    }
+
+    @Override
+    public Set<String> disablePluginIds() {
+        return disablePluginIds;
+    }
+
+    @Override
+    public List<String> sortInitPluginIds() {
+        return sortInitPluginIds;
+    }
+
+    @Override
+    public String version() {
+        return version;
+    }
+
+    @Override
+    public boolean exactVersion() {
+        return exactVersion;
+    }
+
+    @Override
+    public DecryptConfiguration decrypt() {
+        if(decrypt == null){
+            return super.decrypt();
+        }
+        return decrypt;
+    }
 }

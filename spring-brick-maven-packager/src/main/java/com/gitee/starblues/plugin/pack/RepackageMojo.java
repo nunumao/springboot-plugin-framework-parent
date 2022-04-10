@@ -19,6 +19,7 @@ package com.gitee.starblues.plugin.pack;
 import com.gitee.starblues.common.Constants;
 import com.gitee.starblues.plugin.pack.dev.DevConfig;
 import com.gitee.starblues.plugin.pack.dev.DevRepackager;
+import com.gitee.starblues.plugin.pack.encrypt.*;
 import com.gitee.starblues.plugin.pack.main.MainConfig;
 import com.gitee.starblues.plugin.pack.main.MainRepackager;
 import com.gitee.starblues.plugin.pack.prod.ProdConfig;
@@ -33,6 +34,7 @@ import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.annotations.ResolutionScope;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -40,7 +42,7 @@ import java.util.Set;
 /**
  * 重新打包 mojo
  * @author starBlues
- * @version 3.0.0
+ * @version 3.0.1
  */
 @Mojo(name = "repackage", defaultPhase = LifecyclePhase.PACKAGE, requiresProject = true, threadSafe = true,
         requiresDependencyResolution = ResolutionScope.COMPILE_PLUS_RUNTIME,
@@ -61,12 +63,20 @@ public class RepackageMojo extends AbstractPackagerMojo {
     @Parameter(property = "spring-brick-packager.mainLoad")
     private LoadToMain loadToMain;
 
+    @Parameter(property = "spring-brick-packager.encryptConfig")
+    private EncryptConfig encryptConfig;
+
     private final Set<String> loadToMainSet = new HashSet<>();
 
     @Override
     protected void pack() throws MojoExecutionException, MojoFailureException {
         initLoadToMainSet();
         String mode = getMode();
+        try {
+            encrypt();
+        } catch (Exception e) {
+            throw new MojoExecutionException("encrypt failed: " + e.getMessage());
+        }
         if(Constant.MODE_PROD.equalsIgnoreCase(mode)){
             new ProdRepackager(this).repackage();
         } else if(Constant.MODE_DEV.equalsIgnoreCase(mode)){
@@ -99,6 +109,21 @@ public class RepackageMojo extends AbstractPackagerMojo {
         }
         for (Dependency dependency : dependencies) {
             loadToMainSet.add(dependency.getGroupId() + dependency.getArtifactId());
+        }
+    }
+
+    /**
+     * 加密
+     * @throws Exception 加密异常
+     */
+    private void encrypt() throws Exception {
+        if(encryptConfig == null){
+            return;
+        }
+        EncryptPlugin encryptPlugin = new EncryptPluginFactory();
+        PluginInfo pluginInfo = encryptPlugin.encrypt(encryptConfig, getPluginInfo());
+        if(pluginInfo != null){
+            setPluginInfo(pluginInfo);
         }
     }
 

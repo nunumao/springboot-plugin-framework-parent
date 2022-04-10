@@ -16,6 +16,7 @@
 
 package com.gitee.starblues.core.descriptor;
 
+import com.gitee.starblues.core.descriptor.decrypt.PluginDescriptorDecrypt;
 import com.gitee.starblues.core.exception.PluginException;
 import com.gitee.starblues.utils.ResourceUtils;
 import org.slf4j.Logger;
@@ -26,7 +27,7 @@ import java.nio.file.Path;
 /**
  * 生产环境插件描述加载者
  * @author starBlues
- * @version 3.0.0
+ * @version 3.0.1
  */
 public class ProdPluginDescriptorLoader implements PluginDescriptorLoader{
 
@@ -34,14 +35,20 @@ public class ProdPluginDescriptorLoader implements PluginDescriptorLoader{
 
     private PluginDescriptorLoader target;
 
+    private final PluginDescriptorDecrypt pluginDescriptorDecrypt;
+
+    public ProdPluginDescriptorLoader(PluginDescriptorDecrypt pluginDescriptorDecrypt) {
+        this.pluginDescriptorDecrypt = pluginDescriptorDecrypt;
+    }
+
     @Override
     public InsidePluginDescriptor load(Path location) throws PluginException {
         if(ResourceUtils.isJarFile(location)){
-            target = new ProdPackagePluginDescriptorLoader();
+            target = new ProdPackagePluginDescriptorLoader(pluginDescriptorDecrypt);
         } else if(ResourceUtils.isZipFile(location)){
-            target = new ProdPackagePluginDescriptorLoader();
+            target = new ProdPackagePluginDescriptorLoader(pluginDescriptorDecrypt);
         } else if(ResourceUtils.isDirFile(location)){
-            target = new ProdDirPluginDescriptorLoader();
+            target = new ProdDirPluginDescriptorLoader(pluginDescriptorDecrypt);
         } else {
             logger.warn("不能解析文件: {}", location);
             return null;

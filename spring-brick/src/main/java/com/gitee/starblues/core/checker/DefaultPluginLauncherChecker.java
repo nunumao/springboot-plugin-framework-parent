@@ -20,14 +20,18 @@ import com.gitee.starblues.common.Constants;
 import com.gitee.starblues.core.PluginInfo;
 import com.gitee.starblues.core.PluginState;
 import com.gitee.starblues.core.RealizeProvider;
+import com.gitee.starblues.core.descriptor.PluginDescriptor;
 import com.gitee.starblues.core.exception.PluginDisabledException;
 import com.gitee.starblues.core.exception.PluginException;
 import com.gitee.starblues.integration.IntegrationConfiguration;
+import com.gitee.starblues.utils.MsgUtils;
 import com.gitee.starblues.utils.ObjectUtils;
 
 /**
+ * 默认插件启动检查者
+ *
  * @author starBlues
- * @version 3.0.0
+ * @version 3.0.1
  */
 public class DefaultPluginLauncherChecker implements PluginLauncherChecker {
 
@@ -75,12 +79,15 @@ public class DefaultPluginLauncherChecker implements PluginLauncherChecker {
         String requires = pluginInfo.getPluginDescriptor().getRequires();
         boolean exactVersion = configuration.exactVersion();
         int compareVersion = realizeProvider.getVersionInspector().compareTo(requires, version);
+        PluginDescriptor descriptor = pluginInfo.getPluginDescriptor();
         if(exactVersion && compareVersion != 0){
-            String error = "需要安装到[" + requires + "]版本的主程序, 但当前主程序版本为[" + version + "]";
+            String error = "插件[" + MsgUtils.getPluginUnique(descriptor) + "]" +
+                    "只能安装到[" + requires + "]版本的主程序, 但当前主程序版本为[" + version + "]";
             throw new PluginException(pluginInfo.getPluginDescriptor(), error);
         }
         if(compareVersion > 0){
-            String error = "需要安装到小于等于[" + requires + "]版本的主程序, 但当前主程序版本为[" + version + "]";
+            String error = "插件[" + MsgUtils.getPluginUnique(descriptor) + "]" +
+                    "只能安装到小于等于[" + requires + "]版本的主程序, 但当前主程序版本为[" + version + "]";
             throw new PluginException(pluginInfo.getPluginDescriptor(), error);
         }
     }

@@ -17,12 +17,13 @@
 package com.gitee.starblues.core.descriptor;
 
 import com.gitee.starblues.common.ManifestKey;
-import com.gitee.starblues.common.PackageType;
 import com.gitee.starblues.common.PluginDescriptorKey;
+import com.gitee.starblues.core.descriptor.decrypt.PluginDescriptorDecrypt;
 import com.gitee.starblues.utils.PropertiesUtils;
 import com.gitee.starblues.utils.FilesUtils;
 import com.gitee.starblues.utils.ObjectUtils;
 import org.apache.commons.io.FileUtils;
+import org.springframework.context.ApplicationContext;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -43,9 +44,13 @@ import static com.gitee.starblues.common.PackageStructure.*;
  * 生产环境目录式插件 PluginDescriptorLoader 加载者
  * 解析生产的dir
  * @author starBlues
- * @version 3.0.0
+ * @version 3.0.1
  */
 public class ProdDirPluginDescriptorLoader extends AbstractPluginDescriptorLoader{
+
+    public ProdDirPluginDescriptorLoader(PluginDescriptorDecrypt pluginDescriptorDecrypt) {
+        super(pluginDescriptorDecrypt);
+    }
 
     @Override
     protected PluginMeta getPluginMetaInfo(Path location) throws Exception {
@@ -70,7 +75,7 @@ public class ProdDirPluginDescriptorLoader extends AbstractPluginDescriptorLoade
         if(!pluginMetaFile.exists()){
             return null;
         }
-        Properties properties = super.getProperties(new FileInputStream(pluginMetaFile));
+        Properties properties = super.getDecryptProperties(new FileInputStream(pluginMetaFile));
         if(properties.isEmpty()){
             return null;
         }
