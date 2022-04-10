@@ -41,7 +41,7 @@ import static com.gitee.starblues.common.PluginDescriptorKey.PLUGIN_RESOURCES_CO
  * 生产环境打包好的插件 PluginDescriptorLoader 加载者
  * 解析 jar、zip
  * @author starBlues
- * @version 3.0.0
+ * @version 3.0.1
  */
 public class ProdPackagePluginDescriptorLoader extends AbstractPluginDescriptorLoader{
 

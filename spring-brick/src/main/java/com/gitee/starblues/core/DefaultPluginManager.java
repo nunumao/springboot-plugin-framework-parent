@@ -49,7 +49,7 @@ import java.util.stream.Collectors;
 /**
  * 抽象的插件管理者
  * @author starBlues
- * @version 3.0.0
+ * @version 3.0.1
  */
 public class DefaultPluginManager implements PluginManager{
 

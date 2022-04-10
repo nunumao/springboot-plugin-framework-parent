@@ -17,23 +17,19 @@
 package com.gitee.starblues.core.descriptor;
 
 
-import com.gitee.starblues.common.*;
-import com.gitee.starblues.core.descriptor.decrypt.DecryptProperties;
-import com.gitee.starblues.core.descriptor.decrypt.DefaultPluginDescriptorDecrypt;
-import com.gitee.starblues.core.descriptor.decrypt.EmptyPluginDescriptorDecrypt;
+import com.gitee.starblues.common.AbstractDependencyPlugin;
+import com.gitee.starblues.common.Constants;
+import com.gitee.starblues.common.DependencyPlugin;
 import com.gitee.starblues.core.descriptor.decrypt.PluginDescriptorDecrypt;
 import com.gitee.starblues.core.exception.PluginDecryptException;
 import com.gitee.starblues.core.exception.PluginException;
-import com.gitee.starblues.integration.IntegrationConfiguration;
 import com.gitee.starblues.utils.FilesUtils;
 import com.gitee.starblues.utils.ObjectUtils;
-import com.gitee.starblues.utils.SpringBeanUtils;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.ApplicationContext;
 
 import java.io.File;
 import java.io.IOException;

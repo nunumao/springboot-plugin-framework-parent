@@ -34,8 +34,10 @@ import com.gitee.starblues.utils.Assert;
 import org.springframework.context.ApplicationContext;
 
 /**
+ * 默认的RealizeProvider实现
+ *
  * @author starBlues
- * @version 3.0.0
+ * @version 3.0.1
  */
 public class DefaultRealizeProvider implements RealizeProvider {
 
