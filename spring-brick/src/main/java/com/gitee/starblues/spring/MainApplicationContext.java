@@ -21,7 +21,7 @@ import java.util.Map;
 /**
  * 主程序 ApplicationContext 接口
  * @author starBlues
- * @version 3.0.0
+ * @version 3.0.1
  */
 public interface MainApplicationContext extends ApplicationContext {
 
@@ -31,5 +31,11 @@ public interface MainApplicationContext extends ApplicationContext {
      * @return 主程序配置的 env 集合
      */
     Map<String, Map<String, Object>> getConfigurableEnvironment();
+
+    /**
+     * 得到主程序的 ClassLoader
+     * @return ClassLoader
+     */
+    ClassLoader getClassLoader();
 
 }

@@ -18,6 +18,8 @@ package com.gitee.starblues.integration;
 
 import com.gitee.starblues.core.DefaultRealizeProvider;
 import com.gitee.starblues.core.RealizeProvider;;
+import com.gitee.starblues.core.descriptor.decrypt.DefaultPluginDescriptorDecrypt;
+import com.gitee.starblues.core.descriptor.decrypt.PluginDescriptorDecrypt;
 import com.gitee.starblues.core.launcher.plugin.BasicMainResourcePatternDefiner;
 import com.gitee.starblues.integration.operator.DefaultPluginOperator;
 import com.gitee.starblues.integration.operator.PluginOperator;
@@ -32,7 +34,7 @@ import org.springframework.context.support.GenericApplicationContext;
 /**
  * 系统Bean配置
  * @author starBlues
- * @version 3.0.0
+ * @version 3.0.1
  */
 public class ExtendPointConfiguration {
 
@@ -79,6 +81,12 @@ public class ExtendPointConfiguration {
     @ConditionalOnMissingBean
     public BasicMainResourcePatternDefiner mainResourcePatternDefiner(){
         return new BasicMainResourcePatternDefiner(configuration.mainPackage());
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public PluginDescriptorDecrypt pluginDescriptorDecrypt(){
+        return new DefaultPluginDescriptorDecrypt(applicationContext, configuration);
     }
 
 }

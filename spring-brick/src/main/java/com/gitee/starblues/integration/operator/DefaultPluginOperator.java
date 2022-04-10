@@ -53,7 +53,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 /**
  * 默认的插件操作者
  * @author starBlues
- * @version 3.0.0
+ * @version 3.0.1
  */
 public class DefaultPluginOperator implements PluginOperator {
     protected final Logger log = LoggerFactory.getLogger(this.getClass());
@@ -90,12 +90,8 @@ public class DefaultPluginOperator implements PluginOperator {
                return true;
             }
             initBeforeLogPrint();
-            // 触发插件初始化监听器
-            pluginInitializerListenerFactory.before();
             if(!configuration.enable()){
                 log.info("插件功能已被禁用!");
-                // 如果禁用的话, 直接返回
-                pluginInitializerListenerFactory.complete();
                 return false;
             }
             // 开始加载插件
@@ -103,6 +99,8 @@ public class DefaultPluginOperator implements PluginOperator {
             if(ObjectUtils.isEmpty(pluginInfos)){
                 return false;
             }
+            // 触发插件初始化监听器
+            pluginInitializerListenerFactory.before();
             boolean isFoundException = false;
             for (PluginInfo pluginInfo : pluginInfos) {
                 try {
@@ -304,6 +302,8 @@ public class DefaultPluginOperator implements PluginOperator {
                 }
                 // 然后进入更新模式
                 pluginInfo = pluginManager.upgrade(tempFilePath, isUnpackPluginFile);
+                // 删除旧插件包
+                FileUtils.delete(oldPluginPath.toFile());
             } else {
                 // 不存在则进入安装插件模式
                 pluginInfo = pluginManager.install(tempFilePath, isUnpackPluginFile);

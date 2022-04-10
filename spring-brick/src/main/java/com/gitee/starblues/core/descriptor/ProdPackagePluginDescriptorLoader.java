@@ -19,9 +19,11 @@ package com.gitee.starblues.core.descriptor;
 
 import com.gitee.starblues.common.ManifestKey;
 import com.gitee.starblues.common.PackageStructure;
+import com.gitee.starblues.core.descriptor.decrypt.PluginDescriptorDecrypt;
 import com.gitee.starblues.utils.PropertiesUtils;
 import com.gitee.starblues.utils.ObjectUtils;
 import org.apache.commons.io.IOUtils;
+import org.springframework.context.ApplicationContext;
 
 import java.io.InputStream;
 import java.nio.file.Path;
@@ -39,13 +41,14 @@ import static com.gitee.starblues.common.PluginDescriptorKey.PLUGIN_RESOURCES_CO
  * 生产环境打包好的插件 PluginDescriptorLoader 加载者
  * 解析 jar、zip
  * @author starBlues
- * @version 3.0.0
+ * @version 3.0.1
  */
 public class ProdPackagePluginDescriptorLoader extends AbstractPluginDescriptorLoader{
 
     private PluginResourcesConfig pluginResourcesConfig;
 
-    public ProdPackagePluginDescriptorLoader() {
+    public ProdPackagePluginDescriptorLoader(PluginDescriptorDecrypt pluginDescriptorDecrypt) {
+        super(pluginDescriptorDecrypt);
     }
 
     @Override
@@ -62,7 +65,7 @@ public class ProdPackagePluginDescriptorLoader extends AbstractPluginDescriptorL
             if(jarEntry == null){
                 return null;
             }
-            Properties properties = super.getProperties(jarFile.getInputStream(jarEntry));
+            Properties properties = super.getDecryptProperties(jarFile.getInputStream(jarEntry));
             if(properties.isEmpty()){
                 return null;
             }

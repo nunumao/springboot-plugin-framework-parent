@@ -6,7 +6,7 @@
     <name>Spring Boot Plugin Maven Packager</name>
     <groupId>com.gitee.starblues</groupId>
     <artifactId>spring-brick-maven-packager</artifactId>
-    <version>3.0.0</version>
+    <version>3.0.1</version>
     <goalPrefix>spring-brick-packager</goalPrefix>
     <isolatedRealm>false</isolatedRealm>
     <inheritedByDefault>true</inheritedByDefault>
@@ -132,6 +132,14 @@
                     <required>false</required>
                     <editable>true</editable>
                     <description>加载到主程序的依赖</description>
+                </parameter>
+                <parameter>
+                    <name>encryptConfig</name>
+                    <type>com.gitee.starblues.plugin.pack.encrypt.EncryptConfig</type>
+                    <since>3.0.1</since>
+                    <required>false</required>
+                    <editable>true</editable>
+                    <description>加密配置</description>
                 </parameter>
             </parameters>
             <configuration>

@@ -24,14 +24,14 @@ import java.util.Objects;
 /**
  * Object 工具类
  * @author starBlues
- * @version 3.0.0
+ * @version 3.0.1
  */
 public class CommonUtils {
 
     public final static String PLUGIN_FRAMEWORK_GROUP_ID = "com.gitee.starblues";
-    public final static String PLUGIN_FRAMEWORK_ARTIFACT_ID = "springboot-plugin-framework";
+    public final static String PLUGIN_FRAMEWORK_ARTIFACT_ID = "spring-brick";
 
-    public final static String PLUGIN_FRAMEWORK_LOADER_ARTIFACT_ID = "springboot-plugin-framework-loader";
+    public final static String PLUGIN_FRAMEWORK_LOADER_ARTIFACT_ID = "spring-brick-loader";
 
     private CommonUtils(){}
 
