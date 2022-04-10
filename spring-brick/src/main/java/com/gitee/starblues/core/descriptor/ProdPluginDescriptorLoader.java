@@ -16,21 +16,18 @@
 
 package com.gitee.starblues.core.descriptor;
 
-import com.gitee.starblues.core.descriptor.decrypt.EmptyPluginDescriptorDecrypt;
 import com.gitee.starblues.core.descriptor.decrypt.PluginDescriptorDecrypt;
 import com.gitee.starblues.core.exception.PluginException;
 import com.gitee.starblues.utils.ResourceUtils;
-import com.gitee.starblues.utils.SpringBeanUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.ApplicationContext;
 
 import java.nio.file.Path;
 
 /**
  * 生产环境插件描述加载者
  * @author starBlues
- * @version 3.0.0
+ * @version 3.0.1
  */
 public class ProdPluginDescriptorLoader implements PluginDescriptorLoader{
 

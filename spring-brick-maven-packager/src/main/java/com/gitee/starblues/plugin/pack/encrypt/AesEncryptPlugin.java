@@ -2,7 +2,6 @@ package com.gitee.starblues.plugin.pack.encrypt;
 
 import com.gitee.starblues.common.cipher.AbstractPluginCipher;
 import com.gitee.starblues.common.cipher.AesPluginCipher;
-import com.gitee.starblues.common.cipher.RsaPluginCipher;
 import com.gitee.starblues.plugin.pack.PluginInfo;
 import com.gitee.starblues.utils.ObjectUtils;
 import org.apache.maven.plugin.MojoExecutionException;

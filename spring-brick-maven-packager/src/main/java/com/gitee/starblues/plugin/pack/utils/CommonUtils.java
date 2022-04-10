@@ -24,7 +24,7 @@ import java.util.Objects;
 /**
  * Object 工具类
  * @author starBlues
- * @version 3.0.0
+ * @version 3.0.1
  */
 public class CommonUtils {
 
