@@ -119,6 +119,7 @@ public class DefaultPluginManager implements PluginManager{
         if(loaded.get()){
             throw new PluginException("不能重复调用: loadPlugins");
         }
+        pluginListenerFactory = createPluginListenerFactory();
         try {
             if(ObjectUtils.isEmpty(pluginRootDirs)){
                 log.warn("插件根目录为空, 无法加载插件.");
@@ -129,7 +130,6 @@ public class DefaultPluginManager implements PluginManager{
                 printOfNotFoundPlugins();
                 return Collections.emptyList();
             }
-            pluginListenerFactory = createPluginListenerFactory();
             Map<String, PluginInfo> pluginInfoMap = new LinkedHashMap<>(scanPluginPaths.size());
             for (Path path : scanPluginPaths) {
                 try {
