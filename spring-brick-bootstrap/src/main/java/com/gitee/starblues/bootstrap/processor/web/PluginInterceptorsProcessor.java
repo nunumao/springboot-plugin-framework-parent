@@ -24,19 +24,20 @@ import com.gitee.starblues.bootstrap.processor.interceptor.PluginInterceptorRegi
 import com.gitee.starblues.bootstrap.utils.SpringBeanUtils;
 import com.gitee.starblues.integration.IntegrationConfiguration;
 import com.gitee.starblues.spring.MainApplicationContext;
-import com.gitee.starblues.utils.ClassUtils;
-import com.gitee.starblues.utils.OrderUtils;
-import com.gitee.starblues.utils.PluginConfigUtils;
-import com.gitee.starblues.utils.SpringBeanCustomUtils;
+import com.gitee.starblues.utils.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.BeanFactoryUtils;
 import org.springframework.web.context.request.WebRequestInterceptor;
 import org.springframework.web.servlet.HandlerInterceptor;
+import org.springframework.web.servlet.HandlerMapping;
 import org.springframework.web.servlet.handler.AbstractHandlerMapping;
 import org.springframework.web.servlet.handler.WebRequestHandlerInterceptorAdapter;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 插件拦截器处理者
@@ -48,67 +49,79 @@ public class PluginInterceptorsProcessor implements SpringPluginProcessor {
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
     private final static String INTERCEPTORS = "pluginHandlerInterceptors";
 
-    private AbstractHandlerMapping handlerMapping;
+    private List<AbstractHandlerMapping> handlerMappings;
 
 
     @Override
     public void initialize(ProcessorContext context) throws ProcessorException {
         MainApplicationContext applicationContext = context.getMainApplicationContext();
-        handlerMapping = SpringBeanCustomUtils.getExistBean(applicationContext,
+        handlerMappings = SpringBeanCustomUtils.getBeans(applicationContext,
                 AbstractHandlerMapping.class);
-        if(handlerMapping == null){
+        if(handlerMappings.isEmpty()){
             logger.warn("Not found AbstractHandlerMapping, Plugin interceptor can't use");
         }
     }
 
     @Override
     public void refreshAfter(ProcessorContext context) throws ProcessorException {
-        if(handlerMapping == null){
+        if(handlerMappings.isEmpty()){
             return;
         }
         List<PluginInterceptorRegister> interceptorRegisters = SpringBeanUtils.getBeans(
                 context.getApplicationContext(),
                 PluginInterceptorRegister.class);
-        List<HandlerInterceptor> interceptorsObjects = new ArrayList<>();
-        List<HandlerInterceptor> adaptedInterceptors = getAdaptedInterceptors();
-        if(adaptedInterceptors == null){
+
+        Map<AbstractHandlerMapping, List<HandlerInterceptor>> handlerInterceptorMap = new HashMap<>();
+        for (AbstractHandlerMapping handlerMapping : handlerMappings) {
+            List<HandlerInterceptor> adaptedInterceptors = getAdaptedInterceptors(handlerMapping);
+            if(!ObjectUtils.isEmpty(adaptedInterceptors)){
+                handlerInterceptorMap.put(handlerMapping, adaptedInterceptors);
+            }
+        }
+        if(handlerInterceptorMap.isEmpty()){
+            logger.debug("handlerInterceptorMap is empty");
             return;
         }
         IntegrationConfiguration configuration = context.getConfiguration();
         String pluginId = context.getPluginDescriptor().getPluginId();
         String pluginRestPrefix = PluginConfigUtils.getPluginRestPrefix(configuration, pluginId);
 
+
+        List<HandlerInterceptor> storeInterceptors = new ArrayList<>();
         for (PluginInterceptorRegister interceptorRegister : interceptorRegisters) {
             PluginInterceptorRegistry interceptorRegistry = new PluginInterceptorRegistry(pluginRestPrefix);
             interceptorRegister.registry(interceptorRegistry);
-            List<Object> interceptors = interceptorRegistry.getInterceptors();
-            if(interceptors == null || interceptors.isEmpty()){
+            List<Object> registryInterceptors = interceptorRegistry.getInterceptors();
+            if(registryInterceptors == null || registryInterceptors.isEmpty()){
                 continue;
             }
-            for (Object interceptor : interceptors) {
+            for (Object interceptor : registryInterceptors) {
                 HandlerInterceptor handlerInterceptor = adaptInterceptor(interceptor);
-                adaptedInterceptors.add(handlerInterceptor);
-                interceptorsObjects.add(handlerInterceptor);
+                for (List<HandlerInterceptor> value : handlerInterceptorMap.values()) {
+                    value.add(handlerInterceptor);
+                }
+                storeInterceptors.add(handlerInterceptor);
             }
         }
-        context.addRegistryInfo(INTERCEPTORS, interceptorsObjects);
+        context.addRegistryInfo(INTERCEPTORS, storeInterceptors);
     }
 
     @Override
     public void close(ProcessorContext context) throws ProcessorException {
-        if(handlerMapping == null){
+        if(handlerMappings.isEmpty()){
             return;
         }
-        List<HandlerInterceptor> interceptorsObjects = context.getRegistryInfo(INTERCEPTORS);
-        if(interceptorsObjects == null || interceptorsObjects.isEmpty()){
+        List<HandlerInterceptor> storeInterceptors = context.getRegistryInfo(INTERCEPTORS);
+        if(ObjectUtils.isEmpty(storeInterceptors)){
             return;
         }
-        List<HandlerInterceptor> adaptedInterceptors = getAdaptedInterceptors();
-        if(adaptedInterceptors == null){
-            return;
-        }
-        for (HandlerInterceptor interceptor : interceptorsObjects) {
-            adaptedInterceptors.remove(interceptor);
+        for (HandlerInterceptor storeInterceptor : storeInterceptors) {
+            for (AbstractHandlerMapping handlerMapping : handlerMappings) {
+                List<HandlerInterceptor> adaptedInterceptors = getAdaptedInterceptors(handlerMapping);
+                if(!ObjectUtils.isEmpty(adaptedInterceptors)){
+                    adaptedInterceptors.remove(storeInterceptor);
+                }
+            }
         }
     }
 
@@ -119,9 +132,10 @@ public class PluginInterceptorsProcessor implements SpringPluginProcessor {
 
     /**
      * 得到拦截器存储者
+     * @param handlerMapping AbstractHandlerMapping
      * @return List<HandlerInterceptor>
      */
-    private List<HandlerInterceptor> getAdaptedInterceptors(){
+    private List<HandlerInterceptor> getAdaptedInterceptors(AbstractHandlerMapping handlerMapping){
         try {
             return ClassUtils.getReflectionField(handlerMapping, "adaptedInterceptors", List.class);
         } catch (IllegalAccessException e) {

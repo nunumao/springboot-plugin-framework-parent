@@ -44,6 +44,8 @@ public class DefaultInsidePluginDescriptor extends DefaultPluginDescriptor imple
     @Setter
     private String args;
     @Setter
+    private String pluginLibDir;
+    @Setter
     private Set<PluginLibInfo> pluginLibInfo;
     @Setter
     private Set<String> includeMainResourcePatterns;

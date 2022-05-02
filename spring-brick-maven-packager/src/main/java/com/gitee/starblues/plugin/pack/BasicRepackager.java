@@ -187,7 +187,7 @@ public class BasicRepackager implements Repackager{
         properties.put(PLUGIN_VERSION, pluginInfo.getVersion());
         properties.put(PLUGIN_PATH, getPluginPath());
 
-        String resourcesDefineFilePath = writeResourcesDefineFile();
+        String resourcesDefineFilePath = writeResourcesDefineFile(getResourcesDefineContent());
         if(!ObjectUtils.isEmpty(resourcesDefineFilePath)){
             properties.put(PLUGIN_RESOURCES_CONFIG, resourcesDefineFilePath);
         }
@@ -264,10 +264,9 @@ public class BasicRepackager implements Repackager{
         return repackageMojo.getProject().getBuild().getOutputDirectory();
     }
 
-    protected String writeResourcesDefineFile() throws Exception{
+    protected String writeResourcesDefineFile(String resourcesDefineContent) throws Exception{
         resourcesDefineFile = createResourcesDefineFile();
-        writeDependenciesIndex();
-        writeLoadMainResources();
+        FileUtils.write(resourcesDefineFile, resourcesDefineContent, CHARSET_NAME, true);
         return resourcesDefineFile.getPath();
     }
 
@@ -276,15 +275,44 @@ public class BasicRepackager implements Repackager{
         return FilesUtils.createFile(path);
     }
 
-    protected void writeDependenciesIndex() throws Exception {
+    protected String getResourcesDefineContent() throws Exception {
+        String dependenciesIndex = getDependenciesIndex();
+        String loadMainResources = getLoadMainResources();
+        boolean indexIsEmpty = ObjectUtils.isEmpty(dependenciesIndex);
+        boolean resourceIsEmpty = ObjectUtils.isEmpty(loadMainResources);
+
+        if(!indexIsEmpty && !resourceIsEmpty){
+            return dependenciesIndex + "\n" + loadMainResources;
+        } else if(!indexIsEmpty){
+            return dependenciesIndex;
+        } else if(!resourceIsEmpty){
+            return loadMainResources;
+        } else {
+            return "";
+        }
+    }
+
+    protected String getDependenciesIndex() throws Exception {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append(RESOURCES_DEFINE_DEPENDENCIES).append("\n");
         Set<String> libIndex = getDependenciesIndexSet();
         for (String index : libIndex) {
             stringBuilder.append(index).append("\n");
         }
-        String content = stringBuilder.toString();
-        FileUtils.write(resourcesDefineFile, content, CHARSET_NAME, true);
+        return stringBuilder.toString();
+    }
+
+    protected String getLoadMainResources(){
+        LoadMainResourcePattern loadMainResourcePattern = repackageMojo.getLoadMainResourcePattern();
+        if(loadMainResourcePattern == null){
+            return null;
+        }
+        String[] includes = loadMainResourcePattern.getIncludes();
+        String[] excludes = loadMainResourcePattern.getExcludes();
+        StringBuilder stringBuilder = new StringBuilder();
+        addLoadMainResources(stringBuilder, RESOURCES_DEFINE_LOAD_MAIN_INCLUDES, includes);
+        addLoadMainResources(stringBuilder, RESOURCES_DEFINE_LOAD_MAIN_EXCLUDES, excludes);
+        return stringBuilder.toString();
     }
 
     protected Set<String> getDependenciesIndexSet() throws Exception {
@@ -301,27 +329,6 @@ public class BasicRepackager implements Repackager{
 
     protected String getLibIndex(Artifact artifact){
         return artifact.getFile().getPath() + repackageMojo.resolveLoadToMain(artifact);
-    }
-
-    protected void writeLoadMainResources() throws Exception {
-        String loadMainResources = getLoadMainResources();
-        if(ObjectUtils.isEmpty(loadMainResources)){
-            return;
-        }
-        FileUtils.write(resourcesDefineFile, loadMainResources, CHARSET_NAME, true);
-    }
-
-    protected String getLoadMainResources(){
-        LoadMainResourcePattern loadMainResourcePattern = repackageMojo.getLoadMainResourcePattern();
-        if(loadMainResourcePattern == null){
-            return null;
-        }
-        String[] includes = loadMainResourcePattern.getIncludes();
-        String[] excludes = loadMainResourcePattern.getExcludes();
-        StringBuilder stringBuilder = new StringBuilder();
-        addLoadMainResources(stringBuilder, RESOURCES_DEFINE_LOAD_MAIN_INCLUDES, includes);
-        addLoadMainResources(stringBuilder, RESOURCES_DEFINE_LOAD_MAIN_EXCLUDES, excludes);
-        return stringBuilder.toString();
     }
 
     private void addLoadMainResources(StringBuilder stringBuilder, String header, String[] patterns){

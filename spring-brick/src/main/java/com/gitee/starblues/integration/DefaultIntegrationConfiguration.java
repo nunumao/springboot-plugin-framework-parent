@@ -103,7 +103,7 @@ public abstract class DefaultIntegrationConfiguration implements IntegrationConf
      */
     @Override
     public void checkConfig(){
-        Assert.isNotEmpty(mainPackage(), "插件配置: mainPackage 不能为空");
+        Assert.isNotEmpty(mainPackage(), "插件配置: [plugin.mainPackage] 不能为空");
     }
 
 }

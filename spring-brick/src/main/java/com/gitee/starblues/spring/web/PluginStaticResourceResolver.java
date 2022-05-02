@@ -42,7 +42,7 @@ import java.util.stream.Collectors;
 /**
  * 插件web静态资源Resolver
  * @author starBlues
- * @version 3.0.0
+ * @version 3.0.2
  */
 public class PluginStaticResourceResolver extends AbstractResourceResolver {
 
@@ -66,7 +66,8 @@ public class PluginStaticResourceResolver extends AbstractResourceResolver {
         if(request != null){
             String requestUri = request.getRequestURI();
             String formatUri = UrlUtils.format(requestUri);
-            requestPath = UrlUtils.format(formatUri.replace(config.getPathPrefix(), ""));
+            // fix https://gitee.com/starblues/springboot-plugin-framework-parent/issues/I53T9W
+            requestPath = UrlUtils.format(formatUri.replaceFirst(config.getPathPrefix(), ""));
         }
         int startOffset = requestPath.indexOf("/");
         String pluginId = null;

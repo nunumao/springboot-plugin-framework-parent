@@ -108,10 +108,18 @@ public class ProdDirPluginDescriptorLoader extends AbstractPluginDescriptorLoade
 
         Set<String> dependenciesIndex = pluginResourcesConfig.getDependenciesIndex();
         Set<String> pluginLibPaths = new HashSet<>();
+
+        String pluginLibDir = PropertiesUtils.getValue(properties, PluginDescriptorKey.PLUGIN_LIB_DIR);
+
+        boolean isConfigLibDir = !ObjectUtils.isEmpty(pluginLibDir);
+
         for (String index : dependenciesIndex) {
             index = resolvePath(index);
+            if(isConfigLibDir){
+                index  = FilesUtils.joiningFilePath(pluginLibDir, index);
+            }
             File file = new File(index);
-            if(!file.exists()){
+            if(!file.exists() && !isConfigLibDir){
                 // 如果直接读取的路径不存在, 则从相对路径读取
                 file = new File(FilesUtils.joiningFilePath(
                         pathStr, index

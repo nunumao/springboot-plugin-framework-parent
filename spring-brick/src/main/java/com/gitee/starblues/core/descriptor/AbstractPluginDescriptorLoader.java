@@ -104,7 +104,9 @@ public abstract class AbstractPluginDescriptorLoader implements PluginDescriptor
 
         PluginResourcesConfig pluginResourcesConfig = getPluginResourcesConfig(path, properties);
 
-        descriptor.setPluginLibInfo(getPluginLibInfo(pluginResourcesConfig.getDependenciesIndex()));
+        String pluginLibDir = getValue(properties, PLUGIN_LIB_DIR, false);
+        descriptor.setPluginLibDir(pluginLibDir);
+        descriptor.setPluginLibInfo(getPluginLibInfo(pluginLibDir, pluginResourcesConfig.getDependenciesIndex()));
         descriptor.setIncludeMainResourcePatterns(pluginResourcesConfig.getLoadMainResourceIncludes());
         descriptor.setExcludeMainResourcePatterns(pluginResourcesConfig.getLoadMainResourceExcludes());
 
@@ -151,13 +153,17 @@ public abstract class AbstractPluginDescriptorLoader implements PluginDescriptor
         }
     }
 
-    protected Set<PluginLibInfo> getPluginLibInfo(Set<String> dependenciesIndex){
+    protected Set<PluginLibInfo> getPluginLibInfo(String pluginLibDir, Set<String> dependenciesIndex){
         if(ObjectUtils.isEmpty(dependenciesIndex)){
             return Collections.emptySet();
         }
         Set<PluginLibInfo> pluginLibInfos = new HashSet<>(dependenciesIndex.size());
-        File file = new File("");
-        String absolutePath = file.getAbsolutePath();
+        boolean configPluginLibDir = true;
+        if(ObjectUtils.isEmpty(pluginLibDir)){
+            File file = new File("");
+            pluginLibDir = file.getAbsolutePath();
+            configPluginLibDir = false;
+        }
         for (String index : dependenciesIndex) {
             String libPath;
             boolean loadToMain;
@@ -168,7 +174,12 @@ public abstract class AbstractPluginDescriptorLoader implements PluginDescriptor
                 libPath = index;
                 loadToMain = false;
             }
-            pluginLibInfos.add(new PluginLibInfo(FilesUtils.resolveRelativePath(absolutePath, libPath), loadToMain));
+            if(configPluginLibDir){
+                libPath = FilesUtils.joiningFilePath(pluginLibDir, libPath);
+            } else {
+                libPath = FilesUtils.resolveRelativePath(pluginLibDir, libPath);
+            }
+            pluginLibInfos.add(new PluginLibInfo(libPath, loadToMain));
         }
         return pluginLibInfos;
     }

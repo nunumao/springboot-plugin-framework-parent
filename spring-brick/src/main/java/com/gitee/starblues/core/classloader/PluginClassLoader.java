@@ -19,6 +19,7 @@ package com.gitee.starblues.core.classloader;
 import com.gitee.starblues.core.descriptor.InsidePluginDescriptor;
 import com.gitee.starblues.core.descriptor.PluginLibInfo;
 import com.gitee.starblues.core.descriptor.PluginType;
+import com.gitee.starblues.core.exception.PluginException;
 import com.gitee.starblues.loader.classloader.*;
 import com.gitee.starblues.loader.classloader.resource.loader.ResourceLoaderFactory;
 import com.gitee.starblues.utils.Assert;
@@ -63,13 +64,28 @@ public class PluginClassLoader extends GenericClassLoader {
             NestedPluginJarResourceLoader resourceLoader =
                     new NestedPluginJarResourceLoader(descriptor, parentClassLoader, resourceLoaderFactory);
             resourceLoaderFactory.addResource(resourceLoader);
-        } else {
-            addClasspath(descriptor);
+        } else if(pluginType == PluginType.JAR_OUTER || pluginType == PluginType.ZIP_OUTER){
+            addOuterPluginClasspath(descriptor);
             addLibFile(descriptor);
+        } else if(pluginType == PluginType.DIR){
+            addDirPluginClasspath(descriptor);
+            addLibFile(descriptor);
+        } else {
+            throw new PluginException("不能解析[" + pluginType  +"]类型的插件");
         }
     }
 
-    private void addClasspath(InsidePluginDescriptor pluginDescriptor) throws Exception {
+    private void addOuterPluginClasspath(InsidePluginDescriptor descriptor) throws Exception{
+        String pluginPath = descriptor.getPluginPath();
+        File existFile = FilesUtils.getExistFile(pluginPath);
+        if(existFile != null){
+            addResource(existFile);
+        } else {
+            throw new PluginException("没有发现插件路径: " + pluginPath);
+        }
+    }
+
+    private void addDirPluginClasspath(InsidePluginDescriptor pluginDescriptor) throws Exception {
         String pluginClassPath = pluginDescriptor.getPluginClassPath();
         File existFile = FilesUtils.getExistFile(pluginClassPath);
         if(existFile != null){

@@ -25,8 +25,11 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.security.CodeSource;
 import java.security.ProtectionDomain;
+import java.util.Objects;
+import java.util.jar.Attributes;
 import java.util.jar.Manifest;
 
+import static com.gitee.starblues.loader.LoaderConstant.*;
 /**
  * 主程序生成环境启动引导器
  * @author starBlues
@@ -34,7 +37,6 @@ import java.util.jar.Manifest;
  */
 public class SpringMainProdBootstrap {
 
-    private static final String START_CLASS = "Start-Class";
 
     public static void main(String[] args) throws Exception {
         JarFile.registerUrlProtocolHandler();
@@ -44,19 +46,27 @@ public class SpringMainProdBootstrap {
     private void run(String[] args) throws Exception{
         File rootJarFile = getRootJarFile();
         String startClass = null;
+        String mainPackageType;
         try (JarFile jarFile = new JarFile(rootJarFile)){
             Manifest manifest = jarFile.getManifest();
             IllegalStateException exception = new IllegalStateException("当前启动包非法包!");
             if(manifest == null || manifest.getMainAttributes() == null){
                 throw exception;
             }
-            startClass = manifest.getMainAttributes().getValue(START_CLASS);
+            Attributes mainAttributes = manifest.getMainAttributes();
+            startClass = mainAttributes.getValue(START_CLASS);
             if (ObjectUtils.isEmpty(startClass)) {
                 throw exception;
             }
+            mainPackageType = mainAttributes.getValue(MAIN_PACKAGE_TYPE);
         }
         MethodRunner methodRunner = new MethodRunner(startClass, SpringMainBootstrap.SPRING_BOOTSTRAP_RUN_METHOD, args);
-        Launcher<ClassLoader> launcher = new MainJarProgramLauncher(methodRunner, rootJarFile);
+        Launcher<ClassLoader> launcher;
+        if(Objects.equals(mainPackageType, MAIN_PACKAGE_TYPE_JAR_OUTER)){
+            launcher = new MainJarOuterProgramLauncher(methodRunner, rootJarFile);
+        } else {
+            launcher = new MainJarProgramLauncher(methodRunner, rootJarFile);
+        }
         launcher.run(args);
     }
 

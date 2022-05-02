@@ -23,6 +23,7 @@ import com.gitee.starblues.loader.classloader.GenericClassLoader;
 import com.gitee.starblues.loader.classloader.resource.loader.DefaultResourceLoaderFactory;
 import com.gitee.starblues.loader.classloader.resource.loader.ResourceLoaderFactory;
 import com.gitee.starblues.loader.launcher.AbstractLauncher;
+import com.gitee.starblues.loader.launcher.LauncherContext;
 import com.gitee.starblues.spring.SpringPluginHook;
 import com.gitee.starblues.utils.MsgUtils;
 
@@ -79,7 +80,7 @@ public class PluginLauncher extends AbstractLauncher<SpringPluginHook> {
     }
 
     protected GenericClassLoader getParentClassLoader() throws Exception {
-        ClassLoader contextClassLoader = pluginInteractive.getMainApplicationContext().getClassLoader();
+        ClassLoader contextClassLoader = LauncherContext.getMainClassLoader();
         if(contextClassLoader instanceof GenericClassLoader){
             return (GenericClassLoader) contextClassLoader;
         } else {

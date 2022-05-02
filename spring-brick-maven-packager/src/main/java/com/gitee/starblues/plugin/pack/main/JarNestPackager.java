@@ -16,6 +16,7 @@
 
 package com.gitee.starblues.plugin.pack.main;
 
+import com.gitee.starblues.common.PackageType;
 import com.gitee.starblues.plugin.pack.Constant;
 import com.gitee.starblues.plugin.pack.RepackageMojo;
 import com.gitee.starblues.plugin.pack.Repackager;
@@ -38,7 +39,7 @@ import static com.gitee.starblues.common.ManifestKey.*;
 /**
  * 嵌套jar打包
  * @author starBlues
- * @version 3.0.0
+ * @version 3.0.2
  */
 public class JarNestPackager implements Repackager {
 
@@ -81,6 +82,7 @@ public class JarNestPackager implements Repackager {
         attributes.putValue(MANIFEST_VERSION, MANIFEST_VERSION_1_0);
         attributes.putValue(START_CLASS, mainConfig.getMainClass());
         attributes.putValue(MAIN_CLASS, MAIN_CLASS_VALUE);
+        attributes.putValue(MAIN_PACKAGE_TYPE, PackageType.MAIN_PACKAGE_TYPE_JAR);
         return manifest;
     }
 
@@ -114,7 +116,5 @@ public class JarNestPackager implements Repackager {
         packageJar.putDirEntry(libDirEntryName);
         return libDirEntryName;
     }
-
-
 
 }

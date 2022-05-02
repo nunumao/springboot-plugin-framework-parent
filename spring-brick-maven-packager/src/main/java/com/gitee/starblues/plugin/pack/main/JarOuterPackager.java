@@ -16,32 +16,34 @@
 
 package com.gitee.starblues.plugin.pack.main;
 
-import com.gitee.starblues.common.ManifestKey;
 import com.gitee.starblues.common.PackageStructure;
+import com.gitee.starblues.common.PackageType;
+import com.gitee.starblues.plugin.pack.utils.CommonUtils;
 import com.gitee.starblues.utils.FilesUtils;
+import com.gitee.starblues.utils.ObjectUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.jar.Attributes;
 import java.util.jar.Manifest;
 
 import static com.gitee.starblues.common.ManifestKey.*;
-import static com.gitee.starblues.common.ManifestKey.MANIFEST_VERSION_1_0;
 
 /**
  * jar 外置包
  * @author starBlues
- * @version 3.0.0
+ * @version 3.0.2
  */
 public class JarOuterPackager extends JarNestPackager {
 
-    private final List<String> dependenciesName = new ArrayList<>();
+    private static final String LIB_INDEXES_SPLIT = " ";
+
+    private final Set<String> dependencyIndexNames = new HashSet<>();
 
     public JarOuterPackager(MainRepackager mainRepackager) {
         super(mainRepackager);
@@ -58,7 +60,7 @@ public class JarOuterPackager extends JarNestPackager {
     @Override
     protected void writeClasses() throws Exception {
         String buildDir = repackageMojo.getProject().getBuild().getOutputDirectory();
-        packageJar.copyDirToPackage(new File(buildDir), "");
+        packageJar.copyDirToPackage(new File(buildDir), null);
     }
 
     private String createRootDir() throws MojoFailureException{
@@ -81,14 +83,28 @@ public class JarOuterPackager extends JarNestPackager {
         Manifest manifest = new Manifest();
         Attributes attributes = manifest.getMainAttributes();
         attributes.putValue(MANIFEST_VERSION, MANIFEST_VERSION_1_0);
-        attributes.remove(START_CLASS);
-        attributes.putValue(MAIN_CLASS, mainConfig.getMainClass());
-        if(dependenciesName.isEmpty()){
-            return manifest;
+        attributes.putValue(START_CLASS, mainConfig.getMainClass());
+        attributes.putValue(MAIN_CLASS, MAIN_CLASS_VALUE);
+        attributes.putValue(MAIN_PACKAGE_TYPE, PackageType.MAIN_PACKAGE_TYPE_JAR_OUTER);
+        String libDir = PackageStructure.LIB_NAME;
+        if(!ObjectUtils.isEmpty(mainConfig.getLibDir())){
+            libDir = mainConfig.getLibDir();
         }
-        String classPathStr = String.join(" ", dependenciesName);
-        attributes.putValue(ManifestKey.CLASS_PATH, classPathStr);
+        attributes.putValue(MAIN_LIB_DIR, libDir);
+        attributes.putValue(MAIN_LIB_INDEXES, getLibIndexes());
         return manifest;
+    }
+
+
+    private String getLibIndexes() throws Exception {
+        if(dependencyIndexNames.isEmpty()){
+            return "";
+        }
+        StringBuilder libName = new StringBuilder();
+        for (String dependencyIndexName : dependencyIndexNames) {
+            libName.append(dependencyIndexName).append(LIB_INDEXES_SPLIT);
+        }
+        return libName.toString();
     }
 
     @Override
@@ -98,12 +114,16 @@ public class JarOuterPackager extends JarNestPackager {
             if(filterArtifact(artifact)){
                 continue;
             }
-            File artifactFile = artifact.getFile();
-            String targetFilePath = FilesUtils.joiningFilePath(
-                    mainConfig.getOutputDirectory(), PackageStructure.LIB_NAME, artifactFile.getName());
-
-            FileUtils.copyFile(artifactFile, new File(targetFilePath));
-            dependenciesName.add(PackageStructure.LIB_NAME + "/" + artifactFile.getName());
+            if(CommonUtils.isPluginFrameworkLoader(artifact)){
+                // 本框架loader依赖
+                packageJar.copyZipToPackage(artifact.getFile());
+            } else {
+                File artifactFile = artifact.getFile();
+                String targetFilePath = FilesUtils.joiningFilePath(
+                        mainConfig.getOutputDirectory(), PackageStructure.LIB_NAME, artifactFile.getName());
+                FileUtils.copyFile(artifactFile, new File(targetFilePath));
+                dependencyIndexNames.add(artifactFile.getName());
+            }
         }
     }
 
