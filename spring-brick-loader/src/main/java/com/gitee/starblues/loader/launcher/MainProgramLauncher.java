@@ -31,7 +31,7 @@ import java.net.URLClassLoader;
  * @author starBlues
  * @version 3.0.0
  */
-public class MainProgramLauncher extends AbstractLauncher<ClassLoader>{
+public class MainProgramLauncher extends AbstractMainLauncher<ClassLoader>{
 
     public static final String MAIN_CLASS_LOADER_NAME = "MainProgramLauncherClassLoader";
 

@@ -67,6 +67,7 @@ public abstract class PackageStructure {
 
     public static final String PROD_LIB_PATH = LIB_NAME + SEPARATOR;
 
+
     public static String resolvePath(String path){
         if(path == null || "".equals(path)){
             return path;

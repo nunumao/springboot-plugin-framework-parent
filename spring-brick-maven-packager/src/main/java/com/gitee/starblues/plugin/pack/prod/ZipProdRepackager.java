@@ -17,6 +17,7 @@
 package com.gitee.starblues.plugin.pack.prod;
 
 import com.gitee.starblues.common.ManifestKey;
+import com.gitee.starblues.common.PackageStructure;
 import com.gitee.starblues.common.PackageType;
 import com.gitee.starblues.common.PluginDescriptorKey;
 import com.gitee.starblues.plugin.pack.Constant;
@@ -107,11 +108,6 @@ public class ZipProdRepackager extends DevRepackager {
     }
 
     @Override
-    protected String getLibIndex(Artifact artifact){
-        return PROD_LIB_PATH + artifact.getFile().getName() + repackageMojo.resolveLoadToMain(artifact);
-    }
-
-    @Override
     protected boolean filterArtifact(Artifact artifact) {
         return Constant.scopeFilter(artifact.getScope());
     }
@@ -134,6 +130,7 @@ public class ZipProdRepackager extends DevRepackager {
     protected Properties createPluginMetaInfo() throws Exception {
         Properties properties = super.createPluginMetaInfo();
         properties.put(PluginDescriptorKey.PLUGIN_RESOURCES_CONFIG, PROD_RESOURCES_DEFINE_PATH);
+        properties.put(PluginDescriptorKey.PLUGIN_LIB_DIR, PROD_LIB_PATH);
         return properties;
     }
 

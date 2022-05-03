@@ -17,6 +17,7 @@
 package com.gitee.starblues.plugin.pack.main;
 
 
+import com.gitee.starblues.common.PackageStructure;
 import lombok.Data;
 import org.apache.maven.plugins.annotations.Parameter;
 import com.gitee.starblues.plugin.pack.Constant;
@@ -49,9 +50,15 @@ public class MainConfig {
     private String fileName;
 
     /**
+     * 依赖包所在目录
+     */
+    private String libDir;
+
+    /**
      * 输出文件目录。默认target
      */
     private String outputDirectory;
+
 
 
 }

@@ -26,7 +26,7 @@ import java.util.jar.Manifest;
 /**
  * 内部的默认插件描述者
  * @author starBlues
- * @version 3.0.0
+ * @version 3.0.2
  */
 public class DefaultInsidePluginDescriptor extends DefaultPluginDescriptor implements InsidePluginDescriptor {
 
@@ -44,6 +44,8 @@ public class DefaultInsidePluginDescriptor extends DefaultPluginDescriptor imple
     @Setter
     private String args;
     @Setter
+    private String pluginLibDir;
+    @Setter
     private Set<PluginLibInfo> pluginLibInfo;
     @Setter
     private Set<String> includeMainResourcePatterns;
@@ -60,6 +62,11 @@ public class DefaultInsidePluginDescriptor extends DefaultPluginDescriptor imple
     @Override
     public String getPluginClassPath() {
         return pluginClassPath;
+    }
+
+    @Override
+    public String getPluginLibDir() {
+        return pluginLibDir;
     }
 
     @Override

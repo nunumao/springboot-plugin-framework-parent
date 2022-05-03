@@ -19,6 +19,7 @@ package com.gitee.starblues.plugin.pack.prod;
 import com.gitee.starblues.common.ManifestKey;
 import com.gitee.starblues.common.PackageType;
 import com.gitee.starblues.common.PluginDescriptorKey;
+import com.gitee.starblues.plugin.pack.Constant;
 import com.gitee.starblues.plugin.pack.RepackageMojo;
 import com.gitee.starblues.plugin.pack.utils.PackageJar;
 import com.gitee.starblues.plugin.pack.utils.PackageZip;
@@ -30,6 +31,8 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 
 import java.io.File;
+import java.io.OutputStreamWriter;
+import java.nio.charset.StandardCharsets;
 import java.util.HashSet;
 import java.util.Properties;
 import java.util.Set;
@@ -99,5 +102,25 @@ public class ZipOuterProdRepackager extends DirProdRepackager {
         Properties properties = super.createPluginMetaInfo();
         properties.put(PluginDescriptorKey.PLUGIN_PATH, packageZip.getFileName());
         return properties;
+    }
+    @Override
+    protected void writeManifest(Manifest manifest) throws Exception {
+        packageZip.writeManifest(manifest);
+    }
+
+    @Override
+    protected String writePluginMetaInfo(Properties properties) throws Exception {
+        packageZip.write(PROD_PLUGIN_META_PATH, outputStream->{
+            properties.store(new OutputStreamWriter(outputStream, StandardCharsets.UTF_8),
+                    Constant.PLUGIN_METE_COMMENTS);
+        });
+        return PROD_PLUGIN_META_PATH;
+    }
+
+
+    @Override
+    protected String writeResourcesDefineFile(String resourcesDefineContent) throws Exception {
+        packageZip.write(PROD_RESOURCES_DEFINE_PATH, resourcesDefineContent);
+        return PROD_RESOURCES_DEFINE_PATH;
     }
 }

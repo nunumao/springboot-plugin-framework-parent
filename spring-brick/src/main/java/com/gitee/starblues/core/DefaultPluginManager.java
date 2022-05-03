@@ -49,7 +49,7 @@ import java.util.stream.Collectors;
 /**
  * 抽象的插件管理者
  * @author starBlues
- * @version 3.0.1
+ * @version 3.0.2
  */
 public class DefaultPluginManager implements PluginManager{
 
@@ -121,6 +121,7 @@ public class DefaultPluginManager implements PluginManager{
         }
         pluginListenerFactory = createPluginListenerFactory();
         try {
+            pluginListenerFactory = createPluginListenerFactory();
             if(ObjectUtils.isEmpty(pluginRootDirs)){
                 log.warn("插件根目录为空, 无法加载插件.");
                 return Collections.emptyList();
@@ -131,6 +132,7 @@ public class DefaultPluginManager implements PluginManager{
                 return Collections.emptyList();
             }
             Map<String, PluginInfo> pluginInfoMap = new LinkedHashMap<>(scanPluginPaths.size());
+            boolean findException = false;
             for (Path path : scanPluginPaths) {
                 try {
                     PluginInsideInfo pluginInfo = loadPlugin(path, false);
@@ -140,12 +142,13 @@ public class DefaultPluginManager implements PluginManager{
                         pluginListenerFactory.loadSuccess(pluginInfoFace);
                         pluginInfoMap.put(pluginInfo.getPluginId(), pluginInfoFace);
                     }
-                } catch (PluginException e) {
+                } catch (Throwable e) {
                     pluginListenerFactory.loadFailure(path, e);
                     log.error("加载插件包失败: {}. {}", path, e.getMessage(), e);
+                    findException = true;
                 }
             }
-            if(pluginInfoMap.isEmpty()){
+            if(!findException && pluginInfoMap.isEmpty()){
                 printOfNotFoundPlugins();
             }
             return getSortPlugin(pluginInfoMap);
@@ -165,8 +168,8 @@ public class DefaultPluginManager implements PluginManager{
             basicChecker.checkPath(pluginPath);
             PluginDescriptor pluginDescriptor = pluginDescriptorLoader.load(pluginPath);
             return pluginDescriptor != null;
-        } catch (Exception e) {
-            log.error("插件jar包校验失败: {}" , pluginPath, e);
+        } catch (Throwable e) {
+            log.error("插件包校验失败: {}" , pluginPath, e);
             return false;
         }
     }
@@ -208,7 +211,7 @@ public class DefaultPluginManager implements PluginManager{
                 pluginListenerFactory.loadFailure(pluginPath, new PluginException("Not found PluginInsideInfo"));
                 return null;
             }
-        } catch (Exception e) {
+        } catch (Throwable e) {
             PluginException pluginException = PluginException.getPluginException(e, () -> {
                 throw new PluginException("插件包加载失败: " + sourcePluginPath, e);
             });
@@ -243,13 +246,13 @@ public class DefaultPluginManager implements PluginManager{
             pluginListenerFactory.startSuccess(pluginInfo);
             log.info("插件[{}]安装成功", MsgUtils.getPluginUnique(pluginInsideInfo.getPluginDescriptor()));
             return pluginInsideInfo.toPluginInfo();
-        } catch (Exception e){
+        } catch (Throwable e){
             if(e instanceof PluginDisabledException){
                 throw (PluginDisabledException)e;
             }
             PluginException pluginException = PluginException.getPluginException(e, ()-> {
                 unLoad(loadPluginInfo.getPluginId());
-                throw new PluginException("插件包[ " + pluginPath + " ]安装失败: " + e.getMessage(), e);
+                throw new PluginException("插件包[ " + pluginPath + " ]安装: " + e.getMessage(), e);
             });
             pluginListenerFactory.startFailure(pluginInfo, pluginException);
             throw pluginException;
@@ -268,7 +271,7 @@ public class DefaultPluginManager implements PluginManager{
             try {
                 stop(wrapperInside);
                 pluginListenerFactory.stopSuccess(pluginInfo);
-            } catch (Exception e) {
+            } catch (Throwable e) {
                 PluginException pluginException = PluginException.getPluginException(e,
                         ()-> new PluginException("停止", pluginId, e));
                 pluginListenerFactory.stopFailure(pluginInfo, pluginException);
@@ -312,9 +315,9 @@ public class DefaultPluginManager implements PluginManager{
             install(pluginPath, unpackPlugin);
             log.info("更新插件[{}]成功", MsgUtils.getPluginUnique(upgradePluginDescriptor));
             return upgradePlugin;
-        } catch (Exception e){
+        } catch (Throwable e){
             throw PluginException.getPluginException(e, ()->
-                    new PluginException(upgradePluginDescriptor, "更新失败", e));
+                    new PluginException(upgradePluginDescriptor, "更新", e));
         }
     }
 
@@ -333,9 +336,9 @@ public class DefaultPluginManager implements PluginManager{
             log.info("插件[{}]启动成功", MsgUtils.getPluginUnique(pluginInsideInfo.getPluginDescriptor()));
             pluginListenerFactory.startSuccess(pluginInfo);
             return pluginInfo;
-        } catch (Exception e){
+        } catch (Throwable e){
             PluginException pluginException = PluginException.getPluginException(e,
-                    ()-> new PluginException(pluginInsideInfo.getPluginDescriptor(), "启动失败", e));
+                    ()-> new PluginException(pluginInsideInfo.getPluginDescriptor(), "启动", e));
             pluginListenerFactory.startFailure(pluginInfo, pluginException);
             throw pluginException;
         }
@@ -356,9 +359,9 @@ public class DefaultPluginManager implements PluginManager{
             log.info("停止插件[{}]成功", MsgUtils.getPluginUnique(pluginInsideInfo.getPluginDescriptor()));
             pluginListenerFactory.stopSuccess(pluginInfo);
             return pluginInfo;
-        } catch (Exception e) {
+        } catch (Throwable e) {
             PluginException pluginException = PluginException.getPluginException(e,
-                    () -> new PluginException(pluginInsideInfo.getPluginDescriptor(), "停止失败", e));
+                    () -> new PluginException(pluginInsideInfo.getPluginDescriptor(), "停止", e));
             pluginListenerFactory.stopFailure(pluginInfo, pluginException);
             throw pluginException;
         }
@@ -419,7 +422,7 @@ public class DefaultPluginManager implements PluginManager{
     protected PluginInsideInfo loadFromPath(Path pluginPath) {
         try {
             basicChecker.checkPath(pluginPath);
-        } catch (Exception e) {
+        } catch (Throwable e) {
             throw PluginException.getPluginException(e, ()-> {
                 return new PluginException("非法插件包. " + e.getMessage(), e);
             });
@@ -438,7 +441,7 @@ public class DefaultPluginManager implements PluginManager{
                 pluginInsideInfo.setPluginState(PluginState.LOADED);
             }
             return pluginInsideInfo;
-        } catch (Exception e){
+        } catch (Throwable e){
             throw PluginException.getPluginException(e, ()-> new PluginException("加载插件失败"));
         }
     }
@@ -622,8 +625,8 @@ public class DefaultPluginManager implements PluginManager{
             File file = new File("");
             String absolutePath = file.getAbsolutePath();
             return path.stream()
-                    .filter(p->!ObjectUtils.isEmpty(p))
-                    .map(p->FilesUtils.resolveRelativePath(absolutePath, p))
+                    .filter(p -> !ObjectUtils.isEmpty(p))
+                    .map(p -> FilesUtils.resolveRelativePath(absolutePath, p))
                     .collect(Collectors.toList());
         }
     }

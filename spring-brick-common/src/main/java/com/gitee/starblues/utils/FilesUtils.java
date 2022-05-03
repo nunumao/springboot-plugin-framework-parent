@@ -26,7 +26,7 @@ import java.util.function.Supplier;
  * 文件工具类
  *
  * @author starBlues
- * @version 3.0.0
+ * @version 3.0.2
  */
 public class FilesUtils {
 
@@ -106,11 +106,23 @@ public class FilesUtils {
         if(ObjectUtils.isEmpty(relativePath)){
             return relativePath;
         }
-        if(relativePath.startsWith(Constants.RELATIVE_SIGN)){
+        if(isRelativePath(relativePath)){
             return joiningFilePath(rootPath, relativePath.replaceFirst(Constants.RELATIVE_SIGN, ""));
         } else {
             return relativePath;
         }
+    }
+
+    /**
+     * 是否是相对路径
+     * @param path 路径
+     * @return true 为相对路径, false 未非相对路径
+     */
+    public static boolean isRelativePath(String path){
+        if(ObjectUtils.isEmpty(path)){
+            return false;
+        }
+        return path.startsWith(Constants.RELATIVE_SIGN);
     }
 
 }
