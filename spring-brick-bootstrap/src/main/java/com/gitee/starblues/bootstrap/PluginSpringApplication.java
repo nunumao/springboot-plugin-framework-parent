@@ -103,7 +103,7 @@ public class PluginSpringApplication extends SpringApplication {
             return super.run(args);
         } catch (Exception e) {
             pluginProcessor.failure(processorContext);
-            logger.error("启动插件[{}]失败. {}",
+            logger.debug("启动插件[{}]失败. {}",
                     processorContext.getPluginDescriptor().getPluginId(),
                     e.getMessage(), e);
             throw new RuntimeException(e);

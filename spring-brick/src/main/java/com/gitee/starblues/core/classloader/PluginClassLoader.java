@@ -19,11 +19,14 @@ package com.gitee.starblues.core.classloader;
 import com.gitee.starblues.core.descriptor.InsidePluginDescriptor;
 import com.gitee.starblues.core.descriptor.PluginLibInfo;
 import com.gitee.starblues.core.descriptor.PluginType;
+import com.gitee.starblues.core.exception.PluginException;
 import com.gitee.starblues.loader.classloader.*;
 import com.gitee.starblues.loader.classloader.resource.loader.ResourceLoaderFactory;
 import com.gitee.starblues.utils.Assert;
 import com.gitee.starblues.utils.FilesUtils;
+import com.gitee.starblues.utils.MsgUtils;
 import com.gitee.starblues.utils.ObjectUtils;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.File;
 import java.io.IOException;
@@ -37,6 +40,7 @@ import java.util.Set;
  * @author starBlues
  * @version 3.0.0
  */
+@Slf4j
 public class PluginClassLoader extends GenericClassLoader {
 
     private final GenericClassLoader parentClassLoader;
@@ -59,21 +63,36 @@ public class PluginClassLoader extends GenericClassLoader {
 
     public void addResource(InsidePluginDescriptor descriptor) throws Exception {
         PluginType pluginType = descriptor.getType();
-        if(pluginType == PluginType.JAR || pluginType == PluginType.ZIP){
+        if(PluginType.isNestedPackage(pluginType)){
             NestedPluginJarResourceLoader resourceLoader =
                     new NestedPluginJarResourceLoader(descriptor, parentClassLoader, resourceLoaderFactory);
             resourceLoaderFactory.addResource(resourceLoader);
+        } else if(PluginType.isOuterPackage(pluginType)){
+            addOuterPluginClasspath(descriptor);
+            addLibFile(descriptor);
         } else {
-            addClasspath(descriptor);
+            addDirPluginClasspath(descriptor);
             addLibFile(descriptor);
         }
     }
 
-    private void addClasspath(InsidePluginDescriptor pluginDescriptor) throws Exception {
-        String pluginClassPath = pluginDescriptor.getPluginClassPath();
+    private void addOuterPluginClasspath(InsidePluginDescriptor descriptor) throws Exception{
+        String pluginPath = descriptor.getPluginPath();
+        File existFile = FilesUtils.getExistFile(pluginPath);
+        if(existFile != null){
+            addResource(existFile);
+            log.debug("插件[{}]Classpath已被加载: {}", MsgUtils.getPluginUnique(descriptor), existFile.getPath());
+        } else {
+            throw new PluginException("没有发现插件路径: " + pluginPath);
+        }
+    }
+
+    private void addDirPluginClasspath(InsidePluginDescriptor descriptor) throws Exception {
+        String pluginClassPath = descriptor.getPluginClassPath();
         File existFile = FilesUtils.getExistFile(pluginClassPath);
         if(existFile != null){
             addResource(existFile);
+            log.debug("插件[{}]Classpath已被加载: {}", MsgUtils.getPluginUnique(descriptor), existFile.getPath());
         }
     }
 
@@ -82,14 +101,22 @@ public class PluginClassLoader extends GenericClassLoader {
         if(ObjectUtils.isEmpty(pluginLibInfos)){
             return;
         }
+        String pluginUnique = MsgUtils.getPluginUnique(pluginDescriptor);
+        log.info("插件[{}]依赖加载目录: {}", pluginUnique, pluginDescriptor.getPluginLibDir());
+        if(pluginLibInfos.isEmpty()){
+            log.warn("插件[{}]依赖为空！", pluginUnique);
+            return;
+        }
         for (PluginLibInfo pluginLibInfo : pluginLibInfos) {
             File existFile = FilesUtils.getExistFile(pluginLibInfo.getPath());
             if(existFile != null){
                 if(pluginLibInfo.isLoadToMain()){
                     // 加载到主程序中
                     parentClassLoader.addResource(existFile);
+                    log.debug("插件[{}]依赖被加载到主程序中: {}", pluginUnique, existFile.getPath());
                 } else {
                     addResource(existFile);
+                    log.debug("插件[{}]依赖被加载: {}", pluginUnique, existFile.getPath());
                 }
             }
         }

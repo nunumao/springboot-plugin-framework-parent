@@ -67,7 +67,21 @@ public class ManifestKey {
      */
     public static final String CLASS_PATH = "Class-Path";
 
+    /**
+     * jar main lib path
+     */
+    public static final String MAIN_LIB_DIR = "Lib-Dir";
 
+    /**
+     * jar main lib indexes
+     */
+    public static final String MAIN_LIB_INDEXES = "Lib-Indexes";
+
+
+    /**
+     * main package type
+     */
+    public static final String MAIN_PACKAGE_TYPE = "Main-Package-Type";
 
     /**
      * 获取值

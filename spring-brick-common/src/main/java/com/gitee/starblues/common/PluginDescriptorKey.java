@@ -39,6 +39,7 @@ public class PluginDescriptorKey {
     public static final String PLUGIN_CONFIG_FILE_NAME = "plugin.configFileName";
     public static final String PLUGIN_CONFIG_FILE_LOCATION = "plugin.configFileLocation";
     public static final String PLUGIN_ARGS = "plugin.args";
+    public static final String PLUGIN_LIB_DIR = "plugin.libDir";
 
     /** System create prop **/
     public static final String PLUGIN_PATH = "plugin.system.path";

@@ -20,10 +20,12 @@ package com.gitee.starblues.core.descriptor;
 import com.gitee.starblues.common.AbstractDependencyPlugin;
 import com.gitee.starblues.common.Constants;
 import com.gitee.starblues.common.DependencyPlugin;
+import com.gitee.starblues.common.PackageStructure;
 import com.gitee.starblues.core.descriptor.decrypt.PluginDescriptorDecrypt;
 import com.gitee.starblues.core.exception.PluginDecryptException;
 import com.gitee.starblues.core.exception.PluginException;
 import com.gitee.starblues.utils.FilesUtils;
+import com.gitee.starblues.utils.MsgUtils;
 import com.gitee.starblues.utils.ObjectUtils;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -46,7 +48,7 @@ import static com.gitee.starblues.utils.PropertiesUtils.getValue;
 /**
  * 抽象的 PluginDescriptorLoader
  * @author starBlues
- * @version 3.0.1
+ * @version 3.0.2
  */
 @Slf4j
 public abstract class AbstractPluginDescriptorLoader implements PluginDescriptorLoader{
@@ -69,13 +71,12 @@ public abstract class AbstractPluginDescriptorLoader implements PluginDescriptor
                 return null;
             }
             return create(pluginMeta, location);
-        } catch (Exception e) {
-            if(e instanceof PluginDecryptException){
-                logger.error(e.getMessage(), e);
+        } catch (Throwable e) {
+            if(e instanceof PluginException){
+                throw (PluginException) e;
             } else {
-                logger.debug(e.getMessage(), e);
+                throw new PluginException(e.getMessage(), e);
             }
-            return null;
         }
     }
 
@@ -102,11 +103,13 @@ public abstract class AbstractPluginDescriptorLoader implements PluginDescriptor
         );
         descriptor.setType(PluginType.byName(pluginMeta.getPackageType()));
 
-        PluginResourcesConfig pluginResourcesConfig = getPluginResourcesConfig(path, properties);
+        PluginResourcesConfig resourcesConfig = getPluginResourcesConfig(path, properties);
 
-        descriptor.setPluginLibInfo(getPluginLibInfo(pluginResourcesConfig.getDependenciesIndex()));
-        descriptor.setIncludeMainResourcePatterns(pluginResourcesConfig.getLoadMainResourceIncludes());
-        descriptor.setExcludeMainResourcePatterns(pluginResourcesConfig.getLoadMainResourceExcludes());
+        String pluginLibDir = getValue(properties, PLUGIN_LIB_DIR, false);
+        descriptor.setPluginLibDir(pluginLibDir);
+        descriptor.setPluginLibInfo(getPluginLibInfo(descriptor, resourcesConfig.getDependenciesIndex()));
+        descriptor.setIncludeMainResourcePatterns(resourcesConfig.getLoadMainResourceIncludes());
+        descriptor.setExcludeMainResourcePatterns(resourcesConfig.getLoadMainResourceExcludes());
 
         descriptor.setProperties(properties);
         descriptor.setPluginClassPath(getValue(properties, PLUGIN_PATH, false));
@@ -151,26 +154,60 @@ public abstract class AbstractPluginDescriptorLoader implements PluginDescriptor
         }
     }
 
-    protected Set<PluginLibInfo> getPluginLibInfo(Set<String> dependenciesIndex){
+    protected Set<PluginLibInfo> getPluginLibInfo(DefaultInsidePluginDescriptor descriptor, Set<String> dependenciesIndex){
+        String pluginLibDir = descriptor.getPluginLibDir();
+        boolean configPluginLibDir = false;
+        if(!ObjectUtils.isEmpty(pluginLibDir)){
+            descriptor.setPluginLibDir(getLibDir(descriptor, pluginLibDir));
+            configPluginLibDir = true;
+        }
         if(ObjectUtils.isEmpty(dependenciesIndex)){
             return Collections.emptySet();
         }
         Set<PluginLibInfo> pluginLibInfos = new HashSet<>(dependenciesIndex.size());
-        File file = new File("");
-        String absolutePath = file.getAbsolutePath();
         for (String index : dependenciesIndex) {
-            String libPath;
             boolean loadToMain;
             if(index.endsWith(Constants.LOAD_TO_MAIN_SIGN)){
-                libPath = index.substring(0, index.lastIndexOf(Constants.LOAD_TO_MAIN_SIGN));
+                index = index.substring(0, index.lastIndexOf(Constants.LOAD_TO_MAIN_SIGN));
                 loadToMain = true;
             } else {
-                libPath = index;
                 loadToMain = false;
             }
-            pluginLibInfos.add(new PluginLibInfo(FilesUtils.resolveRelativePath(absolutePath, libPath), loadToMain));
+            String libPath = index;
+            if(configPluginLibDir){
+                libPath = getLibPath(descriptor, index);
+            }
+            pluginLibInfos.add(new PluginLibInfo(libPath, loadToMain));
         }
         return pluginLibInfos;
+    }
+
+    protected String getLibDir(DefaultInsidePluginDescriptor descriptor, String configPluginLibDir){
+        if(!FilesUtils.isRelativePath(configPluginLibDir)){
+            return configPluginLibDir;
+        }
+        // 是相对路径
+        // 先相对当前插件目录
+        String resolveRelativePath = FilesUtils.resolveRelativePath(descriptor.getPluginPath(), configPluginLibDir);
+        if(new File(resolveRelativePath).exists()){
+            return resolveRelativePath;
+        }
+        // 再相对插件存放目录
+        resolveRelativePath = FilesUtils.resolveRelativePath(new File(descriptor.getPluginPath()).getParent(), configPluginLibDir);
+        if(new File(resolveRelativePath).exists()){
+            return resolveRelativePath;
+        }
+        // 最后相对主程序目录
+        resolveRelativePath = FilesUtils.resolveRelativePath(new File("").getAbsolutePath(), configPluginLibDir);
+        if(new File(resolveRelativePath).exists()){
+            return resolveRelativePath;
+        }
+        throw new PluginException("插件["+ MsgUtils.getPluginUnique(descriptor) +"]" +
+                "依赖目录[" + descriptor.getPluginLibDir() + "]不存在!");
+    }
+
+    protected String getLibPath(DefaultInsidePluginDescriptor descriptor, String index){
+        return FilesUtils.joiningFilePath(descriptor.getPluginLibDir(), index);
     }
 
     protected Properties getDecryptProperties(InputStream inputStream) throws Exception{

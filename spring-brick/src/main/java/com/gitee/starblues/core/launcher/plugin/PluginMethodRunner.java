@@ -17,7 +17,9 @@
 package com.gitee.starblues.core.launcher.plugin;
 
 import com.gitee.starblues.core.RuntimeMode;
+import com.gitee.starblues.core.descriptor.InsidePluginDescriptor;
 import com.gitee.starblues.loader.launcher.runner.MethodRunner;
+import com.gitee.starblues.utils.MsgUtils;
 import com.gitee.starblues.utils.ObjectUtils;
 import com.gitee.starblues.utils.ReflectionUtils;
 import org.slf4j.Logger;
@@ -51,14 +53,19 @@ public class PluginMethodRunner extends MethodRunner {
     protected Class<?> loadRunClass(ClassLoader classLoader) throws Exception {
         try {
             return super.loadRunClass(classLoader);
-        } catch (Exception e){
+        } catch (Throwable e){
+            InsidePluginDescriptor pluginDescriptor = pluginInteractive.getPluginDescriptor();
+            String pluginUnique = MsgUtils.getPluginUnique(pluginDescriptor);
             if(e instanceof ClassNotFoundException){
-                String pluginId = pluginInteractive.getPluginDescriptor().getPluginId();
-                String error = "插件[" + pluginId + "]没有发现" + "[" + className + "]引导类";
+                String error = "插件[" + pluginUnique + "]没有发现" + "[" + className + "]引导类";
                 if(pluginInteractive.getConfiguration().environment() == RuntimeMode.DEV){
-                    error = error + ", 请确保已经编译！";
+                    error = error + ", 请确保已经编译!";
                 }
                 throw new ClassNotFoundException(error);
+            } else if(e instanceof NoClassDefFoundError){
+                String error = "插件[" + pluginUnique + "]没有发现依赖类: [" +  e.getMessage() + "], " +
+                        "请确保插件依赖被完整加载!";
+                throw new NoClassDefFoundError(error);
             }
             throw e;
         }
@@ -74,21 +81,7 @@ public class PluginMethodRunner extends MethodRunner {
         Object instance = getInstance(runClass);
         setPluginInteractive(instance);
         runMethod.setAccessible(true);
-        try {
-            return runMethod.invoke(instance, runClass, this.args);
-        } catch (Exception e){
-            String error = "Invoke failure: "
-                    + ReflectionUtils.methodToString(runClass, runMethodName, runMethod.getParameterTypes())
-                    + ". ";
-            String message = e.getMessage();
-            if(message != null){
-                error = error + message;
-                logger.error(error, e);
-            } else {
-                logger.error(error);
-            }
-            throw new Exception(error);
-        }
+        return runMethod.invoke(instance, runClass, this.args);
     }
 
     private void setPluginInteractive(Object launchObject) throws Exception {
