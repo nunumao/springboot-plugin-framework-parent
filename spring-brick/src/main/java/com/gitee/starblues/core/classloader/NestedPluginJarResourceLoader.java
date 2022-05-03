@@ -24,6 +24,8 @@ import com.gitee.starblues.loader.classloader.*;
 import com.gitee.starblues.loader.classloader.resource.loader.*;
 import com.gitee.starblues.loader.classloader.resource.storage.ResourceStorage;
 import com.gitee.starblues.loader.launcher.ResourceLoaderFactoryGetter;
+import com.gitee.starblues.utils.MsgUtils;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.InputStream;
 import java.net.URL;
@@ -39,6 +41,7 @@ import java.util.zip.ZipEntry;
  * @author starBlues
  * @version 3.0.0
  */
+@Slf4j
 public class NestedPluginJarResourceLoader extends AbstractResourceLoader {
 
     private final InsidePluginDescriptor pluginDescriptor;
@@ -82,8 +85,13 @@ public class NestedPluginJarResourceLoader extends AbstractResourceLoader {
     private void addLib(JarFile jarFile) throws Exception {
         JarEntry jarEntry = null;
         Set<PluginLibInfo> pluginLibInfos = pluginDescriptor.getPluginLibInfo();
+        String pluginUnique = MsgUtils.getPluginUnique(pluginDescriptor);
         for (PluginLibInfo pluginLibInfo : pluginLibInfos) {
             jarEntry = jarFile.getJarEntry(pluginLibInfo.getPath());
+            if(jarEntry == null){
+                log.debug("Not found: " + pluginLibInfo.getPath());
+                continue;
+            }
             if (jarEntry.getMethod() != ZipEntry.STORED) {
                 throw new PluginException("插件依赖压缩方式错误, 必须是: 存储(stored)压缩方式");
             }
@@ -91,9 +99,11 @@ public class NestedPluginJarResourceLoader extends AbstractResourceLoader {
             URL url = new URL(baseUrl.toString() + pluginLibInfo.getPath() + "!/");
             if(pluginLibInfo.isLoadToMain()){
                 parentClassLoader.addResource(new JarResourceLoader(url, new JarInputStream(jarFileInputStream)));
+                log.debug("插件[{}]依赖被加载到主程序中: {}", pluginUnique, pluginLibInfo.getPath());
             } else {
                 JarResourceLoader jarResourceLoader = new JarResourceLoader(url, new JarInputStream(jarFileInputStream));
                 resourceLoaderFactory.addResource(jarResourceLoader);
+                log.debug("插件[{}]依赖被加载: {}", pluginUnique, pluginLibInfo.getPath());
             }
         }
     }

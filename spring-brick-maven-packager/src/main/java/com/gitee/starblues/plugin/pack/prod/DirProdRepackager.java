@@ -16,10 +16,7 @@
 
 package com.gitee.starblues.plugin.pack.prod;
 
-import com.gitee.starblues.common.ManifestKey;
-import com.gitee.starblues.common.PackageStructure;
-import com.gitee.starblues.common.PackageType;
-import com.gitee.starblues.common.PluginDescriptorKey;
+import com.gitee.starblues.common.*;
 import com.gitee.starblues.plugin.pack.RepackageMojo;
 import com.gitee.starblues.plugin.pack.dev.DevRepackager;
 import com.gitee.starblues.plugin.pack.utils.CommonUtils;
@@ -119,9 +116,10 @@ public class DirProdRepackager extends DevRepackager {
         properties.put(PluginDescriptorKey.PLUGIN_PATH, CLASSES_NAME);
         properties.put(PluginDescriptorKey.PLUGIN_RESOURCES_CONFIG, PROD_RESOURCES_DEFINE_PATH);
         String libDir = prodConfig.getLibDir();
-        if(!ObjectUtils.isEmpty(libDir)){
-            properties.put(PluginDescriptorKey.PLUGIN_LIB_DIR, libDir);
+        if(ObjectUtils.isEmpty(libDir)){
+           libDir = Constants.RELATIVE_SIGN + PackageStructure.PROD_LIB_PATH;
         }
+        properties.put(PluginDescriptorKey.PLUGIN_LIB_DIR, libDir);
         return properties;
     }
 
@@ -138,20 +136,13 @@ public class DirProdRepackager extends DevRepackager {
         Set<Artifact> dependencies = repackageMojo.getFilterDependencies();
         String libDir = createLibDir();
         Set<String> dependencyIndexNames = new HashSet<>(dependencies.size());
-        boolean isConfigLibDir = !ObjectUtils.isEmpty(prodConfig.getLibDir());
         for (Artifact artifact : dependencies) {
             if(filterArtifact(artifact)){
                 continue;
             }
             File artifactFile = artifact.getFile();
             FileUtils.copyFile(artifactFile, new File(FilesUtils.joiningFilePath(libDir, artifactFile.getName())));
-            String artifactFilePath;
-            if(isConfigLibDir){
-                artifactFilePath = artifactFile.getName();
-            } else {
-                artifactFilePath = PackageStructure.PROD_LIB_PATH + artifactFile.getName();
-            }
-            dependencyIndexNames.add(artifactFilePath + repackageMojo.resolveLoadToMain(artifact));
+            dependencyIndexNames.add(artifactFile.getName() + repackageMojo.resolveLoadToMain(artifact));
         }
         return dependencyIndexNames;
     }
