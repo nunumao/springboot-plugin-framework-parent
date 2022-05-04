@@ -141,6 +141,14 @@
                     <editable>true</editable>
                     <description>加密配置</description>
                 </parameter>
+                <parameter>
+                    <name>includeSystemScope</name>
+                    <type>boolean</type>
+                    <since>3.0.2</since>
+                    <required>false</required>
+                    <editable>true</editable>
+                    <description>是否包含scope类型为system的依赖</description>
+                </parameter>
             </parameters>
             <configuration>
                 <project implementation="org.apache.maven.project.MavenProject" default-value="${project}"/>
@@ -155,6 +163,7 @@
                 <prodConfig implementation="com.gitee.starblues.plugin.pack.prod.ProdConfig" />
                 <mainConfig implementation="com.gitee.starblues.plugin.pack.main.MainConfig" />
                 <loadToMain implementation="com.gitee.starblues.plugin.pack.LoadToMain" />
+                <includeSystemScope implementation="boolean" default-value="true" />
             </configuration>
             <requirements>
                 <requirement>

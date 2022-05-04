@@ -28,6 +28,10 @@ public class LoaderConstant {
     public static final String PROD_CLASSES_URL_SIGN = "/classes!/";
     public static final String PROD_LIB_PATH = "lib/";
 
+    /**
+     * 相对路径符号标志
+     */
+    public final static String RELATIVE_SIGN = "~";
 
 
     /**
