@@ -26,6 +26,7 @@ public class Constant {
     public static final String PACKAGING_POM = "pom";
     public static final String SCOPE_PROVIDED = "provided";
     public static final String SCOPE_COMPILE = "compile";
+    public static final String SCOPE_SYSTEM = "system";
     public static final String SCOPE_TEST = "test";
 
     public static final String MODE_MAIN = "main";

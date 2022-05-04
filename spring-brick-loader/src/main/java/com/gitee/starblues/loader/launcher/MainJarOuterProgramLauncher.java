@@ -22,8 +22,8 @@ import com.gitee.starblues.loader.archive.JarFileArchive;
 import com.gitee.starblues.loader.classloader.GenericClassLoader;
 import com.gitee.starblues.loader.classloader.resource.loader.MainJarResourceLoader;
 import com.gitee.starblues.loader.launcher.runner.MethodRunner;
+import com.gitee.starblues.loader.utils.FilesUtils;
 import com.gitee.starblues.loader.utils.ObjectUtils;
-import com.gitee.starblues.loader.utils.ResourceUtils;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -90,10 +90,14 @@ public class MainJarOuterProgramLauncher extends MainProgramLauncher{
     private void addLibResource(Archive archive, GenericClassLoader classLoader) throws Exception {
         Manifest manifest = archive.getManifest();
         String libDir = manifest.getMainAttributes().getValue(MAIN_LIB_DIR);
+        String relativePath = rootJarFile.isDirectory() ? rootJarFile.getPath() : rootJarFile.getParent();
+        libDir = FilesUtils.resolveRelativePath(relativePath, libDir);
         File libJarDir = new File(libDir);
         if(libJarDir.exists()){
             List<String> libIndexes = getLibIndexes(manifest);
             addLibJarFile(libJarDir, libIndexes, classLoader);
+        } else {
+            throw new IllegalStateException("主程序依赖目录不存在: " + libDir);
         }
     }
 
@@ -109,6 +113,9 @@ public class MainJarOuterProgramLauncher extends MainProgramLauncher{
                 continue;
             }
             indexes.add(index);
+        }
+        if(indexes.isEmpty()){
+            throw new IllegalStateException("主程序依赖包未发现!");
         }
         return indexes;
     }
