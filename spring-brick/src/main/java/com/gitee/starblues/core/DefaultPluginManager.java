@@ -119,7 +119,6 @@ public class DefaultPluginManager implements PluginManager{
         if(loaded.get()){
             throw new PluginException("不能重复调用: loadPlugins");
         }
-        pluginListenerFactory = createPluginListenerFactory();
         try {
             pluginListenerFactory = createPluginListenerFactory();
             if(ObjectUtils.isEmpty(pluginRootDirs)){
