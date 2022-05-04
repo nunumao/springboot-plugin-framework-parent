@@ -44,7 +44,7 @@ import static com.gitee.starblues.common.PackageStructure.*;
  * 生产环境目录式插件 PluginDescriptorLoader 加载者
  * 解析生产的dir
  * @author starBlues
- * @version 3.0.1
+ * @version 3.0.2
  */
 public class ProdDirPluginDescriptorLoader extends AbstractPluginDescriptorLoader{
 
@@ -104,25 +104,7 @@ public class ProdDirPluginDescriptorLoader extends AbstractPluginDescriptorLoade
         }
         File libFile = new File(libIndexFile);
         List<String> lines = FileUtils.readLines(libFile, CHARSET_NAME);
-        PluginResourcesConfig pluginResourcesConfig = PluginResourcesConfig.parse(lines);
-
-        Set<String> dependenciesIndex = pluginResourcesConfig.getDependenciesIndex();
-        Set<String> pluginLibPaths = new HashSet<>();
-        for (String index : dependenciesIndex) {
-            index = resolvePath(index);
-            File file = new File(index);
-            if(!file.exists()){
-                // 如果直接读取的路径不存在, 则从相对路径读取
-                file = new File(FilesUtils.joiningFilePath(
-                        pathStr, index
-                ));
-            }
-            if(file.exists()){
-                pluginLibPaths.add(file.getPath());
-            }
-        }
-        pluginResourcesConfig.setDependenciesIndex(pluginLibPaths);
-        return pluginResourcesConfig;
+        return PluginResourcesConfig.parse(lines);
     }
 
     protected String getExistResourcesConfFile(String rootPath, String libIndexPath){

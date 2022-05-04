@@ -16,6 +16,7 @@
 
 package com.gitee.starblues.loader.utils;
 
+import java.io.File;
 import java.net.URL;
 
 /**
@@ -47,6 +48,15 @@ public class ResourceUtils {
         boolean extensionIsJar = url.getPath().toLowerCase().endsWith(JAR_FILE_EXTENSION);
         return (URL_PROTOCOL_FILE.equals(protocol) && extensionIsJar)
                 || (URL_PROTOCOL_JAR_FILE.equals(protocol) || extensionIsJar);
+    }
+
+    /**
+     * 是否为jar文件
+     * @param file file
+     * @return boolean
+     */
+    public static boolean isJarFile(File file) {
+        return file.getName().toLowerCase().endsWith(JAR_FILE_EXTENSION);
     }
 
     /**

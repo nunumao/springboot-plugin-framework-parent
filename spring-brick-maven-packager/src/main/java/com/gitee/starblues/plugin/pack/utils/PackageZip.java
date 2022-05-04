@@ -178,6 +178,12 @@ public class PackageZip implements Closeable{
         outputStream.closeArchiveEntry();
     }
 
+    public void write(String name, String content) throws Exception {
+        outputStream.putArchiveEntry(getArchiveEntry(name));
+        IOUtils.write(content, outputStream, CHARSET_NAME);
+        outputStream.closeArchiveEntry();
+    }
+
     public void write(String name, Writer writer) throws Exception {
         outputStream.putArchiveEntry(getArchiveEntry(name));
         writer.write(outputStream);

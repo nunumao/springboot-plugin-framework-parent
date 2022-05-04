@@ -21,7 +21,7 @@ package com.gitee.starblues.loader.launcher;
  * @author starBlues
  * @version 3.0.2
  */
-public abstract class AbstractLauncher<R> implements Launcher<R> {
+public abstract class AbstractMainLauncher<R> extends AbstractLauncher<R> {
 
     @Override
     public R run(String... args) throws Exception {
@@ -30,27 +30,11 @@ public abstract class AbstractLauncher<R> implements Launcher<R> {
         ClassLoader oldClassLoader  = thread.getContextClassLoader();
         try {
             thread.setContextClassLoader(classLoader);
+            LauncherContext.setMainClassLoader(classLoader);
             return launch(classLoader, args);
         } finally {
             thread.setContextClassLoader(oldClassLoader);
         }
     }
-
-    /**
-     * 创建classloader
-     * @param args 参数
-     * @return ClassLoader
-     * @throws Exception 创建异常
-     */
-    protected abstract ClassLoader createClassLoader(String... args) throws Exception;
-
-    /**
-     * 子类实现具体的启动方法
-     * @param classLoader 当前的 ClassLoader
-     * @param args 启动参数
-     * @return 启动返回值
-     * @throws Exception 启动异常
-     */
-    protected abstract R launch(ClassLoader classLoader, String... args) throws Exception;
 
 }

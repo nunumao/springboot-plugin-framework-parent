@@ -20,6 +20,7 @@ package com.gitee.starblues.core.descriptor;
 import com.gitee.starblues.common.ManifestKey;
 import com.gitee.starblues.common.PackageStructure;
 import com.gitee.starblues.core.descriptor.decrypt.PluginDescriptorDecrypt;
+import com.gitee.starblues.utils.FilesUtils;
 import com.gitee.starblues.utils.PropertiesUtils;
 import com.gitee.starblues.utils.ObjectUtils;
 import org.apache.commons.io.IOUtils;
@@ -41,7 +42,7 @@ import static com.gitee.starblues.common.PluginDescriptorKey.PLUGIN_RESOURCES_CO
  * 生产环境打包好的插件 PluginDescriptorLoader 加载者
  * 解析 jar、zip
  * @author starBlues
- * @version 3.0.1
+ * @version 3.0.2
  */
 public class ProdPackagePluginDescriptorLoader extends AbstractPluginDescriptorLoader{
 
@@ -77,6 +78,24 @@ public class ProdPackagePluginDescriptorLoader extends AbstractPluginDescriptorL
     @Override
     protected PluginResourcesConfig getPluginResourcesConfig(Path path, Properties properties) throws Exception {
         return pluginResourcesConfig;
+    }
+
+    @Override
+    protected String getLibDir(DefaultInsidePluginDescriptor descriptor, String configPluginLibDir) {
+        if(PluginType.isNestedPackage(descriptor.getType())){
+            return descriptor.getPluginLibDir();
+        } else {
+            return super.getLibDir(descriptor, configPluginLibDir);
+        }
+    }
+
+    @Override
+    protected String getLibPath(DefaultInsidePluginDescriptor descriptor, String index) {
+        if(PluginType.isNestedPackage(descriptor.getType())){
+            return index;
+        } else {
+            return super.getLibPath(descriptor, index);
+        }
     }
 
     protected PluginResourcesConfig getPluginResourcesConfig(JarFile jarFile, Properties properties) throws Exception {

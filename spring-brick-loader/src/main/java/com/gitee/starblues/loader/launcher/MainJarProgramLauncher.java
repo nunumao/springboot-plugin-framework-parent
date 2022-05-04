@@ -21,7 +21,7 @@ import com.gitee.starblues.loader.archive.ExplodedArchive;
 import com.gitee.starblues.loader.archive.JarFileArchive;
 import com.gitee.starblues.loader.classloader.GenericClassLoader;
 import com.gitee.starblues.loader.classloader.resource.loader.JarResourceLoader;
-import com.gitee.starblues.loader.classloader.resource.storage.ResourceStorage;
+import com.gitee.starblues.loader.classloader.resource.loader.MainJarResourceLoader;
 import com.gitee.starblues.loader.launcher.runner.MethodRunner;
 
 import java.io.File;
@@ -30,17 +30,14 @@ import java.net.URL;
 import java.util.Iterator;
 import java.util.Objects;
 
+import static com.gitee.starblues.loader.LoaderConstant.*;
+
 /**
  * 主程序jar in jar 模式启动者
  * @author starBlues
- * @version 3.0.0
+ * @version 3.0.2
  */
 public class MainJarProgramLauncher extends MainProgramLauncher{
-
-    private static final String PROD_CLASSES_PATH = "classes/";
-    private static final String PROD_CLASSES_URL_SIGN = "/classes!/";
-
-    private static final String PROD_LIB_PATH = "lib/";
 
     private final static Archive.EntryFilter ENTRY_FILTER = (entry)->{
         String name = entry.getName();
@@ -85,18 +82,5 @@ public class MainJarProgramLauncher extends MainProgramLauncher{
             }
         }
     }
-
-    private static class MainJarResourceLoader extends JarResourceLoader {
-
-        public MainJarResourceLoader(URL url) throws Exception {
-            super(url);
-        }
-
-        @Override
-        protected String resolveName(String name) {
-            return name.replace(PROD_CLASSES_PATH, "");
-        }
-    }
-
 
 }

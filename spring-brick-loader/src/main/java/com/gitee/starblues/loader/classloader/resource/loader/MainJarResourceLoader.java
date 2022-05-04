@@ -14,22 +14,26 @@
  *    limitations under the License.
  */
 
-package com.gitee.starblues.spring;
+package com.gitee.starblues.loader.classloader.resource.loader;
 
-import java.util.Map;
+import java.net.URL;
 
 /**
- * 主程序 ApplicationContext 接口
+ * 主程序 jar 启动时资源加载者
+ *
  * @author starBlues
- * @version 3.0.1
+ * @version 3.0.2
  */
-public interface MainApplicationContext extends ApplicationContext {
+public class MainJarResourceLoader extends JarResourceLoader {
 
-    /**
-     * 得到主程序所有配置的 env
-     *
-     * @return 主程序配置的 env 集合
-     */
-    Map<String, Map<String, Object>> getConfigurableEnvironment();
+    private static final String PROD_CLASSES_PATH = "classes/";
 
+    public MainJarResourceLoader(URL url) throws Exception {
+        super(url);
+    }
+
+    @Override
+    protected String resolveName(String name) {
+        return name.replace(PROD_CLASSES_PATH, "");
+    }
 }

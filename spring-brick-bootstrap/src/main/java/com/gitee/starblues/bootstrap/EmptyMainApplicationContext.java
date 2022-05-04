@@ -46,10 +46,4 @@ public class EmptyMainApplicationContext implements MainApplicationContext {
         return Collections.emptyMap();
     }
 
-    @Override
-    public ClassLoader getClassLoader() {
-        return EmptyMainApplicationContext.class.getClassLoader();
-    }
-
-
 }
