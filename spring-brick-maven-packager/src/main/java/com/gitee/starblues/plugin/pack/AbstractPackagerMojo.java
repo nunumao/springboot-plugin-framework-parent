@@ -54,6 +54,9 @@ public abstract class AbstractPackagerMojo extends AbstractDependencyFilterMojo{
     @Parameter(property = "spring-brick-packager.loadMainResourcePattern", required = false)
     private LoadMainResourcePattern loadMainResourcePattern;
 
+    @Parameter(property = "spring-brick-packager.includeSystemScope", defaultValue = "true", required = false)
+    private Boolean includeSystemScope;
+
     @Override
     public final void execute() throws MojoExecutionException, MojoFailureException {
         if(Constant.isPom(this.getProject().getPackaging())){
