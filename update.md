@@ -1,6 +1,7 @@
-1. 新增插件包启动时可进行密码校验功能。
-2. 修复插件动态安装的问题。
-3. 修复主程序打包为生产环境jar包后，启动问题。
-4. 修复插件更新时, 版本校验问题。
-5. 修复插件排序、启用、禁用配置无效的问题。
-6. 修复插件更新时, 新代码不无法变更的问题。
+1. 新增 `xx-outer、dir` 打包类型的插件可自定义依赖目录
+2. 新增`includeSystemScope`、`type=main` 打包属性
+3. 修复插件拦截器无法拦截不存在的url
+4. 修复主程序在 `jar-outer` 打包模式后无法启动问题
+5. 修复插件首次安装时异常
+6. fix https://gitee.com/starblues/springboot-plugin-framework-parent/issues/I53K4G
+7. fix https://gitee.com/starblues/springboot-plugin-framework-parent/issues/I53T9W

@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package com.gitee.starblues.utils;
+package com.gitee.starblues.loader.utils;
 
-import com.gitee.starblues.common.Constants;
+import com.gitee.starblues.loader.LoaderConstant;
 
 import java.io.File;
 import java.io.IOException;
@@ -106,7 +106,7 @@ public class FilesUtils {
             return relativePath;
         }
         if(isRelativePath(relativePath)){
-            return joiningFilePath(rootPath, relativePath.replaceFirst(Constants.RELATIVE_SIGN, ""));
+            return joiningFilePath(rootPath, relativePath.replaceFirst(LoaderConstant.RELATIVE_SIGN, ""));
         } else {
             return relativePath;
         }
@@ -121,7 +121,7 @@ public class FilesUtils {
         if(ObjectUtils.isEmpty(path)){
             return false;
         }
-        return path.startsWith(Constants.RELATIVE_SIGN);
+        return path.startsWith(LoaderConstant.RELATIVE_SIGN);
     }
 
 }

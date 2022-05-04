@@ -74,6 +74,12 @@ public interface InsidePluginDescriptor extends PluginDescriptor{
     String getPluginClassPath();
 
     /**
+     * 获取插件依赖配置的目录
+     * @return String
+     */
+    String getPluginLibDir();
+
+    /**
      * 获取插件依赖的路径
      * @return String
      */

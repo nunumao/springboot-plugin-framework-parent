@@ -24,7 +24,7 @@ import java.util.Objects;
 
 /**
  * @author starBlues
- * @version 3.0.0
+ * @version 3.0.2
  */
 public enum PluginType {
 
@@ -80,8 +80,23 @@ public enum PluginType {
             return PluginType.ZIP;
         } else if(Objects.equals(packageType, PluginType.ZIP_OUTER.getName())){
             return PluginType.ZIP_OUTER;
+        } else if(Objects.equals(packageType, PluginType.DIR.getName())){
+            return PluginType.DIR;
         } else {
             throw new PluginException("不能解析'" + packageType + "'打包类型的插件");
         }
     }
+
+    public static boolean isOuterPackage(PluginType pluginType){
+        return pluginType == PluginType.JAR_OUTER || pluginType == PluginType.ZIP_OUTER;
+    }
+
+    public static boolean isDirPackage(PluginType pluginType){
+        return pluginType == PluginType.DIR;
+    }
+
+    public static boolean isNestedPackage(PluginType pluginType){
+        return pluginType == PluginType.JAR || pluginType == PluginType.ZIP;
+    }
+
 }

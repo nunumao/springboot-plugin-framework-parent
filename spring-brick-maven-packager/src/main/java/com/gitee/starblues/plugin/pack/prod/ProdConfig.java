@@ -23,7 +23,7 @@ import org.apache.maven.plugins.annotations.Parameter;
 /**
  * 生产环境打包配置
  * @author starBlues
- * @version 3.0.0
+ * @version 3.0.2
  */
 @Data
 public class ProdConfig {
@@ -49,5 +49,10 @@ public class ProdConfig {
      * 输出文件目录。默认target
      */
     private String outputDirectory;
+
+    /**
+     * jar-outer、zip-outer、dir 类型可指定依赖包目录
+     */
+    private String libDir;
 
 }

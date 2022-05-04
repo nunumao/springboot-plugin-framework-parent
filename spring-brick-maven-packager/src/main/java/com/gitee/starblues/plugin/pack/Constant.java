@@ -16,6 +16,8 @@
 
 package com.gitee.starblues.plugin.pack;
 
+import org.apache.maven.artifact.Artifact;
+
 /**
  * 静态类
  * @author starBlues
@@ -26,7 +28,10 @@ public class Constant {
     public static final String PACKAGING_POM = "pom";
     public static final String SCOPE_PROVIDED = "provided";
     public static final String SCOPE_COMPILE = "compile";
+    public static final String SCOPE_SYSTEM = "system";
     public static final String SCOPE_TEST = "test";
+
+    public static final String MAVEN_MAIN_TYPE = "main";
 
     public static final String MODE_MAIN = "main";
     public static final String MODE_DEV = "dev";
@@ -38,9 +43,29 @@ public class Constant {
         return PACKAGING_POM.equalsIgnoreCase(packageType);
     }
 
+    public static boolean filterArtifact(Artifact artifact, Boolean includeSystemScope){
+        boolean scopeFilter = Constant.scopeFilter(artifact.getScope());
+        if(scopeFilter){
+            return true;
+        }
+        if(Constant.isSystemScope(artifact.getScope())){
+            return includeSystemScope == null || !includeSystemScope;
+        }
+        return false;
+    }
+
+    public static boolean filterMainTypeArtifact(Artifact artifact){
+        // 配置了为main的依赖, 则对其过滤
+        return MAVEN_MAIN_TYPE.equalsIgnoreCase(artifact.getType());
+    }
+
     public static boolean scopeFilter(String scope){
         return SCOPE_PROVIDED.equalsIgnoreCase(scope)
                 || SCOPE_TEST.equalsIgnoreCase(scope);
+    }
+
+    public static boolean isSystemScope(String scope){
+        return SCOPE_SYSTEM.equalsIgnoreCase(scope);
     }
 
 }

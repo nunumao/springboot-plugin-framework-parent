@@ -72,14 +72,10 @@ public class ComposeDescriptorLoader implements PluginDescriptorLoader{
     @Override
     public InsidePluginDescriptor load(Path location) throws PluginException {
         for (PluginDescriptorLoader pluginDescriptorLoader : pluginDescriptorLoaders) {
-            try {
-                InsidePluginDescriptor pluginDescriptor = pluginDescriptorLoader.load(location);
-                if(pluginDescriptor != null){
-                    pluginChecker.checkDescriptor(pluginDescriptor);
-                    return pluginDescriptor;
-                }
-            } catch (Exception e){
-                // 忽略异常
+            InsidePluginDescriptor pluginDescriptor = pluginDescriptorLoader.load(location);
+            if(pluginDescriptor != null){
+                pluginChecker.checkDescriptor(pluginDescriptor);
+                return pluginDescriptor;
             }
         }
         return null;
