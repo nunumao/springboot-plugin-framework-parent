@@ -16,19 +16,16 @@
 
 package com.gitee.starblues.plugin.pack;
 
-import com.gitee.starblues.common.AbstractDependencyPlugin;
-import com.gitee.starblues.common.ManifestKey;
-import com.gitee.starblues.common.PackageStructure;
-import com.gitee.starblues.common.PackageType;
-import com.gitee.starblues.plugin.pack.dev.DevConfig;
-import com.gitee.starblues.plugin.pack.utils.CommonUtils;
+import com.gitee.starblues.common.*;
 import com.gitee.starblues.utils.FilesUtils;
 import com.gitee.starblues.utils.ObjectUtils;
 import lombok.Getter;
 import org.apache.commons.io.FileUtils;
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.model.Dependency;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.project.MavenProject;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -355,7 +352,8 @@ public class BasicRepackager implements Repackager{
      * @return 返回true表示被过滤掉
      */
     protected boolean filterArtifact(Artifact artifact){
-        return Constant.scopeFilter(artifact.getScope());
+        return Constant.filterMainTypeArtifact(artifact) ||
+                Constant.filterArtifact(artifact, repackageMojo.getIncludeSystemScope());
     }
 
 

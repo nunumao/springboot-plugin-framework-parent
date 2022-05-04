@@ -108,7 +108,7 @@ public class JarNestPackager implements Repackager {
     }
 
     protected boolean filterArtifact(Artifact artifact) {
-        return Constant.scopeFilter(artifact.getScope());
+        return Constant.filterArtifact(artifact, repackageMojo.getIncludeSystemScope());
     }
 
     protected String createLibEntry() throws Exception {
