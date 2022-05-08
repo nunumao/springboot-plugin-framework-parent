@@ -102,7 +102,10 @@ public class PluginClassLoader extends GenericClassLoader {
             return;
         }
         String pluginUnique = MsgUtils.getPluginUnique(pluginDescriptor);
-        log.info("插件[{}]依赖加载目录: {}", pluginUnique, pluginDescriptor.getPluginLibDir());
+        String pluginLibDir = pluginDescriptor.getPluginLibDir();
+        if(!ObjectUtils.isEmpty(pluginLibDir)){
+            log.info("插件[{}]依赖加载目录: {}", pluginUnique, pluginLibDir);
+        }
         if(pluginLibInfos.isEmpty()){
             log.warn("插件[{}]依赖为空！", pluginUnique);
             return;
