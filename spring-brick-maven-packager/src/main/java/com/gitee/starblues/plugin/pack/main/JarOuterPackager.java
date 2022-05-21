@@ -31,6 +31,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.jar.Attributes;
 import java.util.jar.Manifest;
+import java.util.stream.Stream;
 
 import static com.gitee.starblues.common.ManifestKey.*;
 
@@ -86,11 +87,7 @@ public class JarOuterPackager extends JarNestPackager {
         attributes.putValue(START_CLASS, mainConfig.getMainClass());
         attributes.putValue(MAIN_CLASS, MAIN_CLASS_VALUE);
         attributes.putValue(MAIN_PACKAGE_TYPE, PackageType.MAIN_PACKAGE_TYPE_JAR_OUTER);
-        String libDir = PackageStructure.LIB_NAME;
-        if(!ObjectUtils.isEmpty(mainConfig.getLibDir())){
-            libDir = mainConfig.getLibDir();
-        }
-        attributes.putValue(MAIN_LIB_DIR, libDir);
+        attributes.putValue(MAIN_LIB_DIR, getLibPath());
         attributes.putValue(MAIN_LIB_INDEXES, getLibIndexes());
         return manifest;
     }
@@ -119,12 +116,25 @@ public class JarOuterPackager extends JarNestPackager {
                 packageJar.copyZipToPackage(artifact.getFile());
             } else {
                 File artifactFile = artifact.getFile();
-                String targetFilePath = FilesUtils.joiningFilePath(
-                        mainConfig.getOutputDirectory(), PackageStructure.LIB_NAME, artifactFile.getName());
+                String libPath = getLibPath();
+                if(FilesUtils.isRelativePath(libPath)){
+                    libPath = FilesUtils.resolveRelativePath(mainConfig.getOutputDirectory(), getLibPath());
+                } else {
+                    libPath = FilesUtils.joiningFilePath(mainConfig.getOutputDirectory(), libPath);
+                }
+                String targetFilePath = FilesUtils.joiningFilePath(libPath, artifactFile.getName());
                 FileUtils.copyFile(artifactFile, new File(targetFilePath));
                 dependencyIndexNames.add(artifactFile.getName());
             }
         }
+    }
+
+    private String getLibPath(){
+        String libDir = PackageStructure.LIB_NAME;
+        if(!ObjectUtils.isEmpty(mainConfig.getLibDir())){
+            libDir = mainConfig.getLibDir();
+        }
+        return libDir;
     }
 
 }

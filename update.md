@@ -1,7 +1,9 @@
-1. 新增 `xx-outer、dir` 打包类型的插件可自定义依赖目录
-2. 新增`includeSystemScope`、`type=main` 打包属性
-3. 修复插件拦截器无法拦截不存在的url
-4. 修复主程序在 `jar-outer` 打包模式后无法启动问题
-5. 修复插件首次安装时异常
-6. fix https://gitee.com/starblues/springboot-plugin-framework-parent/issues/I53K4G
-7. fix https://gitee.com/starblues/springboot-plugin-framework-parent/issues/I53T9W
+1. 【新增[#I58CDB]([#I58CDB](https://gitee.com/starblues/springboot-plugin-framework-parent/issues/I58CDB))】
+插件可触发`WebServerInitializedEvent`类型的事件
+2. 【支持】支持插件`Controller`可不配置地址前缀
+3. 【修复】`enablePluginIdRestPathPrefix`不生效问题
+4. 【修复】插件无法注入`ObjectProvider<T>`、`ObjectFactory<T>`类型为主程序的`Bean`
+5. 【修复[#I58CDB](https://gitee.com/starblues/springboot-plugin-framework-parent/issues/I58CDB)】
+插件`Controller`使用`Aop`后, 获取不到参数
+6. 【修复[#I58GCI](https://gitee.com/starblues/springboot-plugin-framework-parent/issues/I58GCI)】 
+主程序打包参数`libDir`不生效问题

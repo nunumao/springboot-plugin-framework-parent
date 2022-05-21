@@ -99,8 +99,13 @@ public class PluginMainResourcePatternDefiner extends JavaMainResourcePatternDef
         patterns.add("org/springframework/remoting/**");
         patterns.add("org/springframework/ui/**");
 
-        patterns.add("com/fasterxml/jackson/**");
+        patterns.add("org/springframework/boot/autoconfigure/http/**");
+        patterns.add("org/springframework/boot/autoconfigure/web/**");
+        patterns.add("org/springframework/boot/autoconfigure/websocket/**");
+        patterns.add("org/springframework/boot/autoconfigure/webservices/**");
+        patterns.add("org/springframework/boot/autoconfigure/jackson/**");
 
+        patterns.add("com/fasterxml/jackson/**");
     }
 
     protected void addApiDoc(Set<String> patterns){
