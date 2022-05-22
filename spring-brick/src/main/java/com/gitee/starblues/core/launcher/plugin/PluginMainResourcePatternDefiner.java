@@ -61,6 +61,8 @@ public class PluginMainResourcePatternDefiner extends JavaMainResourcePatternDef
         addApiDoc(includeResourcePatterns);
         addDbDriver(includeResourcePatterns);
 
+        addIdea(includeResourcePatterns);
+
         // 配置插件自定义从主程序加载的资源匹配
         Set<String> includeMainResourcePatterns = descriptor.getIncludeMainResourcePatterns();
         if(ObjectUtils.isEmpty(includeMainResourcePatterns)){
@@ -75,8 +77,6 @@ public class PluginMainResourcePatternDefiner extends JavaMainResourcePatternDef
         }
         return includeResourcePatterns;
     }
-
-
 
     @Override
     public Set<String> getExcludePatterns() {
@@ -139,6 +139,11 @@ public class PluginMainResourcePatternDefiner extends JavaMainResourcePatternDef
         patterns.add("weblogic/jdbc/**");
         // h2
         patterns.add("jdbc/h2/**");
+    }
+
+    private void addIdea(Set<String> includeResourcePatterns) {
+        // idea debug agent
+        includeResourcePatterns.add("com/intellij/rt/debugger/agent/**");
     }
 
     /**
