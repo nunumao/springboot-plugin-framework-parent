@@ -25,7 +25,7 @@ import java.util.Set;
 /**
  * 空的MainApplicationContext实现
  * @author starBlues
- * @version 3.0.1
+ * @version 3.0.3
  */
 public class EmptyMainApplicationContext implements MainApplicationContext {
 
@@ -44,6 +44,16 @@ public class EmptyMainApplicationContext implements MainApplicationContext {
     @Override
     public Map<String, Map<String, Object>> getConfigurableEnvironment() {
         return Collections.emptyMap();
+    }
+
+    @Override
+    public boolean isResolveDependency(String packageName) {
+        return false;
+    }
+
+    @Override
+    public boolean isWebEnvironment() {
+        return false;
     }
 
 }

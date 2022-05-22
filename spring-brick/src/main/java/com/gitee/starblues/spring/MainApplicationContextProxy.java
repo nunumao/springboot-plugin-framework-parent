@@ -16,6 +16,9 @@
 
 package com.gitee.starblues.spring;
 
+import com.gitee.starblues.integration.IntegrationConfiguration;
+import org.springframework.boot.web.reactive.context.AnnotationConfigReactiveWebServerApplicationContext;
+import org.springframework.boot.web.servlet.context.AnnotationConfigServletWebServerApplicationContext;
 import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.EnumerablePropertySource;
@@ -34,15 +37,24 @@ import java.util.Map;
 public class MainApplicationContextProxy extends ApplicationContextProxy implements MainApplicationContext{
 
     private final GenericApplicationContext applicationContext;
+    private final IntegrationConfiguration configuration;
+    private final boolean isWebEnvironment;
 
-    public MainApplicationContextProxy(GenericApplicationContext applicationContext) {
+    public MainApplicationContextProxy(GenericApplicationContext applicationContext,
+                                       IntegrationConfiguration configuration) {
         super(applicationContext.getBeanFactory());
         this.applicationContext = applicationContext;
+        this.configuration = configuration;
+        this.isWebEnvironment = getIsWebEnvironment(applicationContext);
     }
 
-    public MainApplicationContextProxy(GenericApplicationContext applicationContext, AutoCloseable autoCloseable) {
+    public MainApplicationContextProxy(GenericApplicationContext applicationContext,
+                                       IntegrationConfiguration configuration,
+                                       AutoCloseable autoCloseable) {
         super(applicationContext.getBeanFactory(), autoCloseable);
         this.applicationContext = applicationContext;
+        this.configuration = configuration;
+        this.isWebEnvironment = getIsWebEnvironment(applicationContext);
     }
 
     @Override
@@ -65,6 +77,21 @@ public class MainApplicationContextProxy extends ApplicationContextProxy impleme
             }
         }
         return environmentMap;
+    }
+
+    @Override
+    public boolean isResolveDependency(String packageName) {
+        return packageName.startsWith(configuration.mainPackage());
+    }
+
+    @Override
+    public boolean isWebEnvironment() {
+        return isWebEnvironment;
+    }
+
+    private boolean getIsWebEnvironment(GenericApplicationContext applicationContext){
+        return applicationContext instanceof AnnotationConfigServletWebServerApplicationContext
+                || applicationContext instanceof AnnotationConfigReactiveWebServerApplicationContext;
     }
 
 }

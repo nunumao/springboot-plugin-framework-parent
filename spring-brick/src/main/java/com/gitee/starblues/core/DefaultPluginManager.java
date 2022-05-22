@@ -49,11 +49,11 @@ import java.util.stream.Collectors;
 /**
  * 抽象的插件管理者
  * @author starBlues
- * @version 3.0.2
+ * @version 3.0.3
  */
 public class DefaultPluginManager implements PluginManager{
 
-    private final Logger log = LoggerFactory.getLogger(this.getClass());
+    private final Logger log = LoggerFactory.getLogger(DefaultPluginManager.class);
 
     private final RealizeProvider provider;
     private final IntegrationConfiguration configuration;

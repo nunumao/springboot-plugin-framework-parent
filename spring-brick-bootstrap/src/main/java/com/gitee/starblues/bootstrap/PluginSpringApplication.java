@@ -34,11 +34,11 @@ import org.springframework.core.io.ResourceLoader;
 /**
  * 插件SpringApplication实现
  * @author starBlues
- * @version 3.0.0
+ * @version 3.0.3
  */
 public class PluginSpringApplication extends SpringApplication {
 
-    private final Logger logger = LoggerFactory.getLogger(this.getClass());
+    private final Logger logger = LoggerFactory.getLogger(PluginSpringApplication.class);
 
     private final ProcessorContext.RunMode runMode;
 
@@ -68,6 +68,9 @@ public class PluginSpringApplication extends SpringApplication {
     protected GenericApplicationContext getApplicationContext(){
         if(runMode == ProcessorContext.RunMode.ONESELF){
             return (GenericApplicationContext) super.createApplicationContext();
+        }
+        if(processorContext.getMainApplicationContext().isWebEnvironment()){
+            return new PluginWebApplicationContext(beanFactory, processorContext);
         } else {
             return new PluginApplicationContext(beanFactory, processorContext);
         }
