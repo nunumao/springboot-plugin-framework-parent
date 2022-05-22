@@ -44,10 +44,18 @@ public class DevRepackager extends BasicRepackager {
 
     @Override
     protected Set<String> getDependenciesIndexSet() throws Exception {
-        moduleDependencies = getModuleDependencies(repackageMojo.getDevConfig());
+        DevConfig devConfig = repackageMojo.getDevConfig();
+        if(devConfig == null){
+            return super.getDependenciesIndexSet();
+        }
+        moduleDependencies = getModuleDependencies(devConfig);
         Set<String> dependenciesIndexSet = super.getDependenciesIndexSet();
         for (Dependency dependency : moduleDependencies.values()) {
             dependenciesIndexSet.add(dependency.getClassesPath());
+        }
+        List<String> localJars = devConfig.getLocalJars();
+        if(!ObjectUtils.isEmpty(localJars)){
+            dependenciesIndexSet.addAll(localJars);
         }
         return dependenciesIndexSet;
     }

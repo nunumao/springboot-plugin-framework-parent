@@ -38,7 +38,7 @@ import java.util.stream.Collectors;
 /**
  * 组合的处理器
  * @author starBlues
- * @version 3.0.0
+ * @version 3.0.3
  */
 public class ComposeSpringPluginProcessor implements SpringPluginProcessor {
 
@@ -160,6 +160,10 @@ public class ComposeSpringPluginProcessor implements SpringPluginProcessor {
      * @param processors 处理者容器集合
      */
     protected void addDefaultWebEnvProcessors(ProcessorContext context, List<SpringPluginProcessor> processors){
+        if(!context.getMainApplicationContext().isWebEnvironment()){
+            // 主程序不是web类型, 则不进行注册
+            return;
+        }
         SpringPluginBootstrap springPluginBootstrap = context.getSpringPluginBootstrap();
         DisablePluginWeb disablePluginWeb = AnnotationUtils.findAnnotation(springPluginBootstrap.getClass(),
                 DisablePluginWeb.class);

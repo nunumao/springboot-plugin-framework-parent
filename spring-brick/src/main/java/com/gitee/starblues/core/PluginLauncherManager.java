@@ -60,7 +60,8 @@ public class PluginLauncherManager extends DefaultPluginManager{
                                  GenericApplicationContext applicationContext,
                                  IntegrationConfiguration configuration) {
         super(realizeProvider, configuration);
-        this.mainApplicationContext = new MainApplicationContextProxy(applicationContext, applicationContext);
+        this.mainApplicationContext =
+                new MainApplicationContextProxy(applicationContext, configuration, applicationContext);
         this.mainGenericApplicationContext = applicationContext;
         this.configuration = configuration;
         this.invokeSupperCache = new DefaultInvokeSupperCache();

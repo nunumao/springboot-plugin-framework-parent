@@ -106,8 +106,18 @@ public class PluginStaticResourceResolver extends AbstractResourceResolver {
                 // 存在后缀
                 return null;
             }
-            partialPath = UrlUtils.joiningUrlPath(partialPath, indexPageName);
-            return findResource(pluginResource, partialPath);
+
+            // 查找第一级节点，找不到则读取根index.html
+            if(partialPath.contains(UrlUtils.SPLIT)){
+                partialPath = partialPath.substring(0, partialPath.indexOf(UrlUtils.SPLIT));
+            }
+            // 第一级节点
+            resource = findResource(pluginResource, UrlUtils.joiningUrlPath(partialPath, indexPageName));
+            if(resource != null){
+                return resource;
+            }
+            // 根节点
+            return findResource(pluginResource, UrlUtils.joiningUrlPath(UrlUtils.SPLIT, indexPageName));
         }
     }
 
@@ -144,7 +154,11 @@ public class PluginStaticResourceResolver extends AbstractResourceResolver {
                 PluginResource resource = new PluginResource(classPath + partialPath, pluginResource.getPluginDescriptor());
                 resource.setClassLoader(pluginClassLoader);
                 if(resource.exists()){
-                    return resource;
+                    // 确保资源为文件
+                    File file = resource.getFile();
+                    if(file != null && file.isFile()){
+                        return resource;
+                    }
                 }
             } catch (Exception e){
                 logger.debug("Get static resources of classpath '{}' error.", classPath, e);

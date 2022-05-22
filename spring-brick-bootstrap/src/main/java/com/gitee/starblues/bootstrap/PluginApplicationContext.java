@@ -20,12 +20,14 @@ import com.gitee.starblues.bootstrap.processor.ProcessorContext;
 import com.gitee.starblues.core.descriptor.PluginDescriptor;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
+import org.springframework.boot.web.context.WebServerApplicationContext;
+import org.springframework.boot.web.server.WebServer;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 /**
  * 插件ApplicationContext实现
  * @author starBlues
- * @version 3.0.0
+ * @version 3.0.3
  */
 public class PluginApplicationContext extends AnnotationConfigApplicationContext {
 
@@ -57,4 +59,5 @@ public class PluginApplicationContext extends AnnotationConfigApplicationContext
     public void close() {
         super.close();
     }
+
 }

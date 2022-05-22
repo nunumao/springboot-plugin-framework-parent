@@ -32,4 +32,19 @@ public interface MainApplicationContext extends ApplicationContext {
      */
     Map<String, Map<String, Object>> getConfigurableEnvironment();
 
+    /**
+     * If Resolve the specified main dependency against the beans defined in this factory.
+     *
+     * @param packageName 当前依赖包名称
+     * @return boolean
+     */
+    boolean isResolveDependency(String packageName);
+
+    /**
+     * 是否为web环境
+     * @return boolean
+     */
+    boolean isWebEnvironment();
+
+
 }
