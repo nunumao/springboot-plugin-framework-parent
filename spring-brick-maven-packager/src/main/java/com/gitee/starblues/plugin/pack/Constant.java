@@ -32,6 +32,7 @@ public class Constant {
     public static final String SCOPE_TEST = "test";
 
     public static final String MAVEN_MAIN_TYPE = "main";
+    public static final String MAVEN_POM_TYPE = "pom";
 
     public static final String MODE_MAIN = "main";
     public static final String MODE_DEV = "dev";
@@ -51,12 +52,19 @@ public class Constant {
         if(Constant.isSystemScope(artifact.getScope())){
             return includeSystemScope == null || !includeSystemScope;
         }
+        if(Constant.filterPomTypeArtifact(artifact)){
+            return true;
+        }
         return false;
     }
 
     public static boolean filterMainTypeArtifact(Artifact artifact){
         // 配置了为main的依赖, 则对其过滤
         return MAVEN_MAIN_TYPE.equalsIgnoreCase(artifact.getType());
+    }
+
+    public static boolean filterPomTypeArtifact(Artifact artifact){
+        return MAVEN_POM_TYPE.equalsIgnoreCase(artifact.getType());
     }
 
     public static boolean scopeFilter(String scope){
