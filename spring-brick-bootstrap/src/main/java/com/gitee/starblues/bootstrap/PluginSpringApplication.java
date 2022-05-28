@@ -59,7 +59,7 @@ public class PluginSpringApplication extends SpringApplication {
         this.pluginProcessor = pluginProcessor;
         this.processorContext = processorContext;
         this.resourceLoader = processorContext.getResourceLoader();
-        this.beanFactory = new PluginListableBeanFactory(processorContext.getMainApplicationContext());
+        this.beanFactory = new PluginListableBeanFactory(processorContext);
         this.configurePluginEnvironment = new ConfigurePluginEnvironment(processorContext);
         this.applicationContext = getApplicationContext();
         setDefaultPluginConfig();

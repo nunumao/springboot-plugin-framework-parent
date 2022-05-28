@@ -17,7 +17,6 @@
 package com.gitee.starblues.plugin.pack.prod;
 
 import com.gitee.starblues.common.PackageType;
-import com.gitee.starblues.plugin.pack.Constant;
 import com.gitee.starblues.plugin.pack.PluginInfo;
 import com.gitee.starblues.plugin.pack.RepackageMojo;
 import com.gitee.starblues.plugin.pack.Repackager;

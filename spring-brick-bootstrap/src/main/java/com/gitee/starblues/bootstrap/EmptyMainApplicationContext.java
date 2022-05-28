@@ -47,8 +47,8 @@ public class EmptyMainApplicationContext implements MainApplicationContext {
     }
 
     @Override
-    public boolean isResolveDependency(String packageName) {
-        return false;
+    public Object resolveDependency(String requestingBeanName, Class<?> dependencyType) {
+        return null;
     }
 
     @Override
