@@ -30,6 +30,11 @@ import java.util.Set;
  */
 public class DefaultMainResourceMatcher implements MainResourceMatcher{
 
+    private static final String DEFAULT_PATH_SEPARATOR = "/";
+
+    private final static String SEPARATOR_DOT = ".";
+    private final static String SEPARATOR_BACKSLASH = "\\";
+
     private final Set<String> includePatterns;
     private final Set<String> excludePatterns;
 
@@ -42,13 +47,13 @@ public class DefaultMainResourceMatcher implements MainResourceMatcher{
     }
 
     @Override
-    public boolean match(String resourceUrl) {
+    public Boolean match(String resourceUrl) {
         return match(includePatterns, resourceUrl);
     }
 
-    private boolean match(Collection<String> patterns, String url){
+    private Boolean match(Collection<String> patterns, String url){
         if(ObjectUtils.isEmpty(patterns) || ObjectUtils.isEmpty(url)){
-            return false;
+            return Boolean.FALSE;
         }
         url = formatUrl(url);
         for (String pattern : patterns) {
@@ -57,28 +62,33 @@ public class DefaultMainResourceMatcher implements MainResourceMatcher{
                 return !excludeMatch(excludePatterns, url);
             }
         }
-        return false;
+        return Boolean.FALSE;
     }
 
-    private boolean excludeMatch(Collection<String> patterns, String url){
+    private Boolean excludeMatch(Collection<String> patterns, String url){
         if(ObjectUtils.isEmpty(patterns) || ObjectUtils.isEmpty(url)){
-            return false;
+            return Boolean.FALSE;
         }
         url = formatUrl(url);
         for (String pattern : patterns) {
             boolean match = pathMatcher.match(pattern, url);
             if(match){
-                return true;
+                return Boolean.TRUE;
             }
         }
-        return false;
+        return Boolean.FALSE;
     }
 
 
     private String formatUrl(String url){
-        url = url.replace("\\", AntPathMatcher.DEFAULT_PATH_SEPARATOR);
-        if(url.startsWith(AntPathMatcher.DEFAULT_PATH_SEPARATOR)){
-            url = url.substring(url.indexOf(AntPathMatcher.DEFAULT_PATH_SEPARATOR) + 1);
+        if(url.contains(SEPARATOR_DOT)){
+            url = url.replace(SEPARATOR_DOT, AntPathMatcher.DEFAULT_PATH_SEPARATOR);
+        }
+        if(url.contains(SEPARATOR_BACKSLASH)){
+            url = url.replace(SEPARATOR_BACKSLASH, AntPathMatcher.DEFAULT_PATH_SEPARATOR);
+        }
+        if(url.startsWith(DEFAULT_PATH_SEPARATOR)){
+            url = url.substring(url.indexOf(DEFAULT_PATH_SEPARATOR) + 1);
         }
         return url;
     }

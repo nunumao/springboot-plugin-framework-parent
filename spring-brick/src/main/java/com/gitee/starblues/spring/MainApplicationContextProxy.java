@@ -17,6 +17,7 @@
 package com.gitee.starblues.spring;
 
 import com.gitee.starblues.integration.IntegrationConfiguration;
+import com.gitee.starblues.utils.ObjectUtils;
 import org.springframework.boot.web.reactive.context.AnnotationConfigReactiveWebServerApplicationContext;
 import org.springframework.boot.web.servlet.context.AnnotationConfigServletWebServerApplicationContext;
 import org.springframework.context.support.GenericApplicationContext;
@@ -80,8 +81,15 @@ public class MainApplicationContextProxy extends ApplicationContextProxy impleme
     }
 
     @Override
-    public boolean isResolveDependency(String packageName) {
-        return packageName.startsWith(configuration.mainPackage());
+    public Object resolveDependency(String requestingBeanName, Class<?> dependencyType) {
+        if(!ObjectUtils.isEmpty(requestingBeanName) && applicationContext.containsBean(requestingBeanName)){
+            return applicationContext.getBean(requestingBeanName);
+        }
+        try {
+            return applicationContext.getBean(dependencyType);
+        } catch (Exception e){
+            return null;
+        }
     }
 
     @Override

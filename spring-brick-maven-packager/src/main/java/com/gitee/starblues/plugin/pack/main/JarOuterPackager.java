@@ -69,9 +69,7 @@ public class JarOuterPackager extends JarNestPackager {
         String fileName = mainConfig.getFileName();
         String rootDirPath = FilesUtils.joiningFilePath(outputDirectory, fileName);
         File rootFile = new File(rootDirPath);
-        if(rootFile.exists()){
-            rootFile.deleteOnExit();
-        }
+        CommonUtils.deleteFile(rootFile);
         if(rootFile.mkdirs()){
             return rootDirPath;
         } else {

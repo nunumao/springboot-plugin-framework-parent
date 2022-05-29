@@ -16,24 +16,24 @@
 
 package com.gitee.starblues.bootstrap;
 
+import com.gitee.starblues.bootstrap.annotation.AutowiredType;
+import com.gitee.starblues.bootstrap.processor.ProcessorContext;
 import com.gitee.starblues.bootstrap.utils.DestroyUtils;
+import com.gitee.starblues.core.classloader.MainResourceMatcher;
+import com.gitee.starblues.core.classloader.PluginClassLoader;
 import com.gitee.starblues.spring.MainApplicationContext;
 import com.gitee.starblues.spring.SpringBeanFactory;
-import com.gitee.starblues.utils.ObjectUtils;
 import com.gitee.starblues.utils.ReflectionUtils;
 import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.TypeConverter;
-import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
-import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.config.DependencyDescriptor;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.beans.factory.support.ScopeNotActiveException;
-import org.springframework.core.ResolvableType;
 import org.springframework.lang.Nullable;
 
 import java.util.Map;
@@ -49,12 +49,14 @@ import java.util.stream.Stream;
  */
 public class PluginListableBeanFactory extends DefaultListableBeanFactory {
 
-    private final Logger logger = LoggerFactory.getLogger(PluginListableBeanFactory.class);
+    private static final Logger LOG = LoggerFactory.getLogger(PluginListableBeanFactory.class);
 
     private final MainApplicationContext applicationContext;
+    private final ClassLoader pluginClassLoader;
 
-    public PluginListableBeanFactory(MainApplicationContext applicationContext) {
-        this.applicationContext = applicationContext;
+    public PluginListableBeanFactory(ProcessorContext processorContext) {
+        this.applicationContext = processorContext.getMainApplicationContext();
+        this.pluginClassLoader = processorContext.getResourceLoader().getClassLoader();
     }
 
     @SuppressWarnings("unchecked")
@@ -64,25 +66,45 @@ public class PluginListableBeanFactory extends DefaultListableBeanFactory {
                                     @Nullable Set<String> autowiredBeanNames,
                                     @Nullable TypeConverter typeConverter) throws BeansException {
         if(isDisabled(descriptor)){
-            return resolveDependencyFromMain(descriptor, false);
+            // 插件被禁用的依赖Bean直接从主程序获取。
+            return resolveDependencyFromMain(requestingBeanName, descriptor);
         }
-        try {
-            Object object = super.resolveDependency(descriptor, requestingBeanName, autowiredBeanNames,
-                    typeConverter);
+        AutowiredType.Type autowiredType = getAutowiredType(descriptor);
+        if(autowiredType == AutowiredType.Type.MAIN){
+            Object dependencyObj = resolveDependencyFromMain(requestingBeanName, descriptor);
+            if(dependencyObj != null){
+                return dependencyObj;
+            }
+            throw new NoSuchBeanDefinitionException(descriptor.getDependencyType());
+        } else if(autowiredType == AutowiredType.Type.PLUGIN){
+            return super.resolveDependency(descriptor, requestingBeanName, autowiredBeanNames, typeConverter);
+        } else if(autowiredType == AutowiredType.Type.PLUGIN_MAIN){
+            try {
+                Object object = super.resolveDependency(descriptor, requestingBeanName, autowiredBeanNames,
+                        typeConverter);
 
-            if(object instanceof ObjectProvider){
-                return new PluginObjectProviderWrapper((ObjectProvider<Object>) object, descriptor);
-            }
-            return object;
-        } catch (BeansException e){
-            if(e instanceof NoSuchBeanDefinitionException){
-                Object dependencyBean = resolveDependencyFromMain(descriptor, true);
-                if(dependencyBean != null){
-                    return dependencyBean;
+                if(object instanceof ObjectProvider){
+                    return new PluginObjectProviderWrapper((ObjectProvider<Object>) object, requestingBeanName, descriptor);
                 }
+                return object;
+            } catch (BeansException e){
+                if(e instanceof NoSuchBeanDefinitionException){
+                    Object dependencyObj = resolveDependencyFromMain(requestingBeanName, descriptor);
+                    if(dependencyObj != null){
+                        return dependencyObj;
+                    }
+                }
+                throw e;
             }
-            throw e;
+        } else if(autowiredType == AutowiredType.Type.MAIN_PLUGIN){
+            Object dependencyObj = resolveDependencyFromMain(requestingBeanName, descriptor);
+            if(dependencyObj != null){
+                return dependencyObj;
+            }
+            return super.resolveDependency(descriptor, requestingBeanName, autowiredBeanNames,
+                    typeConverter);
         }
+        throw new NoSuchBeanDefinitionException(descriptor.getDependencyType());
     }
 
     @Override
@@ -100,23 +122,33 @@ public class PluginListableBeanFactory extends DefaultListableBeanFactory {
         return super.getBeanProvider(requiredType, allowEagerInit);
     }
 
+    private AutowiredType.Type getAutowiredType(DependencyDescriptor descriptor){
+        AutowiredType autowiredType = descriptor.getAnnotation(AutowiredType.class);
+        if(autowiredType != null){
+            return autowiredType.value();
+        } else {
+            return AutowiredType.Type.PLUGIN_MAIN;
+        }
+    }
 
-    private Object resolveDependencyFromMain(DependencyDescriptor descriptor, boolean isResolveDependency){
-        String packageName = descriptor.getDependencyType().getPackage().getName();
-        if(isResolveDependency && !applicationContext.isResolveDependency(packageName)){
+    private Object resolveDependencyFromMain(String requestingBeanName, DependencyDescriptor descriptor){
+        Object dependencyObj = null;
+        try {
+            if(pluginClassLoader instanceof PluginClassLoader){
+                PluginClassLoader classLoader = (PluginClassLoader) pluginClassLoader;
+                MainResourceMatcher mainResourceMatcher = classLoader.getMainResourceMatcher();
+                String className = descriptor.getDependencyType().getName();
+                if(mainResourceMatcher.match(className)){
+                    dependencyObj = applicationContext.resolveDependency(requestingBeanName,
+                            descriptor.getDependencyType());
+                }
+            } else {
+                LOG.warn("Cannot get Bean from main program, plugin classLoader is not PluginClassLoader");
+            }
+        } catch (Exception e){
             return null;
         }
-        String dependencyName = descriptor.getDependencyName();
-        SpringBeanFactory springBeanFactory = applicationContext.getSpringBeanFactory();
-        if(!ObjectUtils.isEmpty(dependencyName) && springBeanFactory.containsBean(dependencyName)){
-            return springBeanFactory.getBean(dependencyName);
-        } else {
-            try {
-                return springBeanFactory.getBean(descriptor.getDependencyType());
-            } catch (Exception e){
-                throw new NoSuchBeanDefinitionException(descriptor.getDependencyType());
-            }
-        }
+        return dependencyObj;
     }
 
     private void destroyAll(){
@@ -141,12 +173,14 @@ public class PluginListableBeanFactory extends DefaultListableBeanFactory {
     private class PluginObjectProviderWrapper implements ObjectProvider<Object> {
 
         private final ObjectProvider<Object> pluginObjectProvider;
+
+        private final String requestingBeanName;
         private final DependencyDescriptor descriptor;
 
         @Override
         public Object getObject() throws BeansException {
             if(isDisabled(descriptor)){
-                return resolveDependencyFromMain(descriptor, false);
+                return resolveDependencyFromMain(requestingBeanName, descriptor);
             }
             return pluginObjectProvider.getObject();
         }

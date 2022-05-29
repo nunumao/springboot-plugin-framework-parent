@@ -17,6 +17,7 @@
 package com.gitee.starblues.plugin.pack;
 
 import com.gitee.starblues.common.*;
+import com.gitee.starblues.plugin.pack.utils.CommonUtils;
 import com.gitee.starblues.utils.FilesUtils;
 import com.gitee.starblues.utils.ObjectUtils;
 import lombok.Getter;
@@ -120,7 +121,7 @@ public class BasicRepackager implements Repackager{
     protected String createRootDir() throws MojoFailureException {
         String rootDirPath = getBasicRootDir();
         File rootDir = new File(rootDirPath);
-        rootDir.deleteOnExit();
+        CommonUtils.deleteFile(rootDir);
         if(rootDir.mkdir()){
             return rootDirPath;
         }
