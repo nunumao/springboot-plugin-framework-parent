@@ -77,6 +77,9 @@ public class DefaultPluginLauncherChecker implements PluginLauncherChecker {
             return;
         }
         String requires = pluginInfo.getPluginDescriptor().getRequires();
+        if(ObjectUtils.isEmpty(requires)){
+            return;
+        }
         boolean exactVersion = configuration.exactVersion();
         int compareVersion = realizeProvider.getVersionInspector().compareTo(requires, version);
         PluginDescriptor descriptor = pluginInfo.getPluginDescriptor();
@@ -91,9 +94,5 @@ public class DefaultPluginLauncherChecker implements PluginLauncherChecker {
             throw new PluginException(pluginInfo.getPluginDescriptor(), error);
         }
     }
-
-
-
-
 
 }

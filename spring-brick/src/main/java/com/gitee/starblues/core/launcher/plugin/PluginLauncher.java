@@ -16,24 +16,28 @@
 
 package com.gitee.starblues.core.launcher.plugin;
 
+import com.gitee.starblues.core.classloader.*;
 import com.gitee.starblues.core.descriptor.InsidePluginDescriptor;
-import com.gitee.starblues.core.classloader.PluginClassLoader;
 import com.gitee.starblues.core.launcher.plugin.involved.PluginLaunchInvolved;
 import com.gitee.starblues.loader.classloader.GenericClassLoader;
 import com.gitee.starblues.loader.classloader.resource.loader.DefaultResourceLoaderFactory;
 import com.gitee.starblues.loader.classloader.resource.loader.ResourceLoaderFactory;
 import com.gitee.starblues.loader.launcher.AbstractLauncher;
 import com.gitee.starblues.loader.launcher.LauncherContext;
+import com.gitee.starblues.spring.MainApplicationContext;
 import com.gitee.starblues.spring.SpringPluginHook;
 import com.gitee.starblues.utils.MsgUtils;
+import com.gitee.starblues.utils.SpringBeanCustomUtils;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.WeakHashMap;
 
 /**
  * 插件启动引导类
  * @author starBlues
- * @version 3.0.1
+ * @version 3.0.3
  */
 public class PluginLauncher extends AbstractLauncher<SpringPluginHook> {
 
@@ -41,7 +45,7 @@ public class PluginLauncher extends AbstractLauncher<SpringPluginHook> {
 
     protected final PluginInteractive pluginInteractive;
     protected final InsidePluginDescriptor pluginDescriptor;
-    protected final PluginMainResourcePatternDefiner mainResourcePatternDefiner;
+    protected final MainResourceMatcher mainResourceMatcher;
 
     protected final PluginLaunchInvolved pluginLaunchInvolved;
 
@@ -49,8 +53,22 @@ public class PluginLauncher extends AbstractLauncher<SpringPluginHook> {
                           PluginLaunchInvolved pluginLaunchInvolved) {
         this.pluginInteractive = pluginInteractive;
         this.pluginDescriptor = pluginInteractive.getPluginDescriptor();
-        this.mainResourcePatternDefiner = new PluginMainResourcePatternDefiner(pluginInteractive);
+        this.mainResourceMatcher = getMainResourceMatcher(pluginInteractive);
         this.pluginLaunchInvolved = pluginLaunchInvolved;
+    }
+
+    protected MainResourceMatcher getMainResourceMatcher(PluginInteractive pluginInteractive){
+        MainApplicationContext mainApplicationContext = pluginInteractive.getMainApplicationContext();
+        // 获取主程序定义的资源匹配
+        List<MainResourceMatcher> mainResourceMatchers =
+                SpringBeanCustomUtils.getBeans(mainApplicationContext, MainResourceMatcher.class);
+
+        List<MainResourceMatcher> resourceMatchers = new ArrayList<>(mainResourceMatchers);
+        // 新增插件定义的资源匹配
+        resourceMatchers.add(new DefaultMainResourceMatcher(
+                new PluginMainResourcePatternDefiner(pluginInteractive)
+        ));
+        return new ComposeMainResourceMatcher(resourceMatchers);
     }
 
     @Override
@@ -68,8 +86,7 @@ public class PluginLauncher extends AbstractLauncher<SpringPluginHook> {
             return classLoader;
         }
         PluginClassLoader pluginClassLoader = new PluginClassLoader(
-                pluginId, getParentClassLoader(), mainResourcePatternDefiner,
-                getResourceLoaderFactory()
+                pluginId, getParentClassLoader(), getResourceLoaderFactory(), mainResourceMatcher
         );
         CLASS_LOADER_CACHE.put(key, pluginClassLoader);
         return pluginClassLoader;

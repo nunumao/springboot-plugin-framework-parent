@@ -16,6 +16,7 @@
 
 package com.gitee.starblues.integration;
 
+import com.gitee.starblues.common.Constants;
 import com.gitee.starblues.integration.decrypt.DecryptConfiguration;
 import com.gitee.starblues.utils.Assert;
 
@@ -83,7 +84,7 @@ public abstract class DefaultIntegrationConfiguration implements IntegrationConf
 
     @Override
     public String version() {
-        return "0.0.0";
+        return Constants.ALLOW_VERSION;
     }
 
     @Override

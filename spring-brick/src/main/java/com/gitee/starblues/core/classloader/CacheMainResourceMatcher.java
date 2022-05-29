@@ -23,7 +23,7 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * 可缓存的 ResourceMatcher
  * @author starBlues
- * @version 3.0.0
+ * @version 3.0.3
  */
 public class CacheMainResourceMatcher extends DefaultMainResourceMatcher implements AutoCloseable {
 
@@ -34,7 +34,7 @@ public class CacheMainResourceMatcher extends DefaultMainResourceMatcher impleme
     }
 
     @Override
-    public boolean match(String resourceUrl) {
+    public Boolean match(String resourceUrl) {
         Boolean match = resourceUrlMatchCache.get(resourceUrl);
         if(match == null){
             match = super.match(resourceUrl);

@@ -17,8 +17,11 @@
 package com.gitee.starblues.plugin.pack.utils;
 
 import com.gitee.starblues.plugin.pack.filter.Exclude;
+import org.apache.commons.io.FileUtils;
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.plugin.MojoFailureException;
 
+import java.io.File;
 import java.util.Objects;
 
 /**
@@ -47,5 +50,24 @@ public class CommonUtils {
     public static boolean isPluginFrameworkLoader(Artifact artifact){
         return Objects.equals(artifact.getGroupId(), PLUGIN_FRAMEWORK_GROUP_ID)
                 && Objects.equals(artifact.getArtifactId(), PLUGIN_FRAMEWORK_LOADER_ARTIFACT_ID);
+    }
+
+    public static void deleteFile(File rootFile) throws MojoFailureException {
+        try {
+            if(rootFile == null){
+                return;
+            }
+            if(!rootFile.exists()){
+                return;
+            }
+            if(rootFile.isFile()){
+                FileUtils.delete(rootFile);
+            } else {
+                FileUtils.deleteDirectory(rootFile);
+            }
+        } catch (Exception e){
+            e.printStackTrace();
+            throw new MojoFailureException("Delete file '" + rootFile.getPath() + "' failure. " + e.getMessage());
+        }
     }
 }

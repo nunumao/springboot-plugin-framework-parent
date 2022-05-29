@@ -28,6 +28,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 
 import java.io.*;
+import java.nio.file.Files;
 import java.util.Enumeration;
 import java.util.jar.Manifest;
 import java.util.zip.CRC32;
@@ -73,18 +74,7 @@ public class PackageZip implements Closeable{
     protected File getPackageFile(String rootPath) throws Exception {
         String fileSuffix = getPackageFileSuffix();
         File file = new File(rootPath + "." + fileSuffix);
-
-        if(file.exists()){
-            int i = 0;
-            while (true){
-                file = new File(rootPath + "_" + i + "." + fileSuffix);
-                if(file.exists()){
-                    i = i + 1;
-                    continue;
-                }
-                break;
-            }
-        }
+        CommonUtils.deleteFile(file);
         if(file.createNewFile()){
             return file;
         }
@@ -96,7 +86,7 @@ public class PackageZip implements Closeable{
     }
 
     protected ArchiveOutputStream getOutputStream(File packFile) throws Exception {
-        return new ZipArchiveOutputStream(new FileOutputStream(packFile));
+        return new ZipArchiveOutputStream(Files.newOutputStream(packFile.toPath()));
     }
 
     public void copyDirToPackage(File rootDir, String packageDir) throws Exception {

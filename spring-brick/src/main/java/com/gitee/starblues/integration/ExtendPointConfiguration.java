@@ -18,15 +18,19 @@ package com.gitee.starblues.integration;
 
 import com.gitee.starblues.core.DefaultRealizeProvider;
 import com.gitee.starblues.core.RealizeProvider;;
+import com.gitee.starblues.core.classloader.CacheMainResourceMatcher;
+import com.gitee.starblues.core.classloader.MainResourceMatcher;
 import com.gitee.starblues.core.descriptor.decrypt.DefaultPluginDescriptorDecrypt;
 import com.gitee.starblues.core.descriptor.decrypt.PluginDescriptorDecrypt;
 import com.gitee.starblues.core.launcher.plugin.BasicMainResourcePatternDefiner;
+import com.gitee.starblues.core.launcher.plugin.DefaultMainResourcePatternDefiner;
 import com.gitee.starblues.integration.operator.DefaultPluginOperator;
 import com.gitee.starblues.integration.operator.PluginOperator;
 import com.gitee.starblues.integration.operator.PluginOperatorWrapper;
 import com.gitee.starblues.integration.user.DefaultPluginUser;
 import com.gitee.starblues.integration.user.PluginUser;
 import com.gitee.starblues.spring.extract.ExtractFactory;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.condition.*;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.support.GenericApplicationContext;
@@ -34,7 +38,7 @@ import org.springframework.context.support.GenericApplicationContext;
 /**
  * 系统Bean配置
  * @author starBlues
- * @version 3.0.1
+ * @version 3.0.3
  */
 public class ExtendPointConfiguration {
 
@@ -78,9 +82,11 @@ public class ExtendPointConfiguration {
     }
 
     @Bean
-    @ConditionalOnMissingBean
-    public BasicMainResourcePatternDefiner mainResourcePatternDefiner(){
-        return new BasicMainResourcePatternDefiner(configuration.mainPackage());
+    public MainResourceMatcher mainResourceMatcher(){
+        return new CacheMainResourceMatcher(new DefaultMainResourcePatternDefiner(
+                configuration.mainPackage(),
+                applicationContext
+        ));
     }
 
     @Bean
