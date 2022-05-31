@@ -37,6 +37,4 @@ public interface MainResourcePatternDefiner {
      */
     Set<String> getExcludePatterns();
 
-
-
 }

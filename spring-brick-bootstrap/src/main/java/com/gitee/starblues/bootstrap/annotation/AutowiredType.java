@@ -21,25 +21,26 @@ public @interface AutowiredType {
     Type value() default Type.PLUGIN_MAIN;
 
     enum Type{
-        /**
-         * Bean 注入类型(默认): 先插件后主程序
-         */
-        PLUGIN_MAIN,
 
         /**
-         * Bean 注入类型: 先主程序后插件
-         */
-        MAIN_PLUGIN,
-
-        /**
-         * Bean 注入类型: 仅插件
+         * Bean 注入类型: 仅插件 (默认)
          */
         PLUGIN,
 
         /**
          *  Bean 注入类型: 仅主程序
          */
-        MAIN
+        MAIN,
+
+        /**
+         * Bean 注入类型: 先插件后主程序
+         */
+        PLUGIN_MAIN,
+
+        /**
+         * Bean 注入类型: 先主程序后插件
+         */
+        MAIN_PLUGIN
     }
 
 

@@ -127,7 +127,7 @@ public class PluginListableBeanFactory extends DefaultListableBeanFactory {
         if(autowiredType != null){
             return autowiredType.value();
         } else {
-            return AutowiredType.Type.PLUGIN_MAIN;
+            return AutowiredType.Type.PLUGIN;
         }
     }
 
@@ -268,7 +268,6 @@ public class PluginListableBeanFactory extends DefaultListableBeanFactory {
         @Override
         public Stream<Object> orderedStream() {
             if(isDisabled(descriptor)){
-                // TODO 随意排序
                 return getStreamOfMain().sorted();
             } else {
                 return pluginObjectProvider.orderedStream();

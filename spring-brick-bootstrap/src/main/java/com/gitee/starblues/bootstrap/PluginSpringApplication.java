@@ -102,6 +102,7 @@ public class PluginSpringApplication extends SpringApplication {
     public ConfigurableApplicationContext run(String... args) {
         try {
             processorContext.setApplicationContext(this.applicationContext);
+            PluginContextHolder.initialize(processorContext);
             pluginProcessor.initialize(processorContext);
             return super.run(args);
         } catch (Exception e) {
