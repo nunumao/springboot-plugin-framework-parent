@@ -35,7 +35,9 @@ public class DefaultPluginListenerFactory implements PluginListenerFactory{
 
     public DefaultPluginListenerFactory(ApplicationContext applicationContext){
         listeners = new ArrayList<>();
-        addPluginListener(new SwaggerListener(applicationContext));
+
+        // bug 存在二次创建SwaggerListener对象
+        //addPluginListener(new SwaggerListener(applicationContext));
         addExtendPluginListener(applicationContext);
     }
 
