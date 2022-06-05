@@ -18,12 +18,12 @@ public @interface AutowiredType {
      * 插件Bean注入类型
      * @return Type
      */
-    Type value() default Type.PLUGIN_MAIN;
+    Type value() default Type.PLUGIN;
+
 
     enum Type{
-
         /**
-         * Bean 注入类型: 仅插件 (默认)
+         * Bean 注入类型: 仅插件(默认)
          */
         PLUGIN,
 

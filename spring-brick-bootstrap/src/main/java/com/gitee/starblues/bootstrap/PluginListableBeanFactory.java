@@ -18,6 +18,7 @@ package com.gitee.starblues.bootstrap;
 
 import com.gitee.starblues.bootstrap.annotation.AutowiredType;
 import com.gitee.starblues.bootstrap.processor.ProcessorContext;
+import com.gitee.starblues.bootstrap.realize.AutowiredTypeDefiner;
 import com.gitee.starblues.bootstrap.utils.DestroyUtils;
 import com.gitee.starblues.core.classloader.MainResourceMatcher;
 import com.gitee.starblues.core.classloader.PluginClassLoader;
@@ -30,21 +31,22 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.TypeConverter;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
+import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.config.DependencyDescriptor;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.beans.factory.support.ScopeNotActiveException;
 import org.springframework.lang.Nullable;
 
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
  * 插件BeanFactory实现
  * @author starBlues
+ * @since 3.0.3
  * @version 3.0.3
  */
 public class PluginListableBeanFactory extends DefaultListableBeanFactory {
@@ -52,11 +54,11 @@ public class PluginListableBeanFactory extends DefaultListableBeanFactory {
     private static final Logger LOG = LoggerFactory.getLogger(PluginListableBeanFactory.class);
 
     private final MainApplicationContext applicationContext;
-    private final ClassLoader pluginClassLoader;
+    private final AutowiredTypeResolver autowiredTypeResolver;
 
     public PluginListableBeanFactory(ProcessorContext processorContext) {
         this.applicationContext = processorContext.getMainApplicationContext();
-        this.pluginClassLoader = processorContext.getResourceLoader().getClassLoader();
+        this.autowiredTypeResolver = new AutowiredTypeResolver(processorContext);
     }
 
     @SuppressWarnings("unchecked")
@@ -65,10 +67,6 @@ public class PluginListableBeanFactory extends DefaultListableBeanFactory {
                                     @Nullable String requestingBeanName,
                                     @Nullable Set<String> autowiredBeanNames,
                                     @Nullable TypeConverter typeConverter) throws BeansException {
-        if(isDisabled(descriptor)){
-            // 插件被禁用的依赖Bean直接从主程序获取。
-            return resolveDependencyFromMain(requestingBeanName, descriptor);
-        }
         AutowiredType.Type autowiredType = getAutowiredType(descriptor);
         if(autowiredType == AutowiredType.Type.MAIN){
             Object dependencyObj = resolveDependencyFromMain(requestingBeanName, descriptor);
@@ -80,13 +78,14 @@ public class PluginListableBeanFactory extends DefaultListableBeanFactory {
             return super.resolveDependency(descriptor, requestingBeanName, autowiredBeanNames, typeConverter);
         } else if(autowiredType == AutowiredType.Type.PLUGIN_MAIN){
             try {
-                Object object = super.resolveDependency(descriptor, requestingBeanName, autowiredBeanNames,
+                Object dependencyObj = super.resolveDependency(descriptor, requestingBeanName, autowiredBeanNames,
                         typeConverter);
 
-                if(object instanceof ObjectProvider){
-                    return new PluginObjectProviderWrapper((ObjectProvider<Object>) object, requestingBeanName, descriptor);
+                if(dependencyObj instanceof ObjectProvider){
+                    ObjectProvider<Object> provider = (ObjectProvider<Object>) dependencyObj;
+                    return new PluginObjectProviderWrapper(provider, requestingBeanName, descriptor, autowiredType);
                 }
-                return object;
+                return dependencyObj;
             } catch (BeansException e){
                 if(e instanceof NoSuchBeanDefinitionException){
                     Object dependencyObj = resolveDependencyFromMain(requestingBeanName, descriptor);
@@ -98,6 +97,10 @@ public class PluginListableBeanFactory extends DefaultListableBeanFactory {
             }
         } else if(autowiredType == AutowiredType.Type.MAIN_PLUGIN){
             Object dependencyObj = resolveDependencyFromMain(requestingBeanName, descriptor);
+            if(dependencyObj instanceof ObjectProvider){
+                ObjectProvider<Object> provider = (ObjectProvider<Object>) dependencyObj;
+                return new PluginObjectProviderWrapper(provider, requestingBeanName, descriptor, autowiredType);
+            }
             if(dependencyObj != null){
                 return dependencyObj;
             }
@@ -122,29 +125,15 @@ public class PluginListableBeanFactory extends DefaultListableBeanFactory {
         return super.getBeanProvider(requiredType, allowEagerInit);
     }
 
-    private AutowiredType.Type getAutowiredType(DependencyDescriptor descriptor){
-        AutowiredType autowiredType = descriptor.getAnnotation(AutowiredType.class);
-        if(autowiredType != null){
-            return autowiredType.value();
-        } else {
-            return AutowiredType.Type.PLUGIN;
-        }
+    protected AutowiredType.Type getAutowiredType(DependencyDescriptor descriptor){
+        return autowiredTypeResolver.resolve(descriptor);
     }
 
-    private Object resolveDependencyFromMain(String requestingBeanName, DependencyDescriptor descriptor){
+    protected Object resolveDependencyFromMain(String requestingBeanName, DependencyDescriptor descriptor){
         Object dependencyObj = null;
         try {
-            if(pluginClassLoader instanceof PluginClassLoader){
-                PluginClassLoader classLoader = (PluginClassLoader) pluginClassLoader;
-                MainResourceMatcher mainResourceMatcher = classLoader.getMainResourceMatcher();
-                String className = descriptor.getDependencyType().getName();
-                if(mainResourceMatcher.match(className)){
-                    dependencyObj = applicationContext.resolveDependency(requestingBeanName,
-                            descriptor.getDependencyType());
-                }
-            } else {
-                LOG.warn("Cannot get Bean from main program, plugin classLoader is not PluginClassLoader");
-            }
+            dependencyObj = applicationContext.resolveDependency(requestingBeanName,
+                    descriptor.getDependencyType());
         } catch (Exception e){
             return null;
         }
@@ -164,10 +153,6 @@ public class PluginListableBeanFactory extends DefaultListableBeanFactory {
         });
     }
 
-    private boolean isDisabled(DependencyDescriptor descriptor){
-        String className = descriptor.getDependencyType().getName();
-        return PluginDisableAutoConfiguration.isDisabled(className);
-    }
 
     @AllArgsConstructor
     private class PluginObjectProviderWrapper implements ObjectProvider<Object> {
@@ -176,113 +161,144 @@ public class PluginListableBeanFactory extends DefaultListableBeanFactory {
 
         private final String requestingBeanName;
         private final DependencyDescriptor descriptor;
+        private final AutowiredType.Type autowiredType;
 
         @Override
         public Object getObject() throws BeansException {
-            if(isDisabled(descriptor)){
-                return resolveDependencyFromMain(requestingBeanName, descriptor);
+            if(autowiredType == AutowiredType.Type.MAIN_PLUGIN){
+                Object dependencyObj = resolveDependencyFromMain(requestingBeanName, descriptor);
+                if(dependencyObj != null){
+                    return dependencyObj;
+                }
+                return pluginObjectProvider.getObject();
+            } else {
+                try {
+                    return pluginObjectProvider.getObject();
+                } catch (Exception e){
+                    Object dependencyObj = resolveDependencyFromMain(requestingBeanName, descriptor);
+                    if(dependencyObj != null){
+                        return dependencyObj;
+                    }
+                    throw e;
+                }
             }
-            return pluginObjectProvider.getObject();
         }
 
         @Override
         public Object getObject(final Object... args) throws BeansException {
-            if(isDisabled(descriptor)){
-                SpringBeanFactory springBeanFactory = applicationContext.getSpringBeanFactory();
-                return springBeanFactory.getBean(descriptor.getDependencyType(), args);
+            if(autowiredType == AutowiredType.Type.MAIN_PLUGIN){
+                Object dependencyObj = resolveDependencyFromMain(requestingBeanName, descriptor);
+                if(dependencyObj != null){
+                    return dependencyObj;
+                }
+                return pluginObjectProvider.getObject(args);
+            } else {
+                try {
+                    return pluginObjectProvider.getObject();
+                } catch (Exception e){
+                    try {
+                        return applicationContext.getSpringBeanFactory().getBean(requestingBeanName, args);
+                    } catch (Exception e2){
+                        // 忽略
+                    }
+                    throw e;
+                }
             }
-            return pluginObjectProvider.getObject(args);
         }
 
         @Override
         @Nullable
         public Object getIfAvailable() throws BeansException {
-            if(isDisabled(descriptor)){
-                try {
-                    return getObject();
-                } catch (Exception e){
-                    return null;
+            if(autowiredType == AutowiredType.Type.MAIN_PLUGIN){
+                Object dependencyObj = resolveDependencyFromMain(requestingBeanName, descriptor);
+                if(dependencyObj != null){
+                    return dependencyObj;
                 }
-            } else {
                 return pluginObjectProvider.getIfAvailable();
+            } else {
+                Object dependencyObj = pluginObjectProvider.getIfAvailable();
+                if(dependencyObj == null){
+                    dependencyObj = resolveDependencyFromMain(requestingBeanName, descriptor);
+                }
+                return dependencyObj;
             }
         }
 
         @Override
         public void ifAvailable(Consumer<Object> dependencyConsumer) throws BeansException {
-            if(isDisabled(descriptor)){
-                Object dependency = getIfAvailable();
-                if (dependency != null) {
-                    try {
-                        dependencyConsumer.accept(dependency);
-                    }
-                    catch (ScopeNotActiveException ex) {
-                        // Ignore
-                    }
-                }
-            } else {
-                pluginObjectProvider.ifAvailable(dependencyConsumer);
+            Object ifAvailable = getIfAvailable();
+            if(ifAvailable != null){
+                dependencyConsumer.accept(ifAvailable);
             }
         }
 
         @Override
         @Nullable
         public Object getIfUnique() throws BeansException {
-            if(isDisabled(descriptor)){
-                Object dependency = getIfAvailable();
-                if(dependency == null){
-                    return Optional.empty();
-                } else {
-                    return Optional.of(dependency);
+            if(autowiredType == AutowiredType.Type.MAIN_PLUGIN){
+                Object dependencyObj = resolveDependencyFromMain(requestingBeanName, descriptor);
+                if(dependencyObj != null){
+                    return dependencyObj;
                 }
-            } else {
                 return pluginObjectProvider.getIfUnique();
+            } else {
+                Object dependencyObj = pluginObjectProvider.getIfUnique();
+                if(dependencyObj == null){
+                    dependencyObj = resolveDependencyFromMain(requestingBeanName, descriptor);
+                }
+                return dependencyObj;
             }
         }
 
         @Override
         public void ifUnique(Consumer<Object> dependencyConsumer) throws BeansException {
-            if(isDisabled(descriptor)){
-                Object dependency = getIfUnique();
-                if (dependency != null) {
-                    try {
-                        dependencyConsumer.accept(dependency);
-                    } catch (ScopeNotActiveException ex) {
-                        // Ignore
-                    }
-                }
-            } else {
-               pluginObjectProvider.ifUnique(dependencyConsumer);
+            Object ifUnique = getIfUnique();
+            if(ifUnique != null){
+                dependencyConsumer.accept(ifUnique);
             }
         }
 
         @Override
         public Stream<Object> stream() {
-            if(isDisabled(descriptor)){
-                return getStreamOfMain();
-            } else {
+            if(autowiredType == AutowiredType.Type.MAIN_PLUGIN){
+                Set<Object> collection = getStreamOfMain();
+                if(!collection.isEmpty()){
+                    return collection.stream();
+                }
                 return pluginObjectProvider.stream();
+            } else {
+                Stream<Object> stream = pluginObjectProvider.stream();
+                List<Object> collect = stream.collect(Collectors.toList());
+                if(!collect.isEmpty()){
+                    return collect.stream();
+                }
+                return getStreamOfMain().stream();
             }
         }
 
         @Override
         public Stream<Object> orderedStream() {
-            if(isDisabled(descriptor)){
-                return getStreamOfMain().sorted();
+            if(autowiredType == AutowiredType.Type.MAIN_PLUGIN){
+                Set<Object> collection = getStreamOfMain();
+                if(!collection.isEmpty()){
+                    return collection.stream().sorted();
+                }
+                return pluginObjectProvider.stream();
             } else {
-                return pluginObjectProvider.orderedStream();
+                Stream<Object> stream = pluginObjectProvider.stream();
+                List<Object> collect = stream.collect(Collectors.toList());
+                if(!collect.isEmpty()){
+                    return collect.stream();
+                }
+                return getStreamOfMain().stream().sorted();
             }
         }
 
         @SuppressWarnings("unchecked")
-        private Stream<Object> getStreamOfMain(){
+        private Set<Object> getStreamOfMain(){
             SpringBeanFactory springBeanFactory = applicationContext.getSpringBeanFactory();
             Map<String, ?> beansOfType = springBeanFactory.getBeansOfType(descriptor.getDependencyType());
-            if(beansOfType.isEmpty()){
-                return Stream.empty();
-            } else {
-                return (Stream<Object>) beansOfType.values().stream();
-            }
+            return new HashSet<>(beansOfType.values());
         }
     }
 
