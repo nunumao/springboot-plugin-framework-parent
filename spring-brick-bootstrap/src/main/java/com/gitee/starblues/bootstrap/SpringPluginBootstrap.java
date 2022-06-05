@@ -20,6 +20,7 @@ import com.gitee.starblues.bootstrap.processor.ComposeSpringPluginProcessor;
 import com.gitee.starblues.bootstrap.processor.DefaultProcessorContext;
 import com.gitee.starblues.bootstrap.processor.ProcessorContext;
 import com.gitee.starblues.bootstrap.processor.SpringPluginProcessor;
+import com.gitee.starblues.bootstrap.realize.AutowiredTypeDefiner;
 import com.gitee.starblues.core.launcher.plugin.PluginInteractive;
 import com.gitee.starblues.spring.SpringPluginHook;
 
@@ -29,7 +30,8 @@ import java.util.List;
 /**
  * 插件引导抽象类。插件入口需集成本抽象类
  * @author starBlues
- * @version 3.0.0
+ * @since 3.0.0
+ * @version 3.0.3
  */
 public abstract class SpringPluginBootstrap {
 
@@ -95,5 +97,15 @@ public abstract class SpringPluginBootstrap {
      * 子类自定义插件 SpringPluginProcessor
      */
     protected void addCustomSpringPluginProcessor(){}
+
+    /**
+     * 设置 AutowiredTypeDefiner
+     * @return AutowiredTypeDefiner
+     * @since 3.0.3
+     */
+    protected AutowiredTypeDefiner autowiredTypeDefiner(){
+        return null;
+    }
+
 
 }

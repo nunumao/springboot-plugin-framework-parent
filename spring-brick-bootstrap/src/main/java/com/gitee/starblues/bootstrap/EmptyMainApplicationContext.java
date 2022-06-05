@@ -18,6 +18,9 @@ package com.gitee.starblues.bootstrap;
 
 import com.gitee.starblues.spring.MainApplicationContext;
 import com.gitee.starblues.spring.SpringBeanFactory;
+import com.gitee.starblues.spring.environment.EmptyEnvironmentProvider;
+import com.gitee.starblues.spring.environment.EnvironmentProvider;
+
 import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
@@ -44,6 +47,11 @@ public class EmptyMainApplicationContext implements MainApplicationContext {
     @Override
     public Map<String, Map<String, Object>> getConfigurableEnvironment() {
         return Collections.emptyMap();
+    }
+
+    @Override
+    public EnvironmentProvider getEnvironmentProvider() {
+        return new EmptyEnvironmentProvider();
     }
 
     @Override

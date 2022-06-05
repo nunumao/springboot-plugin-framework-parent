@@ -25,6 +25,7 @@ import com.gitee.starblues.utils.SpringBeanCustomUtils;
 import org.springframework.context.support.GenericApplicationContext;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Modifier;
 import java.util.*;
 
 /**
@@ -148,7 +149,8 @@ public class DefaultPluginUser implements PluginUser{
      * @param clazz clazz
      */
     private void checkInterface(Class<?> clazz) {
-        if (clazz.isInterface()) {
+        int modifiers = clazz.getModifiers();
+        if (Modifier.isInterface(modifiers)|| Modifier.isAbstract(clazz.getModifiers())) {
             return;
         }
         throw new PluginException("[" + clazz.getName() + "]不是一个接口");

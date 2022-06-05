@@ -21,6 +21,7 @@ import com.gitee.starblues.core.descriptor.PluginDescriptor;
 /**
  * 插件被停止监听者。用于自定义关闭资源
  * @author starBlues
+ * @since 3.0.0
  * @version 3.0.0
  */
 public interface PluginCloseListener {

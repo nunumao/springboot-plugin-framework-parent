@@ -14,17 +14,17 @@
  * limitations under the License.
  */
 
-package com.gitee.starblues.bootstrap.realize;
+package com.gitee.starblues.spring.environment;
 
-import java.util.Map;
+import java.util.function.BiConsumer;
 
 /**
- * 主程序配置信息提供者
+ * 配置信息提供者接口
  *
  * @author starBlues
- * @version 3.0.0
+ * @version 3.0.3
  */
-public interface MainEnvironmentProvider {
+public interface EnvironmentProvider {
 
     /**
      * 根据名称获取配置值
@@ -76,9 +76,17 @@ public interface MainEnvironmentProvider {
     Boolean getBoolean(String name);
 
     /**
-     * 获取所有配置集合
-     * @return Map
+     * 根据前缀名称批量获取配置值
+     * @param prefix 前缀
+     * @return 环境
      */
-    Map<String, Map<String, Object>> getAll();
+    EnvironmentProvider getByPrefix(String prefix);
+
+    /**
+     * 获取所有配置集合
+     * @param action 每个条目执行的操作
+     */
+    void forEach(BiConsumer<String, Object> action);
+
 
 }

@@ -32,16 +32,20 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.context.support.GenericApplicationContext;
+import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.mvc.condition.RequestCondition;
 import org.springframework.web.servlet.mvc.method.RequestMappingInfo;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
+import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Method;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Predicate;
 
 /**
  * 插件Controller处理者
@@ -77,8 +81,8 @@ public class PluginControllerProcessor implements SpringPluginProcessor {
             return;
         }
         GenericApplicationContext applicationContext = processorContext.getApplicationContext();
-        applicationContext.registerBean("changeRestPathPostProcessor",
-                ChangeRestPathPostProcessor.class, ()-> new ChangeRestPathPostProcessor(processorContext));
+        applicationContext.registerBean("pluginControllerPostProcessor",
+                ControllerPostProcessor.class, ()-> new ControllerPostProcessor(processorContext));
     }
 
     @Override
@@ -94,9 +98,8 @@ public class PluginControllerProcessor implements SpringPluginProcessor {
         GenericApplicationContext applicationContext = processorContext.getApplicationContext();
 
         Iterator<ControllerWrapper> iterator = controllerWrappers.iterator();
-
-        PluginRequestMappingHandlerMapping pluginHandlerMapping = new PluginRequestMappingHandlerMapping();
-
+        String pathPrefix = PluginConfigUtils.getPluginRestPrefix(processorContext.getConfiguration(), pluginId);
+        PluginRequestMappingHandlerMapping pluginHandlerMapping = new PluginRequestMappingHandlerMapping(pathPrefix);
 
         while (iterator.hasNext()){
             ControllerWrapper controllerWrapper = iterator.next();
@@ -158,14 +161,13 @@ public class PluginControllerProcessor implements SpringPluginProcessor {
         }
     }
 
-    private static class ChangeRestPathPostProcessor implements BeanPostProcessor {
+    private static class ControllerPostProcessor implements BeanPostProcessor {
 
-        private final static Logger LOG = LoggerFactory.getLogger(ChangeRestPathPostProcessor.class);
-        private final static String COMMON_ERROR = "无法统一处理该Controller请求路径前缀";
+        private final static Logger LOG = LoggerFactory.getLogger(ControllerPostProcessor.class);
 
         private final ProcessorContext processorContext;
 
-        private ChangeRestPathPostProcessor(ProcessorContext processorContext) {
+        private ControllerPostProcessor(ProcessorContext processorContext) {
             this.processorContext = processorContext;
         }
 
@@ -178,62 +180,21 @@ public class PluginControllerProcessor implements SpringPluginProcessor {
                 Controller.class, RestController.class
             });
             if(requestMapping != null && isController){
-                changePathForClass(beanName, aClass, requestMapping);
+                addControllerWrapper(beanName, aClass);
             }
             return bean;
         }
 
-        private void changePathForClass(String beanName, Class<?> aClass, RequestMapping requestMapping){
-            String pluginId = processorContext.getPluginDescriptor().getPluginId();
-            IntegrationConfiguration configuration = processorContext.getConfiguration();
-            String pathPrefix = PluginConfigUtils.getPluginRestPrefix(configuration, pluginId);
-            try {
-                if(!ObjectUtils.isEmpty(pathPrefix)){
-                    resolvePathPrefix(pathPrefix, aClass, requestMapping);
-                }
-                List<ControllerWrapper> controllerWrappers = processorContext.getRegistryInfo(PROCESS_CONTROLLERS);
-                if(controllerWrappers == null){
-                    controllerWrappers = new ArrayList<>();
-                    processorContext.addRegistryInfo(PROCESS_CONTROLLERS, controllerWrappers);
-                }
-                ControllerWrapper controllerWrapper = new ControllerWrapper();
-                controllerWrapper.setBeanName(beanName);
-                controllerWrapper.setBeanClass(aClass);
-                controllerWrappers.add(controllerWrapper);
-            } catch (Exception e) {
-                LOG.error("插件 [{}] Controller 类[{}] 注册异常. {}", pluginId, aClass.getName(), e.getMessage(), e);
+        private void addControllerWrapper(String beanName, Class<?> aClass){
+            List<ControllerWrapper> controllerWrappers = processorContext.getRegistryInfo(PROCESS_CONTROLLERS);
+            if(controllerWrappers == null){
+                controllerWrappers = new ArrayList<>();
+                processorContext.addRegistryInfo(PROCESS_CONTROLLERS, controllerWrappers);
             }
-        }
-
-        private void resolvePathPrefix(String pathPrefix, Class<?> aClass, RequestMapping requestMapping) throws Exception{
-            String pluginId = processorContext.getPluginDescriptor().getPluginId();
-
-            Map<String, Object> memberValues = ClassUtils.getAnnotationsUpdater(requestMapping);
-            if(memberValues == null){
-                LOG.error("插件 [{}] Controller 类 [{}] 无法反射获取注解属性, {}",
-                        pluginId, aClass.getSimpleName(), COMMON_ERROR);
-                return;
-            }
-
-            Set<String> definePaths = new HashSet<>();
-            definePaths.addAll(Arrays.asList(requestMapping.path()));
-            definePaths.addAll(Arrays.asList(requestMapping.value()));
-
-            String[] newPath = new String[definePaths.size()];
-            int i = 0;
-            for (String definePath : definePaths) {
-                // 解决插件启用、禁用后, 路径前缀重复的问题。
-                if(definePath.contains(pathPrefix)){
-                    newPath[i++] = definePath;
-                } else {
-                    newPath[i++] = UrlUtils.restJoiningPath(pathPrefix, definePath);
-                }
-            }
-            if(newPath.length == 0){
-                newPath = new String[]{ pathPrefix };
-            }
-            memberValues.put("path", newPath);
-            memberValues.put("value", newPath);
+            ControllerWrapper controllerWrapper = new ControllerWrapper();
+            controllerWrapper.setBeanName(beanName);
+            controllerWrapper.setBeanClass(aClass);
+            controllerWrappers.add(controllerWrapper);
         }
 
     }
@@ -261,6 +222,18 @@ public class PluginControllerProcessor implements SpringPluginProcessor {
     private static class PluginRequestMappingHandlerMapping extends RequestMappingHandlerMapping {
 
         private final List<RegisterMappingInfo> registerMappingInfo = new ArrayList<>();
+
+        public PluginRequestMappingHandlerMapping(){
+            this(null);
+        }
+
+        public PluginRequestMappingHandlerMapping(String pathPrefix){
+            if(!ObjectUtils.isEmpty(pathPrefix)){
+                Map<String, Predicate<Class<?>>> prefixes = new HashMap<>();
+                prefixes.put(pathPrefix, c->true);
+                setPathPrefixes(prefixes);
+            }
+        }
 
         public void registerHandler(Object handler){
             detectHandlerMethods(handler);

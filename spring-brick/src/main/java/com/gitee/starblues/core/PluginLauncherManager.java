@@ -20,6 +20,7 @@ import com.gitee.starblues.core.checker.PluginLauncherChecker;
 import com.gitee.starblues.core.descriptor.InsidePluginDescriptor;
 import com.gitee.starblues.core.descriptor.PluginDescriptor;
 import com.gitee.starblues.core.exception.PluginException;
+import com.gitee.starblues.core.exception.PluginProhibitStopException;
 import com.gitee.starblues.core.launcher.plugin.DefaultPluginInteractive;
 import com.gitee.starblues.core.launcher.plugin.PluginInteractive;
 import com.gitee.starblues.core.launcher.plugin.PluginLauncher;
@@ -43,7 +44,8 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * 可引导启动的插件管理者
  * @author starBlues
- * @version 3.0.1
+ * @since 3.0.0
+ * @version 3.0.3
  */
 public class PluginLauncherManager extends DefaultPluginManager{
 
@@ -60,8 +62,7 @@ public class PluginLauncherManager extends DefaultPluginManager{
                                  GenericApplicationContext applicationContext,
                                  IntegrationConfiguration configuration) {
         super(realizeProvider, configuration);
-        this.mainApplicationContext =
-                new MainApplicationContextProxy(applicationContext, configuration, applicationContext);
+        this.mainApplicationContext = new MainApplicationContextProxy(applicationContext, applicationContext);
         this.mainGenericApplicationContext = applicationContext;
         this.configuration = configuration;
         this.invokeSupperCache = new DefaultInvokeSupperCache();
@@ -124,6 +125,10 @@ public class PluginLauncherManager extends DefaultPluginManager{
             registryInfo.remove(pluginId);
             super.stop(pluginInsideInfo);
         } catch (Exception e){
+            if(e instanceof PluginProhibitStopException){
+                // 禁止停止时, 不设置插件状态
+                throw e;
+            }
             pluginInsideInfo.setPluginState(PluginState.STOPPED_FAILURE);
             throw e;
         }

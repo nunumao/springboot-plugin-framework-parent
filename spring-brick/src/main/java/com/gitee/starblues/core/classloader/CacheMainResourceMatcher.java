@@ -23,9 +23,12 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * 可缓存的 ResourceMatcher
  * @author starBlues
+ * @since 3.0.0
  * @version 3.0.3
  */
 public class CacheMainResourceMatcher extends DefaultMainResourceMatcher implements AutoCloseable {
+
+    public static final String TYPE = "CacheMainResourceMatcher";
 
     private final Map<String, Boolean> resourceUrlMatchCache = new ConcurrentHashMap<>();
 
