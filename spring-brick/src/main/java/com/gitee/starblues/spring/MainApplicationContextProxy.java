@@ -16,7 +16,8 @@
 
 package com.gitee.starblues.spring;
 
-import com.gitee.starblues.integration.IntegrationConfiguration;
+import com.gitee.starblues.spring.environment.EnvironmentProvider;
+import com.gitee.starblues.spring.environment.MainSpringBootEnvironmentProvider;
 import com.gitee.starblues.utils.ObjectUtils;
 import org.springframework.boot.web.reactive.context.AnnotationConfigReactiveWebServerApplicationContext;
 import org.springframework.boot.web.servlet.context.AnnotationConfigServletWebServerApplicationContext;
@@ -38,23 +39,18 @@ import java.util.Map;
 public class MainApplicationContextProxy extends ApplicationContextProxy implements MainApplicationContext{
 
     private final GenericApplicationContext applicationContext;
-    private final IntegrationConfiguration configuration;
     private final boolean isWebEnvironment;
 
-    public MainApplicationContextProxy(GenericApplicationContext applicationContext,
-                                       IntegrationConfiguration configuration) {
+    public MainApplicationContextProxy(GenericApplicationContext applicationContext) {
         super(applicationContext.getBeanFactory());
         this.applicationContext = applicationContext;
-        this.configuration = configuration;
         this.isWebEnvironment = getIsWebEnvironment(applicationContext);
     }
 
     public MainApplicationContextProxy(GenericApplicationContext applicationContext,
-                                       IntegrationConfiguration configuration,
                                        AutoCloseable autoCloseable) {
         super(applicationContext.getBeanFactory(), autoCloseable);
         this.applicationContext = applicationContext;
-        this.configuration = configuration;
         this.isWebEnvironment = getIsWebEnvironment(applicationContext);
     }
 
@@ -78,6 +74,11 @@ public class MainApplicationContextProxy extends ApplicationContextProxy impleme
             }
         }
         return environmentMap;
+    }
+
+    @Override
+    public EnvironmentProvider getEnvironmentProvider() {
+        return new MainSpringBootEnvironmentProvider(applicationContext.getEnvironment());
     }
 
     @Override

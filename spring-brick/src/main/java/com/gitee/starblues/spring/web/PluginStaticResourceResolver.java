@@ -108,8 +108,8 @@ public class PluginStaticResourceResolver extends AbstractResourceResolver {
             }
 
             // 查找第一级节点，找不到则读取根index.html
-            if(partialPath.contains(UrlUtils.SPLIT)){
-                partialPath = partialPath.substring(0, partialPath.indexOf(UrlUtils.SPLIT));
+            if(partialPath.contains(UrlUtils.PATH_SEPARATOR)){
+                partialPath = partialPath.substring(0, partialPath.indexOf(UrlUtils.PATH_SEPARATOR));
             }
             // 第一级节点
             resource = findResource(pluginResource, UrlUtils.joiningUrlPath(partialPath, indexPageName));
@@ -117,7 +117,7 @@ public class PluginStaticResourceResolver extends AbstractResourceResolver {
                 return resource;
             }
             // 根节点
-            return findResource(pluginResource, UrlUtils.joiningUrlPath(UrlUtils.SPLIT, indexPageName));
+            return findResource(pluginResource, UrlUtils.joiningUrlPath(UrlUtils.PATH_SEPARATOR, indexPageName));
         }
     }
 

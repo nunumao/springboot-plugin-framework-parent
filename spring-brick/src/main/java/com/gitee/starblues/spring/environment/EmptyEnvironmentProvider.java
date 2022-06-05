@@ -14,18 +14,19 @@
  * limitations under the License.
  */
 
-package com.gitee.starblues.bootstrap.realize;
+package com.gitee.starblues.spring.environment;
 
-import java.util.Collections;
-import java.util.Map;
+import java.util.function.BiConsumer;
 
 /**
- * 主程序配置信息提供者空值实现
+ * 空的配置信息提供者
  *
  * @author starBlues
- * @version 3.0.0
+ * @version 3.0.3
  */
-public class EmptyMainEnvironmentProvider implements MainEnvironmentProvider{
+public class EmptyEnvironmentProvider implements EnvironmentProvider{
+
+
     @Override
     public Object getValue(String name) {
         return null;
@@ -62,7 +63,12 @@ public class EmptyMainEnvironmentProvider implements MainEnvironmentProvider{
     }
 
     @Override
-    public Map<String, Map<String, Object>> getAll() {
-        return Collections.emptyMap();
+    public EnvironmentProvider getByPrefix(String prefix) {
+        return new EmptyEnvironmentProvider();
+    }
+
+    @Override
+    public void forEach(BiConsumer<String, Object> action) {
+
     }
 }

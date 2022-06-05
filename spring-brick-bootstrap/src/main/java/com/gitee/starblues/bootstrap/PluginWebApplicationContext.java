@@ -18,8 +18,7 @@ package com.gitee.starblues.bootstrap;
 
 import com.gitee.starblues.bootstrap.listener.PluginApplicationWebEventListener;
 import com.gitee.starblues.bootstrap.processor.ProcessorContext;
-import com.gitee.starblues.bootstrap.realize.DefaultMainEnvironmentProvider;
-import com.gitee.starblues.bootstrap.realize.MainEnvironmentProvider;
+import com.gitee.starblues.spring.environment.EnvironmentProvider;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.boot.web.context.WebServerApplicationContext;
 import org.springframework.boot.web.server.WebServer;
@@ -38,9 +37,7 @@ public class PluginWebApplicationContext extends PluginApplicationContext implem
 
     public PluginWebApplicationContext(DefaultListableBeanFactory beanFactory, ProcessorContext processorContext) {
         super(beanFactory, processorContext);
-        MainEnvironmentProvider environmentProvider = new DefaultMainEnvironmentProvider(
-                processorContext.getMainApplicationContext());
-        this.webServer = new PluginSimulationWebServer(environmentProvider);
+        this.webServer = new PluginSimulationWebServer(processorContext);
         this.serverNamespace = processorContext.getPluginDescriptor().getPluginId();
         addApplicationListener(new PluginApplicationWebEventListener(this));
     }
@@ -60,8 +57,9 @@ public class PluginWebApplicationContext extends PluginApplicationContext implem
 
         private final int port;
 
-        public PluginSimulationWebServer(MainEnvironmentProvider environmentProvider) {
-            Integer port = environmentProvider.getInteger("server.port");
+        public PluginSimulationWebServer(ProcessorContext processorContext) {
+            EnvironmentProvider provider = processorContext.getMainApplicationContext().getEnvironmentProvider();
+            Integer port = provider.getInteger("server.port");
             if(port == null){
                 this.port = -1;
             } else {
