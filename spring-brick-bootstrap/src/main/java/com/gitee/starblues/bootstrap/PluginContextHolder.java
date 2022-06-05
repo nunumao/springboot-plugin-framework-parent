@@ -21,7 +21,6 @@ import com.gitee.starblues.core.descriptor.InsidePluginDescriptor;
 import com.gitee.starblues.integration.IntegrationConfiguration;
 import com.gitee.starblues.spring.SpringBeanFactory;
 import com.gitee.starblues.spring.environment.EnvironmentProvider;
-import lombok.Getter;
 
 /**
  * 提供插件上下文的工具类
@@ -69,6 +68,33 @@ public abstract class PluginContextHolder {
     }
 
     /**
+     * 获取主程序针对本框架的配置内容
+     * @return IntegrationConfiguration
+     */
+    public static IntegrationConfiguration getConfiguration() {
+        check();
+        return configuration;
+    }
+
+    /**
+     * 获取主程序的 SpringBeanFactory . 通过它可获取主程序中的Bean
+     * @return SpringBeanFactory
+     */
+    public static SpringBeanFactory getMainSpringBeanFactory() {
+        check();
+        return mainSpringBeanFactory;
+    }
+
+    /**
+     * 判断主程序是否为web环境
+     * @return Boolean
+     */
+    public static Boolean getMainIsWebEnv() {
+        check();
+        return mainIsWebEnv;
+    }
+
+    /**
      * 获取插件的 classloader
      * @return ClassLoader
      */
@@ -84,33 +110,6 @@ public abstract class PluginContextHolder {
     public static InsidePluginDescriptor getPluginDescriptor() {
         check();
         return pluginDescriptor;
-    }
-
-    /**
-     * 获取主程序针对本框架的配置内容
-     * @return IntegrationConfiguration
-     */
-    public static IntegrationConfiguration getConfiguration() {
-        check();
-        return configuration;
-    }
-
-    /**
-     * 判断主程序是否为web环境
-     * @return Boolean
-     */
-    public static Boolean getMainIsWebEnv() {
-        check();
-        return mainIsWebEnv;
-    }
-
-    /**
-     * 获取主程序的 SpringBeanFactory . 通过它可获取主程序中的Bean
-     * @return SpringBeanFactory
-     */
-    public static SpringBeanFactory getMainSpringBeanFactory() {
-        check();
-        return mainSpringBeanFactory;
     }
 
     private static void check(){
