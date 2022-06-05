@@ -13,6 +13,7 @@
 13. 【修复[#I58GCI](https://gitee.com/starblues/springboot-plugin-framework-parent/issues/I58GCI)】 主程序打包参数`libDir`不生效问题
 14. 【修复】修复主程序配置`version`, 插件未配置`requires`导致出现版本校验失败的问题
 15. 【修复】修复`StopValidator`禁止插件停止时, 插件状态变为`STOPPED_FAILURE`问题
+16. 【修复】解决`jdk17`反射问题, 导致无法注册插件`Controller`问题
 
 
 - 注意: 本次升级后, 从主程序注入的`Bean`, 需设置注入类型, 详见文档: [插件中注入主程序Bean说明](https://www.yuque.com/starblues/spring-brick-3.0.0/vot8gg)
