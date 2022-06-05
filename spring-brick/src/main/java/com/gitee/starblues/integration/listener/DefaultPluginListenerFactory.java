@@ -27,7 +27,8 @@ import java.util.List;
 /**
  * 默认的插件工厂
  * @author starBlues
- * @version 3.0.0
+ * @since 3.0.0
+ * @version 3.0.3
  */
 public class DefaultPluginListenerFactory implements PluginListenerFactory{
 
@@ -35,9 +36,6 @@ public class DefaultPluginListenerFactory implements PluginListenerFactory{
 
     public DefaultPluginListenerFactory(ApplicationContext applicationContext){
         listeners = new ArrayList<>();
-
-        // bug 存在二次创建SwaggerListener对象
-        //addPluginListener(new SwaggerListener(applicationContext));
         addExtendPluginListener(applicationContext);
     }
 

@@ -19,6 +19,7 @@ package com.gitee.starblues.integration.listener;
 import com.gitee.starblues.core.PluginInfo;
 import com.gitee.starblues.core.descriptor.PluginDescriptor;
 import com.gitee.starblues.loader.utils.ObjectUtils;
+import com.gitee.starblues.utils.MsgUtils;
 import com.gitee.starblues.utils.SpringBeanUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,9 +44,11 @@ import java.util.List;
 /**
  * Swagger 监听事件
  * @author starBlues
- * @version 3.0.0
+ * @since 3.0.0
+ * @version 3.0.3
  */
 public class SwaggerListener implements PluginListener{
+
     private final Logger log = LoggerFactory.getLogger(this.getClass());
     private final ApplicationContext mainApplicationContext;
 
@@ -54,9 +57,13 @@ public class SwaggerListener implements PluginListener{
     /**
      * 设置全局头部/参数
      * ParameterBuilder tokenPar = new ParameterBuilder();
-    *  tokenPar.name("参数名称").description("参数描述").modelRef(new ModelRef("参数数据类型")).parameterType("header或者query等").required(false);
+    *  tokenPar.name("参数名称")
+     *  .description("参数描述")
+     *  .modelRef(new ModelRef("参数数据类型"))
+     *  .parameterType("header或者query等")
+     *  .required(false);
     *  Parameter param = tokenPar.build();
-     * @param parameters
+     * @param parameters parameters
      */
     public static void setParameters(List<Parameter> parameters){
         parameterList = parameters;
@@ -68,11 +75,12 @@ public class SwaggerListener implements PluginListener{
 
     @Override
     public void startSuccess(PluginInfo pluginInfo) {
-        Docket docket = this.createDocket(pluginInfo);
+        PluginDescriptor descriptor = pluginInfo.getPluginDescriptor();
+        Docket docket = this.createDocket(descriptor);
         String groupName = docket.getGroupName();
         PluginRegistry<DocumentationPlugin, DocumentationType> pluginRegistry = this.getPluginRegistry();
         List<DocumentationPlugin> plugins = pluginRegistry.getPlugins();
-        List<DocumentationPlugin> newPlugins = new ArrayList();
+        List<DocumentationPlugin> newPlugins = new ArrayList<>();
         for(DocumentationPlugin plugin : plugins){
             if(plugin.getGroupName().equals(groupName)){
                 continue;
@@ -88,19 +96,20 @@ public class SwaggerListener implements PluginListener{
             if(!pluginInfo.isFollowSystem() || pluginInfo.getStopTime() != null){
                 this.refresh();
             }
-            log.debug("插件[{}]注册到swagger成功",pluginInfo.getPluginId());
+            log.debug("插件[{}]注册到 Swagger 成功", pluginInfo.getPluginId());
         } catch (NoSuchFieldException | IllegalAccessException e) {
-            log.error("插件[{}]注册到swagger失败，错误为:{}", pluginInfo.getPluginId(),e.getMessage());
+            log.error("插件[{}]注册到 Swagger 失败，错误为:{}", pluginInfo.getPluginId(),e.getMessage());
         }
     }
 
     @Override
     public void stopSuccess(PluginInfo pluginInfo) {
-        String groupName = getGroupName(pluginInfo);
+        PluginDescriptor descriptor = pluginInfo.getPluginDescriptor();
+        String groupName = getGroupName(descriptor);
 
         PluginRegistry<DocumentationPlugin, DocumentationType> pluginRegistry = this.getPluginRegistry();
         List<DocumentationPlugin> plugins = pluginRegistry.getPlugins();
-        List<DocumentationPlugin> newPlugins = new ArrayList();
+        List<DocumentationPlugin> newPlugins = new ArrayList<>();
         for(DocumentationPlugin plugin : plugins){
             if(groupName.equalsIgnoreCase(plugin.getGroupName())){
                 continue;
@@ -113,10 +122,10 @@ public class SwaggerListener implements PluginListener{
             field.set(pluginRegistry, newPlugins);
 
             this.refresh();
-            log.debug("插件[{}]从swagger移除成功",pluginInfo.getPluginId());
+            log.debug("插件[{}]从 Swagger 移除成功", MsgUtils.getPluginUnique(descriptor));
         }
         catch (NoSuchFieldException | IllegalAccessException e) {
-            log.error("插件[{}]从swagger移除失败，错误为:{}", pluginInfo.getPluginId(),e.getMessage());
+            log.error("插件[{}]从 Swagger 移除失败，错误为:{}", MsgUtils.getPluginUnique(descriptor), e.getMessage());
         }
     }
 
@@ -131,49 +140,55 @@ public class SwaggerListener implements PluginListener{
             }
         } catch (Exception e){
             // ignore
-            log.warn("refresh swagger failure");
+            log.warn("refresh swagger failure. {}", e.getMessage());
         }
     }
 
     /**
-     * 获取文档Bootstrapper
-     * @return
+     * 获取文档 Bootstrapper
+     * @return DocumentationPluginsBootstrapper
      */
     private DocumentationPluginsBootstrapper getDocumentationPluginsBootstrapper(){
-        DocumentationPluginsBootstrapper documentationPluginsBootstrapper = SpringBeanUtils.getExistBean(mainApplicationContext,DocumentationPluginsBootstrapper.class);
-        return documentationPluginsBootstrapper;
+        return SpringBeanUtils.getExistBean(mainApplicationContext, DocumentationPluginsBootstrapper.class);
     }
 
     /**
      * 获取文档PluginRegistry
-     * @return
+     * @return PluginRegistry
      */
     private PluginRegistry<DocumentationPlugin, DocumentationType> getPluginRegistry(){
-        PluginRegistry<DocumentationPlugin, DocumentationType> pluginRegistry = SpringBeanUtils.getExistBean(mainApplicationContext,"documentationPluginRegistry");
-        return pluginRegistry;
+        return SpringBeanUtils.getExistBean(mainApplicationContext,"documentationPluginRegistry");
     }
+
     /**
      * 创建swagger分组对象
-     * @param pluginInfo
-     * @return
+     *
+     * @param descriptor 插件信息
+     * @return Docket
      */
-    private Docket createDocket(PluginInfo pluginInfo) {
-        PluginDescriptor pluginDescriptor = pluginInfo.getPluginDescriptor();
-        String description = pluginInfo.getPluginDescriptor().getDescription();
+    private Docket createDocket(PluginDescriptor descriptor) {
+        String description = descriptor.getDescription();
         if (ObjectUtils.isEmpty(description)) {
-            description = pluginDescriptor.getPluginId();
+            description = descriptor.getPluginId();
         }
 
-        String provider = pluginDescriptor.getProvider();
-        String pluginBootstrapClass = pluginDescriptor.getPluginBootstrapClass();
-        String pluginClass = pluginBootstrapClass.substring(0,pluginBootstrapClass.lastIndexOf("."));
+        String provider = descriptor.getProvider();
+        String pluginBootstrapClass = descriptor.getPluginBootstrapClass();
+        String pluginClass = pluginBootstrapClass.substring(0, pluginBootstrapClass.lastIndexOf("."));
         Contact contact = new Contact(provider, "", "");
-        ApiInfo apiInfo = (new ApiInfoBuilder()).title(getGroupName(pluginInfo)).description(description).contact(contact).version(pluginDescriptor.getPluginVersion()).build();
+        ApiInfo apiInfo = new ApiInfoBuilder()
+                .title(getGroupName(descriptor))
+                .description(description)
+                .contact(contact)
+                .version(descriptor.getPluginVersion())
+                .build();
+
         Docket docket = (new Docket(DocumentationType.SWAGGER_2))
                 .apiInfo(apiInfo).select()
                 .apis(RequestHandlerSelectors.basePackage(pluginClass))
                 .paths(PathSelectors.any()).build()
-                .groupName(getGroupName(pluginInfo));
+                .groupName(getGroupName(descriptor));
+
         if(parameterList != null && !parameterList.isEmpty()){
             return docket.globalOperationParameters(parameterList);
         }
@@ -182,14 +197,10 @@ public class SwaggerListener implements PluginListener{
 
     /**
      * 获取组名称
-     * @param pluginInfo
-     * @return
+     * @param descriptor 插件信息
+     * @return 分组信息
      */
-    private String getGroupName(PluginInfo pluginInfo){
-        String description = pluginInfo.getPluginDescriptor().getDescription();
-        if (ObjectUtils.isEmpty(description)) {
-            description = pluginInfo.getPluginId();
-        }
-        return description +"@" +pluginInfo.getPluginId();
+    private String getGroupName(PluginDescriptor descriptor){
+        return descriptor.getPluginId() +"@" + descriptor.getPluginVersion();
     }
 }
