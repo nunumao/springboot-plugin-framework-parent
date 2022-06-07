@@ -18,14 +18,10 @@ package com.gitee.starblues.bootstrap;
 
 import com.gitee.starblues.bootstrap.annotation.AutowiredType;
 import com.gitee.starblues.bootstrap.processor.ProcessorContext;
-import com.gitee.starblues.bootstrap.realize.AutowiredTypeDefiner;
 import com.gitee.starblues.bootstrap.utils.DestroyUtils;
-import com.gitee.starblues.core.classloader.MainResourceMatcher;
-import com.gitee.starblues.core.classloader.PluginClassLoader;
 import com.gitee.starblues.spring.MainApplicationContext;
 import com.gitee.starblues.spring.SpringBeanFactory;
 import com.gitee.starblues.utils.ReflectionUtils;
-import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
@@ -35,7 +31,6 @@ import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.config.DependencyDescriptor;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
-import org.springframework.beans.factory.support.ScopeNotActiveException;
 import org.springframework.lang.Nullable;
 
 import java.util.*;
@@ -68,6 +63,14 @@ public class PluginListableBeanFactory extends DefaultListableBeanFactory {
                                     @Nullable Set<String> autowiredBeanNames,
                                     @Nullable TypeConverter typeConverter) throws BeansException {
         AutowiredType.Type autowiredType = getAutowiredType(descriptor);
+        Class<?> dependencyType = descriptor.getDependencyType();
+        if (dependencyType == ObjectFactory.class || dependencyType == ObjectProvider.class) {
+            Object dependencyObj = super.resolveDependency(descriptor, requestingBeanName, autowiredBeanNames,
+                    typeConverter);
+            ObjectProvider<Object> provider = (ObjectProvider<Object>) dependencyObj;
+            return new PluginObjectProviderWrapper(provider, requestingBeanName, descriptor, autowiredType);
+        }
+
         if(autowiredType == AutowiredType.Type.MAIN){
             Object dependencyObj = resolveDependencyFromMain(requestingBeanName, descriptor);
             if(dependencyObj != null){
@@ -78,14 +81,8 @@ public class PluginListableBeanFactory extends DefaultListableBeanFactory {
             return super.resolveDependency(descriptor, requestingBeanName, autowiredBeanNames, typeConverter);
         } else if(autowiredType == AutowiredType.Type.PLUGIN_MAIN){
             try {
-                Object dependencyObj = super.resolveDependency(descriptor, requestingBeanName, autowiredBeanNames,
+                return super.resolveDependency(descriptor, requestingBeanName, autowiredBeanNames,
                         typeConverter);
-
-                if(dependencyObj instanceof ObjectProvider){
-                    ObjectProvider<Object> provider = (ObjectProvider<Object>) dependencyObj;
-                    return new PluginObjectProviderWrapper(provider, requestingBeanName, descriptor, autowiredType);
-                }
-                return dependencyObj;
             } catch (BeansException e){
                 if(e instanceof NoSuchBeanDefinitionException){
                     Object dependencyObj = resolveDependencyFromMain(requestingBeanName, descriptor);
@@ -154,7 +151,6 @@ public class PluginListableBeanFactory extends DefaultListableBeanFactory {
     }
 
 
-    @AllArgsConstructor
     private class PluginObjectProviderWrapper implements ObjectProvider<Object> {
 
         private final ObjectProvider<Object> pluginObjectProvider;
@@ -163,36 +159,55 @@ public class PluginListableBeanFactory extends DefaultListableBeanFactory {
         private final DependencyDescriptor descriptor;
         private final AutowiredType.Type autowiredType;
 
+        private PluginObjectProviderWrapper(ObjectProvider<Object> pluginObjectProvider,
+                                            String requestingBeanName,
+                                            DependencyDescriptor descriptor,
+                                            AutowiredType.Type autowiredType) {
+            this.pluginObjectProvider = pluginObjectProvider;
+            this.requestingBeanName = requestingBeanName;
+            this.descriptor = new NestedDependencyDescriptor(descriptor);
+            this.autowiredType = autowiredType;
+        }
+
         @Override
         public Object getObject() throws BeansException {
-            if(autowiredType == AutowiredType.Type.MAIN_PLUGIN){
+            if(autowiredType == AutowiredType.Type.PLUGIN) {
+                return pluginObjectProvider.getObject();
+            } else if(autowiredType == AutowiredType.Type.MAIN){
+                Object dependencyObj = resolveDependencyFromMain(requestingBeanName, descriptor);
+                if(dependencyObj != null){
+                    return dependencyObj;
+                }
+            } else if(autowiredType == AutowiredType.Type.PLUGIN_MAIN) {
+                try {
+                    return pluginObjectProvider.getObject();
+                } catch (Exception e) {
+                    Object dependencyObj = resolveDependencyFromMain(requestingBeanName, descriptor);
+                    if (dependencyObj != null) {
+                        return dependencyObj;
+                    }
+                    throw e;
+                }
+            } else if(autowiredType == AutowiredType.Type.MAIN_PLUGIN){
                 Object dependencyObj = resolveDependencyFromMain(requestingBeanName, descriptor);
                 if(dependencyObj != null){
                     return dependencyObj;
                 }
                 return pluginObjectProvider.getObject();
-            } else {
-                try {
-                    return pluginObjectProvider.getObject();
-                } catch (Exception e){
-                    Object dependencyObj = resolveDependencyFromMain(requestingBeanName, descriptor);
-                    if(dependencyObj != null){
-                        return dependencyObj;
-                    }
-                    throw e;
-                }
             }
+            throw new NoSuchBeanDefinitionException(this.descriptor.getResolvableType());
         }
 
         @Override
         public Object getObject(final Object... args) throws BeansException {
-            if(autowiredType == AutowiredType.Type.MAIN_PLUGIN){
+            if(autowiredType == AutowiredType.Type.PLUGIN){
+                return pluginObjectProvider.getObject(args);
+            } else if(autowiredType == AutowiredType.Type.MAIN){
                 Object dependencyObj = resolveDependencyFromMain(requestingBeanName, descriptor);
                 if(dependencyObj != null){
                     return dependencyObj;
                 }
-                return pluginObjectProvider.getObject(args);
-            } else {
+            } else if(autowiredType == AutowiredType.Type.PLUGIN_MAIN){
                 try {
                     return pluginObjectProvider.getObject();
                 } catch (Exception e){
@@ -203,25 +218,37 @@ public class PluginListableBeanFactory extends DefaultListableBeanFactory {
                     }
                     throw e;
                 }
+            } else if(autowiredType == AutowiredType.Type.MAIN_PLUGIN){
+                Object dependencyObj = resolveDependencyFromMain(requestingBeanName, descriptor);
+                if(dependencyObj != null){
+                    return dependencyObj;
+                }
+                return pluginObjectProvider.getObject(args);
             }
+            throw new NoSuchBeanDefinitionException(this.descriptor.getResolvableType());
         }
 
         @Override
         @Nullable
         public Object getIfAvailable() throws BeansException {
-            if(autowiredType == AutowiredType.Type.MAIN_PLUGIN){
-                Object dependencyObj = resolveDependencyFromMain(requestingBeanName, descriptor);
-                if(dependencyObj != null){
-                    return dependencyObj;
-                }
+            if(autowiredType == AutowiredType.Type.PLUGIN){
                 return pluginObjectProvider.getIfAvailable();
-            } else {
+            } else if(autowiredType == AutowiredType.Type.MAIN){
+                return resolveDependencyFromMain(requestingBeanName, descriptor);
+            } else if(autowiredType == AutowiredType.Type.PLUGIN_MAIN){
                 Object dependencyObj = pluginObjectProvider.getIfAvailable();
                 if(dependencyObj == null){
                     dependencyObj = resolveDependencyFromMain(requestingBeanName, descriptor);
                 }
                 return dependencyObj;
+            } else if(autowiredType == AutowiredType.Type.MAIN_PLUGIN){
+                Object dependencyObj = resolveDependencyFromMain(requestingBeanName, descriptor);
+                if(dependencyObj != null){
+                    return dependencyObj;
+                }
+                return pluginObjectProvider.getIfAvailable();
             }
+            return null;
         }
 
         @Override
@@ -235,19 +262,24 @@ public class PluginListableBeanFactory extends DefaultListableBeanFactory {
         @Override
         @Nullable
         public Object getIfUnique() throws BeansException {
-            if(autowiredType == AutowiredType.Type.MAIN_PLUGIN){
-                Object dependencyObj = resolveDependencyFromMain(requestingBeanName, descriptor);
-                if(dependencyObj != null){
-                    return dependencyObj;
-                }
+            if(autowiredType == AutowiredType.Type.PLUGIN){
                 return pluginObjectProvider.getIfUnique();
-            } else {
+            } else if(autowiredType == AutowiredType.Type.MAIN){
+                return resolveDependencyFromMain(requestingBeanName, descriptor);
+            } else if(autowiredType == AutowiredType.Type.PLUGIN_MAIN){
                 Object dependencyObj = pluginObjectProvider.getIfUnique();
                 if(dependencyObj == null){
                     dependencyObj = resolveDependencyFromMain(requestingBeanName, descriptor);
                 }
                 return dependencyObj;
+            } else if(autowiredType == AutowiredType.Type.MAIN_PLUGIN){
+                Object dependencyObj = resolveDependencyFromMain(requestingBeanName, descriptor);
+                if(dependencyObj != null){
+                    return dependencyObj;
+                }
+                return pluginObjectProvider.getIfUnique();
             }
+            return null;
         }
 
         @Override
@@ -260,38 +292,48 @@ public class PluginListableBeanFactory extends DefaultListableBeanFactory {
 
         @Override
         public Stream<Object> stream() {
-            if(autowiredType == AutowiredType.Type.MAIN_PLUGIN){
-                Set<Object> collection = getStreamOfMain();
-                if(!collection.isEmpty()){
-                    return collection.stream();
-                }
+            if(autowiredType == AutowiredType.Type.PLUGIN){
                 return pluginObjectProvider.stream();
-            } else {
+            } else if(autowiredType == AutowiredType.Type.MAIN){
+                return getStreamOfMain().stream();
+            } else if (autowiredType == AutowiredType.Type.PLUGIN_MAIN){
                 Stream<Object> stream = pluginObjectProvider.stream();
                 List<Object> collect = stream.collect(Collectors.toList());
                 if(!collect.isEmpty()){
                     return collect.stream();
                 }
                 return getStreamOfMain().stream();
+            } else if(autowiredType == AutowiredType.Type.MAIN_PLUGIN){
+                Set<Object> collection = getStreamOfMain();
+                if(!collection.isEmpty()){
+                    return collection.stream();
+                }
+                return pluginObjectProvider.stream();
             }
+            return Stream.empty();
         }
 
         @Override
         public Stream<Object> orderedStream() {
-            if(autowiredType == AutowiredType.Type.MAIN_PLUGIN){
-                Set<Object> collection = getStreamOfMain();
-                if(!collection.isEmpty()){
-                    return collection.stream().sorted();
-                }
-                return pluginObjectProvider.stream();
-            } else {
+            if(autowiredType == AutowiredType.Type.PLUGIN){
+                return pluginObjectProvider.orderedStream();
+            } else if(autowiredType == AutowiredType.Type.MAIN){
+                return getStreamOfMain().stream().sorted();
+            } else if(autowiredType == AutowiredType.Type.PLUGIN_MAIN){
                 Stream<Object> stream = pluginObjectProvider.stream();
                 List<Object> collect = stream.collect(Collectors.toList());
                 if(!collect.isEmpty()){
                     return collect.stream();
                 }
                 return getStreamOfMain().stream().sorted();
+            } else if(autowiredType == AutowiredType.Type.MAIN_PLUGIN){
+                Set<Object> collection = getStreamOfMain();
+                if(!collection.isEmpty()){
+                    return collection.stream().sorted();
+                }
+                return pluginObjectProvider.stream();
             }
+            return Stream.empty();
         }
 
         @SuppressWarnings("unchecked")
@@ -299,6 +341,15 @@ public class PluginListableBeanFactory extends DefaultListableBeanFactory {
             SpringBeanFactory springBeanFactory = applicationContext.getSpringBeanFactory();
             Map<String, ?> beansOfType = springBeanFactory.getBeansOfType(descriptor.getDependencyType());
             return new HashSet<>(beansOfType.values());
+        }
+    }
+
+
+    private static class NestedDependencyDescriptor extends DependencyDescriptor {
+
+        public NestedDependencyDescriptor(DependencyDescriptor original) {
+            super(original);
+            increaseNestingLevel();
         }
     }
 
