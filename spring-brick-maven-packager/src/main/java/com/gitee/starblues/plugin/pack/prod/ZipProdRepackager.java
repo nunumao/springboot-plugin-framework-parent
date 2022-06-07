@@ -25,6 +25,7 @@ import com.gitee.starblues.plugin.pack.RepackageMojo;
 import com.gitee.starblues.plugin.pack.dev.Dependency;
 import com.gitee.starblues.plugin.pack.dev.DevConfig;
 import com.gitee.starblues.plugin.pack.dev.DevRepackager;
+import com.gitee.starblues.plugin.pack.utils.CommonUtils;
 import com.gitee.starblues.plugin.pack.utils.PackageZip;
 import com.gitee.starblues.utils.FilesUtils;
 import com.gitee.starblues.utils.ObjectUtils;

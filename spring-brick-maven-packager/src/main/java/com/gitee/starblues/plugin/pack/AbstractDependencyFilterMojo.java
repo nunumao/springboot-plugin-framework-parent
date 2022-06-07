@@ -95,6 +95,12 @@ public abstract class AbstractDependencyFilterMojo extends AbstractMojo {
         excludes.add(Exclude.get("org.springframework.boot", "spring-boot-starter-json"));
         excludes.add(Exclude.get("org.springframework", "spring-webmvc"));
         excludes.add(Exclude.get("org.springframework", "spring-web"));
+
+        // jackson
+        excludes.add(Exclude.get("com.fasterxml.jackson.core", "jackson-core"));
+        excludes.add(Exclude.get("com.fasterxml.jackson.core", "jackson-databind"));
+        excludes.add(Exclude.get("com.fasterxml.jackson.core", "jackson-annotations"));
+        excludes.add(Exclude.get("com.fasterxml.jackson.module", "jackson-module-parameter-names"));
     }
 
 }

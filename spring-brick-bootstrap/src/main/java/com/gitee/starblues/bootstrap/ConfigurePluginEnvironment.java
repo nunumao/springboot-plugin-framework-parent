@@ -23,6 +23,7 @@ import com.gitee.starblues.utils.Assert;
 import com.gitee.starblues.utils.FilesUtils;
 import com.gitee.starblues.utils.ObjectUtils;
 import com.gitee.starblues.utils.PluginFileUtils;
+import org.springframework.context.support.LiveBeansView;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.MapPropertySource;
 

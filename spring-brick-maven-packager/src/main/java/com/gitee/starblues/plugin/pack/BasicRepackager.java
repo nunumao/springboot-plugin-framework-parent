@@ -17,6 +17,7 @@
 package com.gitee.starblues.plugin.pack;
 
 import com.gitee.starblues.common.*;
+import com.gitee.starblues.plugin.pack.utils.CommonUtils;
 import com.gitee.starblues.utils.FilesUtils;
 import com.gitee.starblues.utils.ObjectUtils;
 import lombok.Getter;
@@ -32,6 +33,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.*;
 import java.util.jar.Attributes;
 import java.util.jar.Manifest;
@@ -119,7 +121,7 @@ public class BasicRepackager implements Repackager{
     protected String createRootDir() throws MojoFailureException {
         String rootDirPath = getBasicRootDir();
         File rootDir = new File(rootDirPath);
-        rootDir.deleteOnExit();
+        CommonUtils.deleteFile(rootDir);
         if(rootDir.mkdir()){
             return rootDirPath;
         }
@@ -237,7 +239,7 @@ public class BasicRepackager implements Repackager{
     protected String writePluginMetaInfo(Properties properties) throws Exception {
         File pluginMetaFile = createPluginMetaFile();
         try (OutputStreamWriter writer = new OutputStreamWriter(
-                new FileOutputStream(pluginMetaFile), StandardCharsets.UTF_8)){
+                Files.newOutputStream(pluginMetaFile.toPath()), StandardCharsets.UTF_8)){
             properties.store(writer, Constant.PLUGIN_METE_COMMENTS);
             return pluginMetaFile.getPath();
         }

@@ -38,27 +38,24 @@ import java.util.Set;
 /**
  * 插件 classLoader
  * @author starBlues
- * @version 3.0.0
+ * @version 3.0.3
  */
 @Slf4j
 public class PluginClassLoader extends GenericClassLoader {
 
     private final GenericClassLoader parentClassLoader;
-    private MainResourceMatcher mainResourceMatcher;
+    private final MainResourceMatcher mainResourceMatcher;
 
-    public PluginClassLoader(String name, GenericClassLoader parentClassLoader, MainResourcePatternDefiner patternDefiner,
-                             ResourceLoaderFactory resourceLoaderFactory) {
+    public PluginClassLoader(String name, GenericClassLoader parentClassLoader,
+                             ResourceLoaderFactory resourceLoaderFactory,
+                             MainResourceMatcher mainResourceMatcher) {
         super(name, parentClassLoader, resourceLoaderFactory);
         this.parentClassLoader = parentClassLoader;
-        if(patternDefiner != null){
-            setMainResourceMatcher(new CacheMainResourceMatcher(patternDefiner));
-        } else {
-            setMainResourceMatcher(new ProhibitMainResourceMatcher());
-        }
+        this.mainResourceMatcher = mainResourceMatcher;
     }
 
-    public void setMainResourceMatcher(MainResourceMatcher mainResourceMatcher){
-        this.mainResourceMatcher = Assert.isNotNull(mainResourceMatcher, "参数 mainResourceMatcher 不能为空");
+    public MainResourceMatcher getMainResourceMatcher() {
+        return mainResourceMatcher;
     }
 
     public void addResource(InsidePluginDescriptor descriptor) throws Exception {

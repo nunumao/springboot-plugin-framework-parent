@@ -25,9 +25,13 @@ import com.gitee.starblues.spring.MainApplicationContext;
 import com.gitee.starblues.spring.SpringBeanFactory;
 import com.gitee.starblues.spring.WebConfig;
 import org.springframework.context.support.GenericApplicationContext;
+import org.springframework.core.env.ConfigurableEnvironment;
+import org.springframework.core.env.StandardEnvironment;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.util.ClassUtils;
+
+import java.util.Map;
 
 /**
  * 默认的处理者上下文
@@ -131,8 +135,8 @@ public class DefaultProcessorContext extends CacheRegistryInfo implements Proces
         this.applicationContext = applicationContext;
     }
 
-
     protected ClassLoader getPluginClassLoader(){
         return ClassUtils.getDefaultClassLoader();
     }
+
 }

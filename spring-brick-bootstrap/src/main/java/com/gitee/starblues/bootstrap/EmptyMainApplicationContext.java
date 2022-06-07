@@ -18,6 +18,9 @@ package com.gitee.starblues.bootstrap;
 
 import com.gitee.starblues.spring.MainApplicationContext;
 import com.gitee.starblues.spring.SpringBeanFactory;
+import com.gitee.starblues.spring.environment.EmptyEnvironmentProvider;
+import com.gitee.starblues.spring.environment.EnvironmentProvider;
+
 import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
@@ -25,7 +28,7 @@ import java.util.Set;
 /**
  * 空的MainApplicationContext实现
  * @author starBlues
- * @version 3.0.1
+ * @version 3.0.3
  */
 public class EmptyMainApplicationContext implements MainApplicationContext {
 
@@ -44,6 +47,21 @@ public class EmptyMainApplicationContext implements MainApplicationContext {
     @Override
     public Map<String, Map<String, Object>> getConfigurableEnvironment() {
         return Collections.emptyMap();
+    }
+
+    @Override
+    public EnvironmentProvider getEnvironmentProvider() {
+        return new EmptyEnvironmentProvider();
+    }
+
+    @Override
+    public Object resolveDependency(String requestingBeanName, Class<?> dependencyType) {
+        return null;
+    }
+
+    @Override
+    public boolean isWebEnvironment() {
+        return false;
     }
 
 }

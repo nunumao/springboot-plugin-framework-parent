@@ -32,7 +32,7 @@ import java.util.Set;
 /**
  * 自动集成的配置
  * @author starBlues
- * @version 3.0.1
+ * @version 3.0.3
  */
 @EqualsAndHashCode(callSuper = true)
 @Component
@@ -92,7 +92,7 @@ public class AutoIntegrationConfiguration extends DefaultIntegrationConfiguratio
      * pluginRestPathPrefix: 为pluginRestPathPrefix的配置值
      * pluginId: 为插件id
      */
-    @Value("${pluginRestPathPrefix:true}")
+    @Value("${enablePluginIdRestPathPrefix:true}")
     private Boolean enablePluginIdRestPathPrefix;
 
     /**
