@@ -68,18 +68,7 @@ public class DirProdRepackager extends DevRepackager {
         String fileName = prodConfig.getFileName();
         String dirPath = FilesUtils.joiningFilePath(prodConfig.getOutputDirectory(), fileName);
         File dirFile = new File(dirPath);
-        if(dirFile.exists() && dirFile.isFile()){
-            int i = 0;
-            while (true){
-                dirFile = new File(dirPath + "_" + i);
-                if(dirFile.exists() && dirFile.isFile()){
-                    i = i + 1;
-                    continue;
-                }
-                break;
-            }
-        }
-        dirFile.deleteOnExit();
+        CommonUtils.deleteFile(dirFile);
         if(!dirFile.mkdirs()){
             throw new MojoFailureException("Create package dir failure: " + dirFile.getPath());
         }

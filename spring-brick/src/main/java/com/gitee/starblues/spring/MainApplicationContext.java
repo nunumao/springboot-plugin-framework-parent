@@ -16,6 +16,8 @@
 
 package com.gitee.starblues.spring;
 
+import com.gitee.starblues.spring.environment.EnvironmentProvider;
+
 import java.util.Map;
 
 /**
@@ -31,5 +33,29 @@ public interface MainApplicationContext extends ApplicationContext {
      * @return 主程序配置的 env 集合
      */
     Map<String, Map<String, Object>> getConfigurableEnvironment();
+
+
+    /**
+     * 得到主程序配置的 Provider
+     * @return EnvironmentProvider
+     */
+    EnvironmentProvider getEnvironmentProvider();
+
+
+    /**
+     * 从主程序获取依赖
+     *
+     * @param requestingBeanName 依赖Bean名称
+     * @param dependencyType 依赖类型
+     * @return boolean
+     */
+    Object resolveDependency(String requestingBeanName, Class<?> dependencyType);
+
+    /**
+     * 是否为web环境
+     * @return boolean
+     */
+    boolean isWebEnvironment();
+
 
 }

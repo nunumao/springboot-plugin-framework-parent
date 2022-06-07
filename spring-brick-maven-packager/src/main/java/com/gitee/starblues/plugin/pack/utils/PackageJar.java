@@ -23,6 +23,7 @@ import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.nio.file.Files;
 
 /**
  * jar 打包工具
@@ -45,7 +46,7 @@ public class PackageJar extends PackageZip{
 
     @Override
     protected ArchiveOutputStream getOutputStream(File packFile) throws Exception {
-        return new JarArchiveOutputStream(new FileOutputStream(packFile));
+        return new JarArchiveOutputStream(Files.newOutputStream(packFile.toPath()));
     }
 
     @Override

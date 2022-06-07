@@ -34,4 +34,9 @@ public class DevConfig {
      */
     private List<Dependency> moduleDependencies;
 
+    /**
+     * 本地jar依赖文件定义
+     */
+    private List<String> localJars;
+
 }

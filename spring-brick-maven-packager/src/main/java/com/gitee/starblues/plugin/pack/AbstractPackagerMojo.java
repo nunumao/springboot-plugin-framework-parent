@@ -48,6 +48,9 @@ public abstract class AbstractPackagerMojo extends AbstractDependencyFilterMojo{
     @Parameter(property = "spring-brick-packager.skip", defaultValue = "false")
     private boolean skip;
 
+    @Parameter
+    private String classifier;
+
     @Parameter(property = "spring-brick-packager.pluginInfo")
     private PluginInfo pluginInfo;
 

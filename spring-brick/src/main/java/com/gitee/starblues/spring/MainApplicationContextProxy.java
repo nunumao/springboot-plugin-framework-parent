@@ -16,6 +16,11 @@
 
 package com.gitee.starblues.spring;
 
+import com.gitee.starblues.spring.environment.EnvironmentProvider;
+import com.gitee.starblues.spring.environment.MainSpringBootEnvironmentProvider;
+import com.gitee.starblues.utils.ObjectUtils;
+import org.springframework.boot.web.reactive.context.AnnotationConfigReactiveWebServerApplicationContext;
+import org.springframework.boot.web.servlet.context.AnnotationConfigServletWebServerApplicationContext;
 import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.EnumerablePropertySource;
@@ -34,15 +39,19 @@ import java.util.Map;
 public class MainApplicationContextProxy extends ApplicationContextProxy implements MainApplicationContext{
 
     private final GenericApplicationContext applicationContext;
+    private final boolean isWebEnvironment;
 
     public MainApplicationContextProxy(GenericApplicationContext applicationContext) {
         super(applicationContext.getBeanFactory());
         this.applicationContext = applicationContext;
+        this.isWebEnvironment = getIsWebEnvironment(applicationContext);
     }
 
-    public MainApplicationContextProxy(GenericApplicationContext applicationContext, AutoCloseable autoCloseable) {
+    public MainApplicationContextProxy(GenericApplicationContext applicationContext,
+                                       AutoCloseable autoCloseable) {
         super(applicationContext.getBeanFactory(), autoCloseable);
         this.applicationContext = applicationContext;
+        this.isWebEnvironment = getIsWebEnvironment(applicationContext);
     }
 
     @Override
@@ -65,6 +74,30 @@ public class MainApplicationContextProxy extends ApplicationContextProxy impleme
             }
         }
         return environmentMap;
+    }
+
+    @Override
+    public EnvironmentProvider getEnvironmentProvider() {
+        return new MainSpringBootEnvironmentProvider(applicationContext.getEnvironment());
+    }
+
+    @Override
+    public Object resolveDependency(String requestingBeanName, Class<?> dependencyType) {
+        try {
+            return applicationContext.getBean(dependencyType);
+        } catch (Exception e){
+            return null;
+        }
+    }
+
+    @Override
+    public boolean isWebEnvironment() {
+        return isWebEnvironment;
+    }
+
+    private boolean getIsWebEnvironment(GenericApplicationContext applicationContext){
+        return applicationContext instanceof AnnotationConfigServletWebServerApplicationContext
+                || applicationContext instanceof AnnotationConfigReactiveWebServerApplicationContext;
     }
 
 }

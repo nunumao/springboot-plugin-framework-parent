@@ -8,18 +8,22 @@ import java.util.function.Function;
  * map 值获取者工具类
  *
  * @author starBlues
- * @version 3.0.1
+ * @version 3.0.3
  */
 public class MapValueGetter {
 
-    private final Map<String, Object> map;
+    private final Map<String, Object> source;
 
-    public MapValueGetter(Map<String, Object> map) {
-        if(map == null){
-            this.map = Collections.emptyMap();
+    public MapValueGetter(Map<String, Object> source) {
+        if(source == null){
+            this.source = Collections.emptyMap();
         } else {
-            this.map = map;
+            this.source = source;
         }
+    }
+
+    public Map<String, Object> getSource(){
+        return source;
     }
 
     /**
@@ -28,7 +32,7 @@ public class MapValueGetter {
      * @return value
      */
     public Object getObject(String key) {
-        return map.get(key);
+        return source.get(key);
     }
 
 
@@ -38,7 +42,7 @@ public class MapValueGetter {
      * @return String value
      */
     public String getString(String key) {
-        return getValue(key, String::valueOf);
+        return getValue(key, ObjectValueUtils::getString);
     }
 
     /**
@@ -47,12 +51,7 @@ public class MapValueGetter {
      * @return Integer value
      */
     public Integer getInteger(String key) {
-        return getValue(key, value -> {
-            if(value instanceof Integer){
-                return (Integer) value;
-            }
-            return Integer.parseInt(String.valueOf(value));
-        });
+        return getValue(key, ObjectValueUtils::getInteger);
     }
 
     /**
@@ -61,12 +60,7 @@ public class MapValueGetter {
      * @return Long value
      */
     public Long getLong(String key) {
-        return getValue(key, value -> {
-            if(value instanceof Long){
-                return (Long) value;
-            }
-            return Long.parseLong(String.valueOf(value));
-        });
+        return getValue(key, ObjectValueUtils::getLong);
     }
 
     /**
@@ -75,12 +69,7 @@ public class MapValueGetter {
      * @return Double value
      */
     public Double getDouble(String key) {
-        return getValue(key, value -> {
-            if(value instanceof Double){
-                return (Double) value;
-            }
-            return Double.parseDouble(String.valueOf(value));
-        });
+        return getValue(key, ObjectValueUtils::getDouble);
     }
 
     /**
@@ -89,12 +78,7 @@ public class MapValueGetter {
      * @return Float value
      */
     public Float getFloat(String key) {
-        return getValue(key, value -> {
-            if(value instanceof Float){
-                return (Float) value;
-            }
-            return Float.parseFloat(String.valueOf(value));
-        });
+        return getValue(key, ObjectValueUtils::getFloat);
     }
 
     /**
@@ -103,12 +87,7 @@ public class MapValueGetter {
      * @return Boolean value
      */
     public Boolean getBoolean(String key) {
-        return getValue(key, value -> {
-            if(value instanceof Boolean){
-                return (Boolean) value;
-            }
-            return Boolean.parseBoolean(String.valueOf(value));
-        });
+        return getValue(key, ObjectValueUtils::getBoolean);
     }
 
     /**

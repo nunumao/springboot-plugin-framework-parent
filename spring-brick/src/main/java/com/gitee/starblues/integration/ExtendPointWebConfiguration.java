@@ -17,6 +17,7 @@
 package com.gitee.starblues.integration;
 
 import com.gitee.starblues.integration.listener.SwaggerListener;
+import com.gitee.starblues.spring.ResolvePluginThreadClassLoader;
 import com.gitee.starblues.spring.web.PluginStaticResourceConfig;
 import com.gitee.starblues.spring.web.PluginStaticResourceWebMvcConfigurer;
 import com.gitee.starblues.spring.web.thymeleaf.PluginThymeleafInvolved;
@@ -27,6 +28,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplicat
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.support.GenericApplicationContext;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.resource.ResourceResolver;
 import org.thymeleaf.spring5.SpringTemplateEngine;
 import org.thymeleaf.templatemode.TemplateMode;
@@ -88,6 +90,11 @@ public class ExtendPointWebConfiguration {
             return new SwaggerListener(applicationContext);
         }
 
+    }
+
+    @Bean
+    public WebMvcConfigurer webMvcConfigurer(){
+        return new ResolvePluginThreadClassLoader();
     }
 
 }
