@@ -7,7 +7,7 @@
     <parent>
         <artifactId>spring-brick-parent</artifactId>
         <groupId>com.gitee.starblues</groupId>
-        <version>3.0.3</version>
+        <version>3.0.4</version>
     </parent>
 
     <artifactId>spring-brick</artifactId>

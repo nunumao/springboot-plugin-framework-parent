@@ -16,6 +16,7 @@
 
 package com.gitee.starblues.loader.launcher;
 
+import com.gitee.starblues.loader.DevelopmentMode;
 import com.gitee.starblues.loader.jar.JarFile;
 import com.gitee.starblues.loader.launcher.runner.MainMethodRunner;
 import com.gitee.starblues.loader.launcher.runner.MethodRunner;
@@ -37,7 +38,6 @@ public class SpringMainBootstrap {
     private static final CountDownLatch COUNT_DOWN_LATCH = new CountDownLatch(1);
 
     private static SpringBootstrap springBootstrap;
-
 
     public static void launch(Class<? extends SpringBootstrap> bootstrapClass, String[] args) {
         try {
@@ -86,7 +86,12 @@ public class SpringMainBootstrap {
     private static void main(String[] args) throws Exception {
         Objects.requireNonNull(springBootstrap, "springBootBootstrap 不能为空");
         MethodRunner run = new MethodRunner(springBootstrap.getClass().getName(), SPRING_BOOTSTRAP_RUN_METHOD, args);
-        Launcher<ClassLoader> launcher = new MainProgramLauncher(run);
+        Launcher<ClassLoader> launcher;
+        if(springBootstrap.developmentMode() == DevelopmentMode.SIMPLE){
+            launcher = new SimpleModeMainLauncher(run);
+        } else {
+            launcher = new MainProgramLauncher(run);
+        }
         launcher.run(args);
     }
 

@@ -1,2 +1,6 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
   com.gitee.starblues.integration.SpringBootPluginStarter
+
+# Application Context Initializers
+org.springframework.context.ApplicationContextInitializer=\
+com.gitee.starblues.integration.simple.SimpleDevelopmentModeInitializer

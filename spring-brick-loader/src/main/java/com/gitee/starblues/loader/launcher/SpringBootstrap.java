@@ -16,6 +16,8 @@
 
 package com.gitee.starblues.loader.launcher;
 
+import com.gitee.starblues.loader.DevelopmentMode;
+
 /**
  * 主程序实现该接口引导启动SpringBoot
  * @author starBlues
@@ -29,5 +31,15 @@ public interface SpringBootstrap {
      * @throws Exception 启动异常
      */
     void run(String[] args) throws Exception;
+
+
+    /**
+     * 设置开发模式
+     *
+     * @return DevelopmentMode
+     */
+    default DevelopmentMode developmentMode(){
+        return DevelopmentMode.DYNAMIC;
+    }
 
 }
