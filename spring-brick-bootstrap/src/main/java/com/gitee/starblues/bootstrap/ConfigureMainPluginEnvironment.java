@@ -39,6 +39,7 @@ import java.util.*;
  * 插件环境配置
  * @author starBlues
  * @version 3.0.0
+ * @since 3.0.0
  */
 class ConfigureMainPluginEnvironment {
 

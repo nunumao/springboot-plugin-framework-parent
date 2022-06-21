@@ -21,7 +21,9 @@ import org.springframework.beans.factory.ListableBeanFactory;
 /**
  * spring bean factory 封装接口
  * @author starBlues
+ * @since 3.0.0
  * @version 3.0.0
  */
 public interface SpringBeanFactory extends ListableBeanFactory {
+
 }
