@@ -10,14 +10,19 @@ package com.gitee.starblues.loader;
 public enum DevelopmentMode {
 
     /**
-     * 简单模式
+     * 隔离模式
      */
-    SIMPLE("simple"),
+    ISOLATION("isolation"),
 
     /**
-     * 动态模式
+     * 共存模式
      */
-    DYNAMIC("dynamic");
+    COEXIST("coexist"),
+
+    /**
+     * 简单模式
+     */
+    SIMPLE("simple");
 
     private final String developmentMode;
 
@@ -35,10 +40,12 @@ public enum DevelopmentMode {
     }
 
     public static DevelopmentMode byName(String model){
-        if(SIMPLE.name().equalsIgnoreCase(model)){
+        if(COEXIST.getDevelopmentMode().equalsIgnoreCase(model)){
+            return DevelopmentMode.ISOLATION;
+        } else if(SIMPLE.getDevelopmentMode().equalsIgnoreCase(model)){
             return DevelopmentMode.SIMPLE;
         } else {
-            return DevelopmentMode.DYNAMIC;
+            return DevelopmentMode.ISOLATION;
         }
     }
 }

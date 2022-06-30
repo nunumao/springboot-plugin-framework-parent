@@ -16,9 +16,12 @@
 
 package com.gitee.starblues.core.launcher.plugin;
 
+import com.gitee.starblues.common.Constants;
 import com.gitee.starblues.core.classloader.*;
 import com.gitee.starblues.core.descriptor.InsidePluginDescriptor;
+import com.gitee.starblues.core.exception.PluginException;
 import com.gitee.starblues.core.launcher.plugin.involved.PluginLaunchInvolved;
+import com.gitee.starblues.loader.DevelopmentMode;
 import com.gitee.starblues.loader.classloader.GenericClassLoader;
 import com.gitee.starblues.loader.classloader.resource.loader.DefaultResourceLoaderFactory;
 import com.gitee.starblues.loader.classloader.resource.loader.ResourceLoaderFactory;
@@ -35,11 +38,13 @@ import java.util.Map;
 import java.util.WeakHashMap;
 
 /**
- * 插件启动引导类
+ * 插件隔离式启动引导
+ *
  * @author starBlues
- * @version 3.0.3
+ * @since 3.0.0
+ * @version 3.0.4
  */
-public class PluginLauncher extends AbstractLauncher<SpringPluginHook> {
+public class PluginIsolationLauncher extends AbstractLauncher<SpringPluginHook> {
 
     private static final Map<String, PluginClassLoader> CLASS_LOADER_CACHE = new WeakHashMap<>();
 
@@ -49,8 +54,8 @@ public class PluginLauncher extends AbstractLauncher<SpringPluginHook> {
 
     protected final PluginLaunchInvolved pluginLaunchInvolved;
 
-    public PluginLauncher(PluginInteractive pluginInteractive,
-                          PluginLaunchInvolved pluginLaunchInvolved) {
+    public PluginIsolationLauncher(PluginInteractive pluginInteractive,
+                                   PluginLaunchInvolved pluginLaunchInvolved) {
         this.pluginInteractive = pluginInteractive;
         this.pluginDescriptor = pluginInteractive.getPluginDescriptor();
         this.mainResourceMatcher = getMainResourceMatcher(pluginInteractive);
@@ -118,6 +123,5 @@ public class PluginLauncher extends AbstractLauncher<SpringPluginHook> {
             throw throwable;
         }
     }
-
 
 }

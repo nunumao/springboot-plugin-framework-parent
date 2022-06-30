@@ -26,6 +26,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Import;
+import org.springframework.context.support.GenericApplicationContext;
 
 /**
  * 自动初始化的 PluginApplication。该PluginApplication 基于 Spring InitializingBean 自动初始化插件。
@@ -57,10 +58,14 @@ public class AutoPluginApplication extends DefaultPluginApplication
         throw new RuntimeException("Cannot be initialized manually");
     }
 
-
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) {
         this.applicationContext = applicationContext;
+    }
+
+    @Override
+    protected void setBeanFactory(GenericApplicationContext applicationContext) {
+        // 忽略
     }
 
     /**

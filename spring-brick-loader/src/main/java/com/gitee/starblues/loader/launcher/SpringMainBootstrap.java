@@ -21,7 +21,6 @@ import com.gitee.starblues.loader.jar.JarFile;
 import com.gitee.starblues.loader.launcher.runner.MainMethodRunner;
 import com.gitee.starblues.loader.launcher.runner.MethodRunner;
 
-import java.io.File;
 import java.util.Objects;
 import java.util.concurrent.CountDownLatch;
 
@@ -50,6 +49,7 @@ public class SpringMainBootstrap {
 
     public static void launch(SpringBootstrap springBootstrap, String[] args) {
         SpringMainBootstrap.springBootstrap = Objects.requireNonNull(springBootstrap, "springBootBootstrap 不能为空");
+        DevelopmentModeSetting.setDevelopmentMode(springBootstrap.developmentMode());
         MainMethodRunner mainMethodRunner = new MainMethodRunner(SpringMainBootstrap.class.getName(),
                 MAIN_RUN_METHOD, args);
         JarFile.registerUrlProtocolHandler();
@@ -87,7 +87,9 @@ public class SpringMainBootstrap {
         Objects.requireNonNull(springBootstrap, "springBootBootstrap 不能为空");
         MethodRunner run = new MethodRunner(springBootstrap.getClass().getName(), SPRING_BOOTSTRAP_RUN_METHOD, args);
         Launcher<ClassLoader> launcher;
-        if(springBootstrap.developmentMode() == DevelopmentMode.SIMPLE){
+
+        DevelopmentMode developmentMode = springBootstrap.developmentMode();
+        if(developmentMode == DevelopmentMode.SIMPLE || developmentMode == DevelopmentMode.COEXIST){
             launcher = new SimpleModeMainLauncher(run);
         } else {
             launcher = new MainProgramLauncher(run);

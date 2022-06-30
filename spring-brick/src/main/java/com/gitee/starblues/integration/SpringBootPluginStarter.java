@@ -28,7 +28,6 @@ import org.springframework.context.annotation.Import;
  * @author starBlues
  * @version 3.0.0
  */
-@Configuration(proxyBeanMethods = true)
 @EnableConfigurationProperties(AutoIntegrationConfiguration.class)
 @ConditionalOnExpression("${" + AutoIntegrationConfiguration.ENABLE_STARTER_KEY + ":true}")
 @Import(AutoPluginApplication.class)

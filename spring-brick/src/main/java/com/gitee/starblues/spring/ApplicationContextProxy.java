@@ -32,6 +32,7 @@ public class ApplicationContextProxy extends GenericApplicationContext{
     public ApplicationContextProxy(Object targetBeanFactory) {
         super();
         setSpringBeanFactory(createSpringBeanFactory(targetBeanFactory));
+        setSourcesBeanFactory(targetBeanFactory);
     }
 
     protected SpringBeanFactory createSpringBeanFactory(Object targetBeanFactory){

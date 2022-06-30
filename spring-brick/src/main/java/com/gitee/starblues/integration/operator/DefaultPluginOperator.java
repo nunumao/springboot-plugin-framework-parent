@@ -60,7 +60,7 @@ public class DefaultPluginOperator implements PluginOperator {
 
     private final static DateTimeFormatter FORMAT = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
 
-    private final AtomicBoolean isInit = new AtomicBoolean(false);
+    private static final AtomicBoolean IS_INIT = new AtomicBoolean(false);
 
     private final GenericApplicationContext applicationContext;
     private final IntegrationConfiguration configuration;
@@ -79,7 +79,7 @@ public class DefaultPluginOperator implements PluginOperator {
 
     @Override
     public synchronized boolean initPlugins(PluginInitializerListener pluginInitializerListener) throws PluginException {
-        if(isInit.get()){
+        if(IS_INIT.get()){
             throw new RuntimeException("插件已经被初始化了, 不能再初始化.");
         }
         try {
@@ -114,7 +114,7 @@ public class DefaultPluginOperator implements PluginOperator {
                     isFoundException = true;
                 }
             }
-            isInit.set(true);
+            IS_INIT.set(true);
             if(isFoundException){
                 log.error("插件初始化失败");
                 pluginInitializerListenerFactory.failure(new PluginException("插件初始化存在异常"));

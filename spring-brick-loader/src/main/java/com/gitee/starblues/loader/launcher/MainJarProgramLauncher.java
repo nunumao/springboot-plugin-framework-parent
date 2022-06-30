@@ -59,6 +59,11 @@ public class MainJarProgramLauncher extends MainProgramLauncher{
     }
 
     @Override
+    protected boolean resolveThreadClassLoader() {
+        return true;
+    }
+
+    @Override
     protected void addResource(GenericClassLoader classLoader) throws Exception {
         super.addResource(classLoader);
         Archive archive = getArchive();

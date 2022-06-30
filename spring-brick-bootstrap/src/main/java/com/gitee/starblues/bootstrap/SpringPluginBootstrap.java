@@ -16,13 +16,17 @@
 
 package com.gitee.starblues.bootstrap;
 
+import com.gitee.starblues.bootstrap.launcher.*;
 import com.gitee.starblues.bootstrap.processor.ComposeSpringPluginProcessor;
 import com.gitee.starblues.bootstrap.processor.DefaultProcessorContext;
 import com.gitee.starblues.bootstrap.processor.ProcessorContext;
 import com.gitee.starblues.bootstrap.processor.SpringPluginProcessor;
 import com.gitee.starblues.bootstrap.realize.AutowiredTypeDefiner;
 import com.gitee.starblues.core.launcher.plugin.PluginInteractive;
+import com.gitee.starblues.loader.launcher.DevelopmentModeSetting;
 import com.gitee.starblues.spring.SpringPluginHook;
+import lombok.Getter;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,11 +39,15 @@ import java.util.List;
  */
 public abstract class SpringPluginBootstrap {
 
+    @Getter
     private ProcessorContext.RunMode runMode = ProcessorContext.RunMode.ONESELF;
-
+    @Getter
     private volatile PluginInteractive pluginInteractive;
-
+    @Getter
     private final List<SpringPluginProcessor> customPluginProcessors = new ArrayList<>();
+
+    private final BootstrapLauncherFactory launcherFactory = new DefaultBootstrapLauncherFactory();
+
 
     public final SpringPluginHook run(String[] args){
         return run(this.getClass(), args);
@@ -56,16 +64,8 @@ public abstract class SpringPluginBootstrap {
     private SpringPluginHook start(Class<?>[] primarySources, String[] args){
         createPluginInteractive();
         addCustomSpringPluginProcessor();
-        SpringPluginProcessor pluginProcessor = new ComposeSpringPluginProcessor(runMode, customPluginProcessors);
-        ProcessorContext processorContext = new DefaultProcessorContext(
-                runMode, this, pluginInteractive, this.getClass()
-        );
-        PluginSpringApplication springApplication = new PluginSpringApplication(
-                pluginProcessor,
-                processorContext,
-                primarySources);
-        springApplication.run(args);
-        return new DefaultSpringPluginHook(pluginProcessor, processorContext);
+        BootstrapLauncher bootstrapLauncher = launcherFactory.create(this);
+        return bootstrapLauncher.launch(primarySources, args);
     }
 
     public final SpringPluginBootstrap setPluginInteractive(PluginInteractive pluginInteractive) {

@@ -16,6 +16,7 @@
 
 package com.gitee.starblues.bootstrap;
 
+import com.gitee.starblues.loader.launcher.DevelopmentModeSetting;
 import com.gitee.starblues.utils.ObjectUtils;
 import org.springframework.boot.autoconfigure.AutoConfigurationImportFilter;
 import org.springframework.boot.autoconfigure.AutoConfigurationMetadata;
@@ -31,42 +32,91 @@ import java.util.List;
  */
 public class PluginDisableAutoConfiguration implements AutoConfigurationImportFilter {
 
-    private static final List<String> DISABLE_FUZZY_CLASSES = new ArrayList<>();
 
-    public PluginDisableAutoConfiguration(){
-        addDisableFuzzyClasses();
-    }
+    private static final ThreadLocal<Boolean> LAUNCH_PLUGIN = new ThreadLocal<Boolean>();
 
-    private void addDisableFuzzyClasses() {
-        DISABLE_FUZZY_CLASSES.add("org.springframework.boot.autoconfigure.http");
-        DISABLE_FUZZY_CLASSES.add("org.springframework.boot.autoconfigure.web");
-        DISABLE_FUZZY_CLASSES.add("org.springframework.boot.autoconfigure.websocket");
-        DISABLE_FUZZY_CLASSES.add("org.springframework.boot.autoconfigure.jackson");
-        DISABLE_FUZZY_CLASSES.add("org.springframework.boot.autoconfigure.webservices");
-    }
-
-    public static boolean isDisabled(String className){
-        if(ObjectUtils.isEmpty(className)){
-            return false;
-        }
-        for (String disableFuzzyClass : DISABLE_FUZZY_CLASSES) {
-            if (className.contains(disableFuzzyClass)) {
-                return true;
-            }
-        }
-        return false;
+    public static void setLaunchPlugin() {
+        LAUNCH_PLUGIN.set(true);
     }
 
     @Override
     public boolean[] match(String[] autoConfigurationClasses, AutoConfigurationMetadata autoConfigurationMetadata) {
-        boolean[] match = new boolean[autoConfigurationClasses.length];
-        for (int i = 0; i < autoConfigurationClasses.length; i++) {
-            String autoConfigurationClass = autoConfigurationClasses[i];
-            if(autoConfigurationClass == null || "".equals(autoConfigurationClass)){
-                continue;
+        if(DevelopmentModeSetting.isolation()){
+            return new IsolationDisableAutoConfiguration().match(autoConfigurationClasses, autoConfigurationMetadata);
+        } else if(DevelopmentModeSetting.coexist()){
+            return new CoexistDisableAutoConfiguration().match(autoConfigurationClasses, autoConfigurationMetadata);
+        } else {
+            boolean[] permitAll = new boolean[autoConfigurationClasses.length];
+            for (int i = 0; i < autoConfigurationClasses.length; i++) {
+                permitAll[i] = true;
             }
-            match[i] = !isDisabled(autoConfigurationClass);
+            return permitAll;
         }
-        return match;
     }
+
+
+    private static class IsolationDisableAutoConfiguration implements AutoConfigurationImportFilter{
+
+        private final List<String> disableFuzzyClass = new ArrayList<>();
+
+        IsolationDisableAutoConfiguration(){
+            addDisableFuzzyClasses();
+        }
+
+        private void addDisableFuzzyClasses() {
+            disableFuzzyClass.add("org.springframework.boot.autoconfigure.http");
+            disableFuzzyClass.add("org.springframework.boot.autoconfigure.web");
+            disableFuzzyClass.add("org.springframework.boot.autoconfigure.websocket");
+            disableFuzzyClass.add("org.springframework.boot.autoconfigure.jackson");
+            disableFuzzyClass.add("org.springframework.boot.autoconfigure.webservices");
+        }
+
+        private boolean isDisabled(String className){
+            if(ObjectUtils.isEmpty(className)){
+                return false;
+            }
+            for (String disableFuzzyClass : disableFuzzyClass) {
+                if (className.contains(disableFuzzyClass)) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        @Override
+        public boolean[] match(String[] autoConfigurationClasses, AutoConfigurationMetadata autoConfigurationMetadata) {
+            boolean[] match = new boolean[autoConfigurationClasses.length];
+            for (int i = 0; i < autoConfigurationClasses.length; i++) {
+                String autoConfigurationClass = autoConfigurationClasses[i];
+                if(autoConfigurationClass == null || "".equals(autoConfigurationClass)){
+                    continue;
+                }
+                match[i] = !isDisabled(autoConfigurationClass);
+            }
+            return match;
+        }
+    }
+
+
+    private static class CoexistDisableAutoConfiguration implements AutoConfigurationImportFilter{
+
+        @Override
+        public boolean[] match(String[] autoConfigurationClasses, AutoConfigurationMetadata autoConfigurationMetadata) {
+            Boolean launchPlugin = LAUNCH_PLUGIN.get();
+            boolean[] match = new boolean[autoConfigurationClasses.length];
+            try {
+                if(launchPlugin != null && launchPlugin){
+                    return match;
+                } else {
+                    for (int i = 0; i < autoConfigurationClasses.length; i++) {
+                        match[i] = true;
+                    }
+                }
+                return match;
+            } finally {
+                LAUNCH_PLUGIN.remove();
+            }
+        }
+    }
+
 }

@@ -19,6 +19,7 @@ package com.gitee.starblues.bootstrap;
 import com.gitee.starblues.bootstrap.processor.ProcessorContext;
 import com.gitee.starblues.core.descriptor.InsidePluginDescriptor;
 import com.gitee.starblues.integration.AutoIntegrationConfiguration;
+import com.gitee.starblues.loader.launcher.DevelopmentModeSetting;
 import com.gitee.starblues.utils.Assert;
 import com.gitee.starblues.utils.FilesUtils;
 import com.gitee.starblues.utils.ObjectUtils;
@@ -36,7 +37,7 @@ import java.util.Map;
  * @author starBlues
  * @version 3.0.0
  */
-class ConfigurePluginEnvironment {
+public class ConfigurePluginEnvironment {
 
     private final static String PLUGIN_PROPERTY_NAME = "pluginPropertySources";
 
@@ -53,13 +54,13 @@ class ConfigurePluginEnvironment {
     private final ProcessorContext processorContext;
     private final InsidePluginDescriptor pluginDescriptor;
 
-    ConfigurePluginEnvironment(ProcessorContext processorContext) {
+    public ConfigurePluginEnvironment(ProcessorContext processorContext) {
         this.processorContext = Assert.isNotNull(processorContext, "processorContext 不能为空");
         this.pluginDescriptor = Assert.isNotNull(processorContext.getPluginDescriptor(),
                 "pluginDescriptor 不能为空");
     }
 
-    void configureEnvironment(ConfigurableEnvironment environment, String[] args) {
+    public void configureEnvironment(ConfigurableEnvironment environment, String[] args) {
         Map<String, Object> env = new HashMap<>();
         String pluginId = pluginDescriptor.getPluginId();
         String configFileName = pluginDescriptor.getConfigFileName();
@@ -75,13 +76,19 @@ class ConfigurePluginEnvironment {
         env.put(SPRING_ADMIN_JMX_NAME, SPRING_ADMIN_JMX_VALUE + pluginId);
         env.put(REGISTER_SHUTDOWN_HOOK_PROPERTY, false);
         env.put(MBEAN_DOMAIN_PROPERTY_NAME, pluginId);
-        environment.getPropertySources().addFirst(new MapPropertySource(PLUGIN_PROPERTY_NAME, env));
 
         if(processorContext.runMode() == ProcessorContext.RunMode.ONESELF){
             ConfigureMainPluginEnvironment configureMainPluginEnvironment =
                     new ConfigureMainPluginEnvironment(processorContext);
             configureMainPluginEnvironment.configureEnvironment(environment, args);
+            env.put(AutoIntegrationConfiguration.ENABLE_STARTER_KEY, false);
         }
+
+        if(DevelopmentModeSetting.coexist()){
+            env.put(AutoIntegrationConfiguration.ENABLE_STARTER_KEY, false);
+        }
+
+        environment.getPropertySources().addFirst(new MapPropertySource(PLUGIN_PROPERTY_NAME, env));
     }
 
     private String getConfigFileLocation(String configFileLocation){

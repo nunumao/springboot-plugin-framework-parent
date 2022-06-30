@@ -38,12 +38,13 @@ import java.util.Map;
 /**
  * 默认的插件钩子器
  * @author starBlues
- * @version 3.0.0
+ * @since 3.0.0
+ * @version 3.0.4
  */
 public class DefaultSpringPluginHook implements SpringPluginHook {
 
-    private final SpringPluginProcessor pluginProcessor;
-    private final ProcessorContext processorContext;
+    protected final SpringPluginProcessor pluginProcessor;
+    protected final ProcessorContext processorContext;
     private final StopValidator stopValidator;
 
     public DefaultSpringPluginHook(SpringPluginProcessor pluginProcessor,

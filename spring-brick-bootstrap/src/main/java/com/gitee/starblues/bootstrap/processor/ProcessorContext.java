@@ -132,6 +132,7 @@ public interface ProcessorContext extends RegistryInfo {
         /**
          * 插件独立运行
          */
+        @Deprecated
         ONESELF
     }
 

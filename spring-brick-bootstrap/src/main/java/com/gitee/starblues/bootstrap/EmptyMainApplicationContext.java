@@ -40,6 +40,11 @@ public class EmptyMainApplicationContext implements MainApplicationContext {
     }
 
     @Override
+    public Object getSourceBeanFactory() {
+        return null;
+    }
+
+    @Override
     public void close() throws Exception {
 
     }
@@ -62,6 +67,11 @@ public class EmptyMainApplicationContext implements MainApplicationContext {
     @Override
     public boolean isWebEnvironment() {
         return false;
+    }
+
+    @Override
+    public Object getSourceApplicationContext() {
+        return null;
     }
 
 }

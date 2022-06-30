@@ -21,11 +21,14 @@ import com.gitee.starblues.bootstrap.processor.SpringPluginProcessor;
 import com.gitee.starblues.spring.ApplicationContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.boot.Banner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.WebApplicationType;
+import org.springframework.boot.context.properties.ConfigurationPropertiesBindingPostProcessor;
 import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.StandardEnvironment;
@@ -34,22 +37,21 @@ import org.springframework.core.io.ResourceLoader;
 /**
  * 插件SpringApplication实现
  * @author starBlues
- * @version 3.0.3
+ * @since 3.0.0
+ * @version 3.0.4
  */
 public class PluginSpringApplication extends SpringApplication {
 
     private final Logger logger = LoggerFactory.getLogger(PluginSpringApplication.class);
 
+    protected final SpringPluginProcessor pluginProcessor;
+    protected final ProcessorContext processorContext;
+
     private final ProcessorContext.RunMode runMode;
-
-    private final SpringPluginProcessor pluginProcessor;
-    private final ProcessorContext processorContext;
-
-    private final GenericApplicationContext applicationContext;
-
-    private final DefaultListableBeanFactory beanFactory;
-    private final ResourceLoader resourceLoader;
     private final ConfigurePluginEnvironment configurePluginEnvironment;
+    private final GenericApplicationContext applicationContext;
+    private final ResourceLoader resourceLoader;
+
 
     public PluginSpringApplication(SpringPluginProcessor pluginProcessor,
                                    ProcessorContext processorContext,
@@ -59,7 +61,6 @@ public class PluginSpringApplication extends SpringApplication {
         this.pluginProcessor = pluginProcessor;
         this.processorContext = processorContext;
         this.resourceLoader = processorContext.getResourceLoader();
-        this.beanFactory = new PluginListableBeanFactory(processorContext);
         this.configurePluginEnvironment = new ConfigurePluginEnvironment(processorContext);
         this.applicationContext = getApplicationContext();
         setDefaultPluginConfig();
@@ -69,11 +70,16 @@ public class PluginSpringApplication extends SpringApplication {
         if(runMode == ProcessorContext.RunMode.ONESELF){
             return (GenericApplicationContext) super.createApplicationContext();
         }
+        DefaultListableBeanFactory beanFactory = getBeanFactory(processorContext);
         if(processorContext.getMainApplicationContext().isWebEnvironment()){
             return new PluginWebApplicationContext(beanFactory, processorContext);
         } else {
             return new PluginApplicationContext(beanFactory, processorContext);
         }
+    }
+
+    protected DefaultListableBeanFactory getBeanFactory(ProcessorContext processorContext){
+        return new PluginListableBeanFactory(processorContext);
     }
 
     public void setDefaultPluginConfig(){

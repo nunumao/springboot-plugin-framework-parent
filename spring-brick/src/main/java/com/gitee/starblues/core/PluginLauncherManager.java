@@ -23,12 +23,15 @@ import com.gitee.starblues.core.exception.PluginException;
 import com.gitee.starblues.core.exception.PluginProhibitStopException;
 import com.gitee.starblues.core.launcher.plugin.DefaultPluginInteractive;
 import com.gitee.starblues.core.launcher.plugin.PluginInteractive;
-import com.gitee.starblues.core.launcher.plugin.PluginLauncher;
+import com.gitee.starblues.core.launcher.plugin.PluginCoexistLauncher;
+import com.gitee.starblues.core.launcher.plugin.PluginIsolationLauncher;
 import com.gitee.starblues.core.launcher.plugin.involved.PluginLaunchInvolved;
 import com.gitee.starblues.core.launcher.plugin.involved.PluginLaunchInvolvedFactory;
 import com.gitee.starblues.integration.IntegrationConfiguration;
 import com.gitee.starblues.integration.listener.DefaultPluginListenerFactory;
 import com.gitee.starblues.integration.listener.PluginListenerFactory;
+import com.gitee.starblues.loader.launcher.AbstractLauncher;
+import com.gitee.starblues.loader.launcher.DevelopmentModeSetting;
 import com.gitee.starblues.spring.MainApplicationContext;
 import com.gitee.starblues.spring.MainApplicationContextProxy;
 import com.gitee.starblues.spring.SpringPluginHook;
@@ -96,7 +99,12 @@ public class PluginLauncherManager extends DefaultPluginManager{
             InsidePluginDescriptor pluginDescriptor = pluginInsideInfo.getPluginDescriptor();
             PluginInteractive pluginInteractive = new DefaultPluginInteractive(pluginDescriptor,
                     mainApplicationContext, configuration, invokeSupperCache);
-            PluginLauncher pluginLauncher = new PluginLauncher(pluginInteractive, pluginLaunchInvolved);
+            AbstractLauncher<SpringPluginHook> pluginLauncher;
+            if(DevelopmentModeSetting.isolation()){
+                pluginLauncher = new PluginIsolationLauncher(pluginInteractive, pluginLaunchInvolved);
+            } else {
+                pluginLauncher = new PluginCoexistLauncher(pluginInteractive, pluginLaunchInvolved);
+            }
             SpringPluginHook springPluginHook = pluginLauncher.run();
             RegistryPluginInfo registryPluginInfo = new RegistryPluginInfo(pluginDescriptor, springPluginHook);
             registryInfo.put(pluginDescriptor.getPluginId(), registryPluginInfo);
@@ -108,6 +116,8 @@ public class PluginLauncherManager extends DefaultPluginManager{
             throw e;
         }
     }
+
+
 
 
     @Override
