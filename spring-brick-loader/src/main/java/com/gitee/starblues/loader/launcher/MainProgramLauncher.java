@@ -22,6 +22,7 @@ import com.gitee.starblues.loader.launcher.runner.MethodRunner;
 import com.gitee.starblues.loader.utils.ObjectUtils;
 
 
+import java.io.File;
 import java.lang.management.ManagementFactory;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -66,7 +67,7 @@ public class MainProgramLauncher extends AbstractMainLauncher<ClassLoader>{
     protected void addResource(GenericClassLoader classLoader) throws Exception{
         String classPath = ManagementFactory.getRuntimeMXBean().getClassPath();
         if(!ObjectUtils.isEmpty(classPath)){
-            String[] classPathStr = classPath.split(";");
+            String[] classPathStr = classPath.split(File.pathSeparator);
             for (String path : classPathStr) {
                 classLoader.addResource(path);
             }
