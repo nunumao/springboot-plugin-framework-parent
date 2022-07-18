@@ -28,8 +28,17 @@ import java.net.URL;
  */
 public interface ResourceLoader extends AutoCloseable{
 
+    /**
+     * 获取资源基本 URL
+     * @return URL
+     */
     URL getBaseUrl();
 
+    /**
+     * 装载资源到ResourceStorage
+     * @param resourceStorage 资源存储
+     * @throws Exception 装载异常
+     */
     void load(ResourceStorage resourceStorage) throws Exception;
 
 }

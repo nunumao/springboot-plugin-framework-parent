@@ -16,17 +16,14 @@
 
 package com.gitee.starblues.bootstrap;
 
+import com.gitee.starblues.bootstrap.coexist.CoexistAllowAutoConfiguration;
 import com.gitee.starblues.bootstrap.launcher.*;
-import com.gitee.starblues.bootstrap.processor.ComposeSpringPluginProcessor;
-import com.gitee.starblues.bootstrap.processor.DefaultProcessorContext;
 import com.gitee.starblues.bootstrap.processor.ProcessorContext;
 import com.gitee.starblues.bootstrap.processor.SpringPluginProcessor;
 import com.gitee.starblues.bootstrap.realize.AutowiredTypeDefiner;
 import com.gitee.starblues.core.launcher.plugin.PluginInteractive;
-import com.gitee.starblues.loader.launcher.DevelopmentModeSetting;
 import com.gitee.starblues.spring.SpringPluginHook;
 import lombok.Getter;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -45,9 +42,14 @@ public abstract class SpringPluginBootstrap {
     private volatile PluginInteractive pluginInteractive;
     @Getter
     private final List<SpringPluginProcessor> customPluginProcessors = new ArrayList<>();
+    @Getter
+    private final CoexistAllowAutoConfiguration coexistAllowAutoConfiguration = new CoexistAllowAutoConfiguration();
 
     private final BootstrapLauncherFactory launcherFactory = new DefaultBootstrapLauncherFactory();
 
+    public SpringPluginBootstrap() {
+        SpringPluginBootstrapBinder.set(this);
+    }
 
     public final SpringPluginHook run(String[] args){
         return run(this.getClass(), args);
@@ -62,6 +64,7 @@ public abstract class SpringPluginBootstrap {
     }
 
     private SpringPluginHook start(Class<?>[] primarySources, String[] args){
+        configCoexistAllowAutoConfiguration(this.coexistAllowAutoConfiguration);
         createPluginInteractive();
         addCustomSpringPluginProcessor();
         BootstrapLauncher bootstrapLauncher = launcherFactory.create(this);
@@ -107,5 +110,12 @@ public abstract class SpringPluginBootstrap {
         return null;
     }
 
+    /**
+     * 在 Coexist 模式下手动配置 spring-boot-auto-configuration 类
+     * @param configuration 配置的类
+     */
+    protected void configCoexistAllowAutoConfiguration(CoexistAllowAutoConfiguration configuration){
+
+    }
 
 }

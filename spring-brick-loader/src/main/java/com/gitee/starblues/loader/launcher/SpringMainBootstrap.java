@@ -32,7 +32,6 @@ import java.util.concurrent.CountDownLatch;
 public class SpringMainBootstrap {
 
     static final String MAIN_RUN_METHOD = "main";
-    static final String SPRING_BOOTSTRAP_RUN_METHOD = "run";
 
     private static final CountDownLatch COUNT_DOWN_LATCH = new CountDownLatch(1);
 
@@ -85,15 +84,7 @@ public class SpringMainBootstrap {
 
     private static void main(String[] args) throws Exception {
         Objects.requireNonNull(springBootstrap, "springBootBootstrap 不能为空");
-        MethodRunner run = new MethodRunner(springBootstrap.getClass().getName(), SPRING_BOOTSTRAP_RUN_METHOD, args);
-        Launcher<ClassLoader> launcher;
-
-        DevelopmentMode developmentMode = springBootstrap.developmentMode();
-        if(developmentMode == DevelopmentMode.SIMPLE || developmentMode == DevelopmentMode.COEXIST){
-            launcher = new SimpleModeMainLauncher(run);
-        } else {
-            launcher = new MainProgramLauncher(run);
-        }
+        Launcher<ClassLoader> launcher = new DevLauncher(springBootstrap);
         launcher.run(args);
     }
 

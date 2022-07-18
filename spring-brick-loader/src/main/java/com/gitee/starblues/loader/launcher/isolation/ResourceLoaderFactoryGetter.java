@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-package com.gitee.starblues.loader.launcher;
+package com.gitee.starblues.loader.launcher.isolation;
 
 import com.gitee.starblues.loader.classloader.resource.loader.DefaultResourceLoaderFactory;
 import com.gitee.starblues.loader.classloader.resource.loader.ResourceLoaderFactory;

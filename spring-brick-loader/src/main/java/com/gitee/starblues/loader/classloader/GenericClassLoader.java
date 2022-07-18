@@ -27,9 +27,7 @@ import java.io.*;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.Path;
-import java.util.Enumeration;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -37,13 +35,14 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author starBlues
  * @version 3.0.0
  */
-public class GenericClassLoader extends URLClassLoader {
+public class GenericClassLoader extends URLClassLoader implements ResourceLoaderFactory{
 
     private final String name;
     private final ClassLoader parent;
 
     protected final ResourceLoaderFactory resourceLoaderFactory;
 
+    private final ResourceLoaderFactory classLoaderTranslator;
     private final Map<String, Class<?>> pluginClassCache = new ConcurrentHashMap<>();
 
     public GenericClassLoader(String name, ResourceLoaderFactory resourceLoaderFactory) {
@@ -55,36 +54,56 @@ public class GenericClassLoader extends URLClassLoader {
         this.name = Assert.isNotEmpty(name, "name 不能为空");
         this.resourceLoaderFactory = Assert.isNotNull(resourceLoaderFactory, "resourceLoaderFactory 不能为空");
         this.parent = parent;
-
+        this.classLoaderTranslator = new ClassLoaderTranslator(this);
     }
 
     public String getName() {
         return name;
     }
 
-
+    @Override
     public void addResource(String path) throws Exception {
         resourceLoaderFactory.addResource(path);
     }
 
+    @Override
     public void addResource(File file) throws Exception {
         resourceLoaderFactory.addResource(file);
     }
 
+    @Override
     public void addResource(Path path) throws Exception {
         resourceLoaderFactory.addResource(path);
     }
 
+    @Override
     public void addResource(URL url) throws Exception {
         resourceLoaderFactory.addResource(url);
     }
 
+    @Override
     public void addResource(ResourceLoader resourceLoader) throws Exception{
         resourceLoaderFactory.addResource(resourceLoader);
     }
 
-    public ClassLoader getParentClassLoader(){
-        return parent;
+    @Override
+    public Resource findFirstResource(String name) {
+        return classLoaderTranslator.findFirstResource(name);
+    }
+
+    @Override
+    public Enumeration<Resource> findAllResource(String name) {
+        return classLoaderTranslator.findAllResource(name);
+    }
+
+    @Override
+    public InputStream getInputStream(String name) {
+        return classLoaderTranslator.getInputStream(name);
+    }
+
+    @Override
+    public List<URL> getUrls() {
+        return classLoaderTranslator.getUrls();
     }
 
     @Override
@@ -129,7 +148,7 @@ public class GenericClassLoader extends URLClassLoader {
         if (aClass != null) {
             return aClass;
         }
-        Resource resource = resourceLoaderFactory.findResource(formatClassName);
+        Resource resource = resourceLoaderFactory.findFirstResource(formatClassName);
         byte[] bytes = null;
         if(resource != null){
             bytes = resource.getBytes();
@@ -218,7 +237,7 @@ public class GenericClassLoader extends URLClassLoader {
     }
 
     protected URL findResourceFromLocal(String name) {
-        Resource resource = resourceLoaderFactory.findResource(name);
+        Resource resource = resourceLoaderFactory.findFirstResource(name);
         if (resource == null) {
             return null;
         }
@@ -262,7 +281,7 @@ public class GenericClassLoader extends URLClassLoader {
     }
 
     protected Enumeration<URL> findResourcesFromLocal(String name) throws IOException{
-        Enumeration<Resource> enumeration = resourceLoaderFactory.findResources(name);
+        Enumeration<Resource> enumeration = resourceLoaderFactory.findAllResource(name);
         return new Enumeration<URL>() {
             @Override
             public boolean hasMoreElements() {

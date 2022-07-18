@@ -23,8 +23,9 @@ import com.gitee.starblues.loader.DevelopmentMode;
  * @author starBlues
  * @version 3.0.2
  */
-public abstract class AbstractMainLauncher<R> extends AbstractLauncher<R> {
+public abstract class AbstractMainLauncher extends AbstractLauncher<ClassLoader> {
 
+    public static final String MAIN_CLASS_LOADER_NAME = "MainProgramLauncherClassLoader";
 
     /**
      * SpringPluginBootstrap 包名称
@@ -40,7 +41,7 @@ public abstract class AbstractMainLauncher<R> extends AbstractLauncher<R> {
 
 
     @Override
-    public R run(String... args) throws Exception {
+    public ClassLoader run(String... args) throws Exception {
         ClassLoader classLoader = createClassLoader(args);
         if(!resolveThreadClassLoader()){
             return toLaunch(classLoader, args);
@@ -55,7 +56,7 @@ public abstract class AbstractMainLauncher<R> extends AbstractLauncher<R> {
         }
     }
 
-    protected R toLaunch(ClassLoader classLoader, String... args) throws Exception{
+    protected ClassLoader toLaunch(ClassLoader classLoader, String... args) throws Exception{
         LauncherContext.setMainClassLoader(classLoader);
         checkSpringPluginBootstrap(classLoader);
         return launch(classLoader, args);

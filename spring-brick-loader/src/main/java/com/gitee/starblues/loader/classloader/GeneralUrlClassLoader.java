@@ -1,11 +1,22 @@
 package com.gitee.starblues.loader.classloader;
 
+import com.gitee.starblues.loader.classloader.resource.Resource;
+import com.gitee.starblues.loader.classloader.resource.loader.DefaultResource;
+import com.gitee.starblues.loader.classloader.resource.loader.ResourceLoader;
+import com.gitee.starblues.loader.classloader.resource.loader.ResourceLoaderFactory;
+
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Enumeration;
+import java.util.List;
 
 /**
  * 通用的Url ClassLoader
@@ -14,21 +25,28 @@ import java.nio.file.Paths;
  * @since 3.0.4
  * @version 3.0.4
  */
-public class GeneralUrlClassLoader extends URLClassLoader {
+public class GeneralUrlClassLoader extends URLClassLoader implements ResourceLoaderFactory {
 
-    public GeneralUrlClassLoader(ClassLoader parent) {
+    private final String name;
+    private final ResourceLoaderFactory classLoaderTranslator;
+
+    public GeneralUrlClassLoader(String name, ClassLoader parent) {
         super(new URL[]{}, parent);
+        this.name = name;
+        this.classLoaderTranslator = new ClassLoaderTranslator(this);
     }
 
-    public void addUrl(String url) throws Exception{
-        addPath(Paths.get(url));
+    public String getName() {
+        return name;
     }
 
-    public void addPath(Path path) throws Exception{
-        addFile(path.toFile());
+    @Override
+    public void addResource(String path) throws Exception {
+        addResource(Paths.get(path));
     }
 
-    public void addFile(File file) throws Exception {
+    @Override
+    public void addResource(File file) throws Exception {
         if(!file.exists()){
             throw new FileNotFoundException("Not found file:" + file.getPath());
         }
@@ -36,7 +54,37 @@ public class GeneralUrlClassLoader extends URLClassLoader {
     }
 
     @Override
-    public void addURL(URL url) {
+    public void addResource(Path path) throws Exception {
+        addResource(path.toFile());
+    }
+
+    @Override
+    public void addResource(URL url) throws Exception {
         super.addURL(url);
+    }
+
+    @Override
+    public void addResource(ResourceLoader resourceLoader) throws Exception {
+        addResource(resourceLoader.getBaseUrl());
+    }
+
+    @Override
+    public Resource findFirstResource(String name) {
+        return classLoaderTranslator.findFirstResource(name);
+    }
+
+    @Override
+    public Enumeration<Resource> findAllResource(String name) {
+        return classLoaderTranslator.findAllResource(name);
+    }
+
+    @Override
+    public InputStream getInputStream(String name) {
+        return classLoaderTranslator.getInputStream(name);
+    }
+
+    @Override
+    public List<URL> getUrls() {
+        return classLoaderTranslator.getUrls();
     }
 }

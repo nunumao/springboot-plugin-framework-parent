@@ -14,20 +14,18 @@
  *    limitations under the License.
  */
 
-package com.gitee.starblues.loader.launcher;
+package com.gitee.starblues.loader.launcher.isolation;
 
-import com.gitee.starblues.loader.archive.Archive;
-import com.gitee.starblues.loader.archive.ExplodedArchive;
-import com.gitee.starblues.loader.archive.JarFileArchive;
 import com.gitee.starblues.loader.classloader.GenericClassLoader;
 import com.gitee.starblues.loader.classloader.resource.loader.JarResourceLoader;
 import com.gitee.starblues.loader.classloader.resource.loader.MainJarResourceLoader;
+import com.gitee.starblues.loader.launcher.classpath.ClasspathResource;
+import com.gitee.starblues.loader.launcher.classpath.FastJarClasspathResource;
 import com.gitee.starblues.loader.launcher.runner.MethodRunner;
 
 import java.io.File;
-import java.io.IOException;
 import java.net.URL;
-import java.util.Iterator;
+import java.util.List;
 import java.util.Objects;
 
 import static com.gitee.starblues.loader.LoaderConstant.*;
@@ -37,25 +35,14 @@ import static com.gitee.starblues.loader.LoaderConstant.*;
  * @author starBlues
  * @version 3.0.2
  */
-public class MainJarProgramLauncher extends MainProgramLauncher{
+public class IsolationFastJarLauncher extends IsolationBaseLauncher {
 
-    private final static Archive.EntryFilter ENTRY_FILTER = (entry)->{
-        String name = entry.getName();
-        return name.startsWith(PROD_CLASSES_PATH) || name.startsWith(PROD_LIB_PATH);
-    };
+    private final ClasspathResource classpathResource;
 
-    private final static Archive.EntryFilter INCLUDE_FILTER = (entry) -> {
-        if (entry.isDirectory()) {
-            return entry.getName().equals(PROD_CLASSES_PATH);
-        }
-        return entry.getName().startsWith(PROD_LIB_PATH);
-    };
-
-    private final File rootJarFile;
-
-    public MainJarProgramLauncher(MethodRunner methodRunner, File rootJarFile) {
+    public IsolationFastJarLauncher(MethodRunner methodRunner, File rootJarFile) {
         super(methodRunner);
-        this.rootJarFile = Objects.requireNonNull(rootJarFile, "参数 rootJarFile 不能为空");
+        Objects.requireNonNull(rootJarFile, "参数 rootJarFile 不能为空");
+        this.classpathResource = new FastJarClasspathResource(rootJarFile);
     }
 
     @Override
@@ -66,19 +53,8 @@ public class MainJarProgramLauncher extends MainProgramLauncher{
     @Override
     protected void addResource(GenericClassLoader classLoader) throws Exception {
         super.addResource(classLoader);
-        Archive archive = getArchive();
-        Iterator<Archive> archiveIterator = archive.getNestedArchives(ENTRY_FILTER, INCLUDE_FILTER);
-        addLibResource(archiveIterator, classLoader);
-    }
-
-    private Archive getArchive() throws IOException {
-        return (rootJarFile.isDirectory() ? new ExplodedArchive(rootJarFile) : new JarFileArchive(rootJarFile));
-    }
-
-    private void addLibResource(Iterator<Archive> archives, GenericClassLoader classLoader) throws Exception {
-        while (archives.hasNext()){
-            Archive archive = archives.next();
-            URL url = archive.getUrl();
+        List<URL> classpath = classpathResource.getClasspath();
+        for (URL url : classpath) {
             String path = url.getPath();
             if(path.contains(PROD_CLASSES_URL_SIGN)){
                 classLoader.addResource(new MainJarResourceLoader(url));
@@ -87,5 +63,6 @@ public class MainJarProgramLauncher extends MainProgramLauncher{
             }
         }
     }
+
 
 }

@@ -19,24 +19,18 @@ package com.gitee.starblues.loader.classloader.resource.loader;
 import com.gitee.starblues.loader.classloader.resource.Resource;
 import com.gitee.starblues.loader.classloader.resource.storage.ResourceStorage;
 import com.gitee.starblues.loader.classloader.resource.storage.SameRootResourceStorage;
-import com.gitee.starblues.loader.launcher.ResourceLoaderFactoryGetter;
+import com.gitee.starblues.loader.launcher.isolation.ResourceLoaderFactoryGetter;
 import com.gitee.starblues.loader.utils.IOUtils;
 import com.gitee.starblues.loader.utils.ResourceUtils;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLConnection;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Consumer;
-import java.util.function.Function;
 
 /**
  * 默认的资源加载工厂
@@ -119,7 +113,7 @@ public class DefaultResourceLoaderFactory implements ResourceLoaderFactory{
     }
 
     @Override
-    public Resource findResource(String name) {
+    public Resource findFirstResource(String name) {
         for (Map.Entry<URL, SameRootResourceStorage> entry : resourceLoaderMap.entrySet()) {
             ResourceStorage resourceStorage = entry.getValue();
             Resource resource = resourceStorage.get(name);
@@ -131,7 +125,7 @@ public class DefaultResourceLoaderFactory implements ResourceLoaderFactory{
     }
 
     @Override
-    public Enumeration<Resource> findResources(String name) {
+    public Enumeration<Resource> findAllResource(String name) {
         return new Enumeration<Resource>() {
             private final List<SameRootResourceStorage> list  = new ArrayList<>(resourceLoaderMap.values());
             private int index = 0;

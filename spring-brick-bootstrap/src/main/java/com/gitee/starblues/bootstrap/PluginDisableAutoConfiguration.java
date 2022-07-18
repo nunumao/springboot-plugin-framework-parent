@@ -16,6 +16,7 @@
 
 package com.gitee.starblues.bootstrap;
 
+import com.gitee.starblues.bootstrap.coexist.CoexistAllowAutoConfiguration;
 import com.gitee.starblues.loader.launcher.DevelopmentModeSetting;
 import com.gitee.starblues.utils.ObjectUtils;
 import org.springframework.boot.autoconfigure.AutoConfigurationImportFilter;
@@ -100,12 +101,26 @@ public class PluginDisableAutoConfiguration implements AutoConfigurationImportFi
 
     private static class CoexistDisableAutoConfiguration implements AutoConfigurationImportFilter{
 
+        public CoexistDisableAutoConfiguration(){
+
+        }
+
         @Override
         public boolean[] match(String[] autoConfigurationClasses, AutoConfigurationMetadata autoConfigurationMetadata) {
             Boolean launchPlugin = LAUNCH_PLUGIN.get();
             boolean[] match = new boolean[autoConfigurationClasses.length];
             try {
                 if(launchPlugin != null && launchPlugin){
+                    CoexistAllowAutoConfiguration configuration = SpringPluginBootstrapBinder.get()
+                            .getCoexistAllowAutoConfiguration();
+                    for (int i = 0; i < autoConfigurationClasses.length; i++) {
+                        String autoConfigurationClass = autoConfigurationClasses[i];
+                        if(ObjectUtils.isEmpty(autoConfigurationClass)){
+                            continue;
+                        }
+
+                        match[i] = configuration.match(autoConfigurationClass);
+                    }
                     return match;
                 } else {
                     for (int i = 0; i < autoConfigurationClasses.length; i++) {

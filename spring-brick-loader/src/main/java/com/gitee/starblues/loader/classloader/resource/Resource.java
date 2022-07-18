@@ -54,6 +54,7 @@ public interface Resource extends AutoCloseable{
     /**
      * 设置字节数
      * @param byteGetter byteGetter
+     * @throws Exception set byte 异常
      */
     void setBytes(ResourceByteGetter byteGetter) throws Exception;
 

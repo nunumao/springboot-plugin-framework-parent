@@ -18,6 +18,7 @@ package com.gitee.starblues.bootstrap.launcher;
 
 import com.gitee.starblues.bootstrap.*;
 import com.gitee.starblues.bootstrap.annotation.AutowiredType;
+import com.gitee.starblues.bootstrap.coexist.CoexistResolveClassLoaderAspect;
 import com.gitee.starblues.bootstrap.processor.DefaultProcessorContext;
 import com.gitee.starblues.bootstrap.processor.ProcessorContext;
 import com.gitee.starblues.bootstrap.processor.SpringPluginProcessor;
@@ -26,11 +27,6 @@ import com.gitee.starblues.spring.SpringPluginHook;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.config.DependencyDescriptor;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
-import org.springframework.boot.context.config.ConfigDataEnvironmentPostProcessor;
-import org.springframework.boot.context.properties.ConfigurationPropertiesBindingPostProcessor;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ConfigurableApplicationContext;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.core.env.ConfigurableEnvironment;
 
@@ -78,6 +74,12 @@ public class CoexistBootstrapLauncher implements BootstrapLauncher{
             super.configureEnvironment(environment, args);
         }
 
+        @Override
+        protected GenericApplicationContext getApplicationContext() {
+            PluginApplicationContext applicationContext = (PluginApplicationContext) super.getApplicationContext();
+            applicationContext.register(CoexistResolveClassLoaderAspect.class);
+            return applicationContext;
+        }
     }
 
     private static class CoexistPluginListableBeanFactory extends PluginListableBeanFactory{

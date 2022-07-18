@@ -89,6 +89,8 @@ public class DefaultSpringPluginHook implements SpringPluginHook {
             DestroyUtils.destroyAll(null, SpringFactoriesLoader.class, "cache", Map.class);
         } catch (Exception e){
             e.printStackTrace();
+        } finally {
+            SpringPluginBootstrapBinder.remove();
         }
     }
 

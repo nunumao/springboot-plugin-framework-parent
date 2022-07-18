@@ -32,7 +32,7 @@ import java.util.List;
  * @author starBlues
  * @version 3.0.0
  */
-public interface ResourceLoaderFactory extends AutoCloseable{
+public interface ResourceLoaderFactory extends AutoCloseable {
 
     /**
      * 根据路径字符串添加资源
@@ -74,14 +74,14 @@ public interface ResourceLoaderFactory extends AutoCloseable{
      * @param name 资源名称
      * @return Resource
      */
-    Resource findResource(String name);
+    Resource findFirstResource(String name);
 
     /**
      * 根据资源名称获取资源集合
      * @param name 资源名称
      * @return Resource
      */
-    Enumeration<Resource> findResources(String name);
+    Enumeration<Resource> findAllResource(String name);
 
     /**
      * 根据资源名称获取第一个资源的 InputStream
