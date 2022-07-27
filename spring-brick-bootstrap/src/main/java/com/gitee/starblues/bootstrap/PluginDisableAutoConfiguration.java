@@ -17,24 +17,28 @@
 package com.gitee.starblues.bootstrap;
 
 import com.gitee.starblues.bootstrap.coexist.CoexistAllowAutoConfiguration;
+import com.gitee.starblues.common.PluginDisableAutoConfig;
 import com.gitee.starblues.loader.launcher.DevelopmentModeSetting;
 import com.gitee.starblues.utils.ObjectUtils;
 import org.springframework.boot.autoconfigure.AutoConfigurationImportFilter;
 import org.springframework.boot.autoconfigure.AutoConfigurationMetadata;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 /**
  * 插件禁用的 AutoConfiguration
  *
  * @author starBlues
- * @version 3.0.3
+ * @version 3.0.4
+ * @since 3.0.3
  */
 public class PluginDisableAutoConfiguration implements AutoConfigurationImportFilter {
 
-
     private static final ThreadLocal<Boolean> LAUNCH_PLUGIN = new ThreadLocal<Boolean>();
+
+    public PluginDisableAutoConfiguration(){
+
+    }
 
     public static void setLaunchPlugin() {
         LAUNCH_PLUGIN.set(true);
@@ -49,12 +53,25 @@ public class PluginDisableAutoConfiguration implements AutoConfigurationImportFi
         } else {
             boolean[] permitAll = new boolean[autoConfigurationClasses.length];
             for (int i = 0; i < autoConfigurationClasses.length; i++) {
-                permitAll[i] = true;
+                permitAll[i] = permit(
+                        PluginDisableAutoConfig.getCommonPluginDisableAutoConfig(),
+                        autoConfigurationClasses[i]);
             }
             return permitAll;
         }
     }
 
+    private static boolean permit(Collection<String> disableCollection, String className){
+        if(ObjectUtils.isEmpty(className)){
+            return true;
+        }
+        for (String disableFuzzyClass : disableCollection) {
+            if (className.contains(disableFuzzyClass)) {
+                return false;
+            }
+        }
+        return true;
+    }
 
     private static class IsolationDisableAutoConfiguration implements AutoConfigurationImportFilter{
 
@@ -70,18 +87,7 @@ public class PluginDisableAutoConfiguration implements AutoConfigurationImportFi
             disableFuzzyClass.add("org.springframework.boot.autoconfigure.websocket");
             disableFuzzyClass.add("org.springframework.boot.autoconfigure.jackson");
             disableFuzzyClass.add("org.springframework.boot.autoconfigure.webservices");
-        }
-
-        private boolean isDisabled(String className){
-            if(ObjectUtils.isEmpty(className)){
-                return false;
-            }
-            for (String disableFuzzyClass : disableFuzzyClass) {
-                if (className.contains(disableFuzzyClass)) {
-                    return true;
-                }
-            }
-            return false;
+            disableFuzzyClass.addAll(PluginDisableAutoConfig.getCommonPluginDisableAutoConfig());
         }
 
         @Override
@@ -92,7 +98,7 @@ public class PluginDisableAutoConfiguration implements AutoConfigurationImportFi
                 if(autoConfigurationClass == null || "".equals(autoConfigurationClass)){
                     continue;
                 }
-                match[i] = !isDisabled(autoConfigurationClass);
+                match[i] = permit(disableFuzzyClass, autoConfigurationClass);
             }
             return match;
         }
@@ -118,8 +124,11 @@ public class PluginDisableAutoConfiguration implements AutoConfigurationImportFi
                         if(ObjectUtils.isEmpty(autoConfigurationClass)){
                             continue;
                         }
-
-                        match[i] = configuration.match(autoConfigurationClass);
+                        if(permit(PluginDisableAutoConfig.getCommonPluginDisableAutoConfig(), autoConfigurationClass)){
+                            match[i] = configuration.match(autoConfigurationClass);
+                        } else {
+                            match[i] = false;
+                        }
                     }
                     return match;
                 } else {

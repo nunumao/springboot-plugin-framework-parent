@@ -88,10 +88,8 @@ public class ConfigurePluginEnvironment {
             Method method = LiveBeansView.class.getDeclaredMethod("registerApplicationContext", ConfigurableApplicationContext.class);
             method.setAccessible(true);
             method.invoke(null,processorContext.getApplicationContext());
-        }
-        catch (Exception ex){
-            logger.error("LiveBeansView.registerApplicationContext失败. {}",
-                    ex.getMessage(), ex);
+        } catch (Exception ex){
+            logger.error("LiveBeansView.registerApplicationContext失败. {}", ex.getMessage(), ex);
         }
         if(processorContext.runMode() == ProcessorContext.RunMode.ONESELF){
             ConfigureMainPluginEnvironment configureMainPluginEnvironment =

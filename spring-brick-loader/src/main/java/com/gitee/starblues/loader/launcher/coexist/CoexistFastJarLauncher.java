@@ -17,20 +17,14 @@
 package com.gitee.starblues.loader.launcher.coexist;
 
 import com.gitee.starblues.loader.classloader.GeneralUrlClassLoader;
-import com.gitee.starblues.loader.classloader.GenericClassLoader;
-import com.gitee.starblues.loader.classloader.resource.loader.JarResourceLoader;
-import com.gitee.starblues.loader.classloader.resource.loader.MainJarResourceLoader;
 import com.gitee.starblues.loader.launcher.classpath.ClasspathResource;
 import com.gitee.starblues.loader.launcher.classpath.FastJarClasspathResource;
-import com.gitee.starblues.loader.launcher.isolation.IsolationBaseLauncher;
 import com.gitee.starblues.loader.launcher.runner.MethodRunner;
 
 import java.io.File;
 import java.net.URL;
 import java.util.List;
 import java.util.Objects;
-
-import static com.gitee.starblues.loader.LoaderConstant.PROD_CLASSES_URL_SIGN;
 
 /**
  * 主程序jar in jar 模式启动者

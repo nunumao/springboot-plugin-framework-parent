@@ -90,8 +90,8 @@ public class JarOuterPackager extends JarNestPackager {
 
         // 增加jar包title和version属性
         MavenProject mavenProject = this.repackageMojo.getProject();
-        attributes.putValue(IMPLEMENTATION_TITLE,mavenProject.getArtifactId());
-        attributes.putValue(IMPLEMENTATION_VERSION,mavenProject.getVersion());
+        attributes.putValue(IMPLEMENTATION_TITLE, mavenProject.getArtifactId());
+        attributes.putValue(IMPLEMENTATION_VERSION, mavenProject.getVersion());
         return manifest;
     }
 

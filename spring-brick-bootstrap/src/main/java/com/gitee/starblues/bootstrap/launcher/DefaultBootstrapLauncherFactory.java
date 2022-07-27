@@ -23,8 +23,6 @@ import com.gitee.starblues.bootstrap.processor.ProcessorContext;
 import com.gitee.starblues.bootstrap.processor.SpringPluginProcessor;
 import com.gitee.starblues.core.launcher.plugin.PluginInteractive;
 import com.gitee.starblues.loader.launcher.DevelopmentModeSetting;
-import org.springframework.boot.context.config.ConfigDataLoader;
-import org.springframework.core.io.support.SpringFactoriesLoader;
 
 import java.util.List;
 

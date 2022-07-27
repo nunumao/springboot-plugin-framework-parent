@@ -39,6 +39,7 @@ import java.util.Set;
  * 插件 classLoader
  * @author starBlues
  * @version 3.0.3
+ * @since 3.0.0
  */
 @Slf4j
 public class PluginClassLoader extends GenericClassLoader implements PluginResourceLoaderFactory{

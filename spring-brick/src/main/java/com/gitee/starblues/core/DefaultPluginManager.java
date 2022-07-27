@@ -49,7 +49,8 @@ import java.util.stream.Collectors;
 /**
  * 抽象的插件管理者
  * @author starBlues
- * @version 3.0.3
+ * @version 3.0.4
+ * @since 3.0.0
  */
 public class DefaultPluginManager implements PluginManager{
 
@@ -251,7 +252,8 @@ public class DefaultPluginManager implements PluginManager{
             }
             PluginException pluginException = PluginException.getPluginException(e, ()-> {
                 unLoad(loadPluginInfo.getPluginId());
-                throw new PluginException("插件包[ " + pluginPath + " ]安装: " + e.getMessage(), e);
+                // fix https://gitee.com/starblues/springboot-plugin-framework-parent/issues/I5GJO9
+                return new PluginException("插件包[ " + pluginPath + " ]安装: " + e.getMessage(), e);
             });
             pluginListenerFactory.startFailure(pluginInfo, pluginException);
             throw pluginException;

@@ -38,7 +38,8 @@ import java.util.zip.ZipEntry;
 /**
  * 嵌套插件jar加载者
  * @author starBlues
- * @version 3.0.0
+ * @since 3.0.0
+ * @version 3.0.4
  */
 @Slf4j
 public class NestedPluginJarResourceLoader extends AbstractResourceLoader {

@@ -16,8 +16,6 @@
 
 package com.gitee.starblues.loader.classloader.resource.loader;
 
-
-import com.gitee.starblues.loader.classloader.resource.storage.EmptyResourceStorage;
 import com.gitee.starblues.loader.classloader.resource.storage.ResourceStorage;
 import com.gitee.starblues.loader.utils.IOUtils;
 
