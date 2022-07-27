@@ -1,20 +1,18 @@
 package com.gitee.starblues.loader.classloader;
 
 import com.gitee.starblues.loader.classloader.resource.Resource;
-import com.gitee.starblues.loader.classloader.resource.loader.DefaultResource;
 import com.gitee.starblues.loader.classloader.resource.loader.ResourceLoader;
 import com.gitee.starblues.loader.classloader.resource.loader.ResourceLoaderFactory;
+import com.gitee.starblues.loader.classloader.resource.storage.EmptyResourceStorage;
+import com.gitee.starblues.loader.classloader.resource.storage.ResourceStorage;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.Enumeration;
 import java.util.List;
 
@@ -29,6 +27,8 @@ public class GeneralUrlClassLoader extends URLClassLoader implements ResourceLoa
 
     private final String name;
     private final ResourceLoaderFactory classLoaderTranslator;
+
+    private final ResourceStorage resourceStorage = new EmptyResourceStorage();
 
     public GeneralUrlClassLoader(String name, ClassLoader parent) {
         super(new URL[]{}, parent);
@@ -65,7 +65,7 @@ public class GeneralUrlClassLoader extends URLClassLoader implements ResourceLoa
 
     @Override
     public void addResource(ResourceLoader resourceLoader) throws Exception {
-        addResource(resourceLoader.getBaseUrl());
+        resourceLoader.load(resourceStorage);
     }
 
     @Override

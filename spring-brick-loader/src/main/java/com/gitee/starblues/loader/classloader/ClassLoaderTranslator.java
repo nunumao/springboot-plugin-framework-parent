@@ -17,11 +17,11 @@ import java.util.Enumeration;
 import java.util.List;
 
 /**
- * 注释
+ * classloader 转换器
  *
  * @author starBlues
- * @version 1.0.0
- * @since 1.0.0
+ * @version 3.0.4
+ * @since 3.0.4
  */
 public class ClassLoaderTranslator implements ResourceLoaderFactory {
 

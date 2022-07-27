@@ -57,7 +57,7 @@ public class CoexistFastJarLauncher extends CoexistBaseLauncher {
         super.addResource(classLoader);
         List<URL> classpath = classpathResource.getClasspath();
         for (URL url : classpath) {
-            classLoader.addURL(url);
+            classLoader.addResource(url);
         }
     }
 

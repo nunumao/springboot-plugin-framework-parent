@@ -1,6 +1,7 @@
 package com.gitee.starblues.core.launcher.plugin;
 
 import com.gitee.starblues.core.classloader.NestedPluginJarResourceLoader;
+import com.gitee.starblues.core.classloader.PluginGeneralUrlClassLoader;
 import com.gitee.starblues.core.descriptor.InsidePluginDescriptor;
 import com.gitee.starblues.core.descriptor.PluginLibInfo;
 import com.gitee.starblues.core.descriptor.PluginType;
@@ -8,6 +9,7 @@ import com.gitee.starblues.core.exception.PluginException;
 import com.gitee.starblues.core.launcher.plugin.involved.PluginLaunchInvolved;
 import com.gitee.starblues.loader.classloader.GeneralUrlClassLoader;
 import com.gitee.starblues.loader.launcher.AbstractLauncher;
+import com.gitee.starblues.loader.launcher.LauncherContext;
 import com.gitee.starblues.spring.SpringPluginHook;
 import com.gitee.starblues.utils.FilesUtils;
 import com.gitee.starblues.utils.MsgUtils;
@@ -38,10 +40,10 @@ public class PluginCoexistLauncher extends AbstractLauncher<SpringPluginHook> {
 
     @Override
     protected ClassLoader createClassLoader(String... args) throws Exception {
-        GeneralUrlClassLoader classLoader = new GeneralUrlClassLoader(
+        PluginGeneralUrlClassLoader classLoader = new PluginGeneralUrlClassLoader(
                 pluginInteractive.getPluginDescriptor().getPluginId(),
-                this.getClass().getClassLoader());
-        addClasspath(classLoader);
+                getParentClassLoader());
+        classLoader.addResource(pluginInteractive.getPluginDescriptor());
         return classLoader;
     }
 
@@ -63,39 +65,12 @@ public class PluginCoexistLauncher extends AbstractLauncher<SpringPluginHook> {
         }
     }
 
-    private void addClasspath(GeneralUrlClassLoader classLoader) throws Exception {
-        InsidePluginDescriptor pluginDescriptor = pluginInteractive.getPluginDescriptor();
-        PluginType pluginType = pluginDescriptor.getType();
-        if(PluginType.isNestedPackage(pluginType)){
-            classLoader.addResource(new NestedPluginJarResourceLoader(
-                    pluginDescriptor, null, classLoader
-            ));
-
-        } else if(PluginType.isOuterPackage(pluginType)){
-            // TODO addOuterPluginClasspath(descriptor);
-            addLibFile(classLoader);
+    protected GeneralUrlClassLoader getParentClassLoader() throws Exception {
+        ClassLoader contextClassLoader = LauncherContext.getMainClassLoader();
+        if(contextClassLoader instanceof GeneralUrlClassLoader){
+            return (GeneralUrlClassLoader) contextClassLoader;
         } else {
-            // TODO addDirPluginClasspath(descriptor);
-            addLibFile(classLoader);
-        }
-        String pluginClassPath = pluginDescriptor.getPluginClassPath();
-        classLoader.addResource(pluginClassPath);
-    }
-
-    private void addLibFile(GeneralUrlClassLoader classLoader) throws Exception {
-        InsidePluginDescriptor pluginDescriptor = pluginInteractive.getPluginDescriptor();
-        Set<PluginLibInfo> pluginLibInfos = pluginDescriptor.getPluginLibInfo();
-        String pluginUnique = MsgUtils.getPluginUnique(pluginDescriptor);
-        if(ObjectUtils.isEmpty(pluginLibInfos)){
-            log.warn("插件[{}]依赖为空！", pluginUnique);
-            return;
-        }
-        for (PluginLibInfo pluginLibInfo : pluginLibInfos) {
-            File existFile = FilesUtils.getExistFile(pluginLibInfo.getPath());
-            if(existFile != null){
-                classLoader.addResource(existFile);
-                log.debug("插件[{}]依赖被加载: {}", pluginUnique, existFile.getPath());
-            }
+            throw new Exception("非法父类加载器: " + contextClassLoader.getClass().getName());
         }
     }
 
