@@ -24,11 +24,15 @@ import com.gitee.starblues.utils.Assert;
 import com.gitee.starblues.utils.FilesUtils;
 import com.gitee.starblues.utils.ObjectUtils;
 import com.gitee.starblues.utils.PluginFileUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.support.LiveBeansView;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.MapPropertySource;
 
 import java.io.File;
+import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -38,6 +42,7 @@ import java.util.Map;
  * @version 3.0.0
  */
 public class ConfigurePluginEnvironment {
+    private final Logger logger = LoggerFactory.getLogger(ConfigurePluginEnvironment.class);
 
     private final static String PLUGIN_PROPERTY_NAME = "pluginPropertySources";
 
@@ -77,6 +82,17 @@ public class ConfigurePluginEnvironment {
         env.put(REGISTER_SHUTDOWN_HOOK_PROPERTY, false);
         env.put(MBEAN_DOMAIN_PROPERTY_NAME, pluginId);
 
+        try{
+            // fix: https://gitee.com/starblues/springboot-plugin-framework-parent/issues/I57965
+            // 优先注册LiveBeansView对象，防止注册异常
+            Method method = LiveBeansView.class.getDeclaredMethod("registerApplicationContext", ConfigurableApplicationContext.class);
+            method.setAccessible(true);
+            method.invoke(null,processorContext.getApplicationContext());
+        }
+        catch (Exception ex){
+            logger.error("LiveBeansView.registerApplicationContext失败. {}",
+                    ex.getMessage(), ex);
+        }
         if(processorContext.runMode() == ProcessorContext.RunMode.ONESELF){
             ConfigureMainPluginEnvironment configureMainPluginEnvironment =
                     new ConfigureMainPluginEnvironment(processorContext);

@@ -84,6 +84,16 @@ public class ManifestKey {
     public static final String MAIN_PACKAGE_TYPE = "Main-Package-Type";
 
     /**
+     * jar package name
+     */
+    public static final String IMPLEMENTATION_TITLE = "Implementation-Title";
+
+    /**
+     * jar package version
+     */
+    public static final String IMPLEMENTATION_VERSION = "Implementation-Version";
+
+    /**
      * 获取值
      *
      * @param attributes attributes
