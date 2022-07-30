@@ -93,11 +93,11 @@ public class DefaultOpExtractFactory implements OpExtractFactory {
         if(extractCoordinates  == null){
             throw new RuntimeException("Not found " + coordinate + " from plugin '" + pluginId + "'");
         }
-        Object extracts = extractCoordinates.get(coordinate);
+        ExtractWrapper extracts = extractCoordinates.get(coordinate);
         if(extracts == null){
             throw new RuntimeException("Not found " + coordinate + " from plugin '" + pluginId + "'");
         }
-        return (T) extracts;
+        return (T) extracts.getObject();
     }
 
     @SuppressWarnings("unchecked")
