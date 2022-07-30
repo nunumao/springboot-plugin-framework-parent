@@ -83,6 +83,8 @@ public class JarNestPackager implements Repackager {
         attributes.putValue(START_CLASS, mainConfig.getMainClass());
         attributes.putValue(MAIN_CLASS, MAIN_CLASS_VALUE);
         attributes.putValue(MAIN_PACKAGE_TYPE, PackageType.MAIN_PACKAGE_TYPE_JAR);
+        attributes.putValue(DEVELOPMENT_MODE, mainConfig.getDevelopmentMode());
+
         // 增加jar包title和version属性
         MavenProject mavenProject = this.repackageMojo.getProject();
         attributes.putValue(IMPLEMENTATION_TITLE, mavenProject.getArtifactId());

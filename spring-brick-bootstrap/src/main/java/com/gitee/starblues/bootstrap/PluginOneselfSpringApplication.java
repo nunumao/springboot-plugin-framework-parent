@@ -1,42 +1,26 @@
-/**
- * Copyright [2019-2022] [starBlues]
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *        http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package com.gitee.starblues.bootstrap;
 
 import com.gitee.starblues.bootstrap.processor.ProcessorContext;
 import com.gitee.starblues.bootstrap.processor.SpringPluginProcessor;
+import com.gitee.starblues.integration.operator.EmptyPluginOperator;
+import com.gitee.starblues.integration.user.DefaultPluginUser;
+import com.gitee.starblues.spring.extract.DefaultOpExtractFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
-import org.springframework.boot.Banner;
 import org.springframework.boot.SpringApplication;
-import org.springframework.boot.WebApplicationType;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.core.env.ConfigurableEnvironment;
-import org.springframework.core.env.StandardEnvironment;
-import org.springframework.core.io.ResourceLoader;
 
 /**
- * 插件SpringApplication实现
+ * 插件自主启动的 SpringApplication
+ *
  * @author starBlues
- * @since 3.0.0
  * @version 3.0.4
+ * @since 3.0.4
  */
-public class PluginSpringApplication extends SpringApplication {
+public class PluginOneselfSpringApplication extends SpringApplication {
 
     private final Logger logger = LoggerFactory.getLogger(PluginSpringApplication.class);
 
@@ -45,41 +29,20 @@ public class PluginSpringApplication extends SpringApplication {
 
     private final ConfigurePluginEnvironment configurePluginEnvironment;
     private final GenericApplicationContext applicationContext;
-    private final ResourceLoader resourceLoader;
 
 
-    public PluginSpringApplication(SpringPluginProcessor pluginProcessor,
-                                   ProcessorContext processorContext,
-                                   Class<?>... primarySources) {
+    public PluginOneselfSpringApplication(SpringPluginProcessor pluginProcessor,
+                                          ProcessorContext processorContext,
+                                          Class<?>... primarySources) {
         super(primarySources);
         this.pluginProcessor = pluginProcessor;
         this.processorContext = processorContext;
-        this.resourceLoader = processorContext.getResourceLoader();
         this.configurePluginEnvironment = new ConfigurePluginEnvironment(processorContext);
         this.applicationContext = getApplicationContext();
-        setDefaultPluginConfig();
     }
 
-    protected GenericApplicationContext getApplicationContext(){
-        DefaultListableBeanFactory beanFactory = getBeanFactory(processorContext);
-        if(processorContext.getMainApplicationContext().isWebEnvironment()){
-            return new PluginWebApplicationContext(beanFactory, processorContext);
-        } else {
-            return new PluginApplicationContext(beanFactory, processorContext);
-        }
-    }
-
-    protected DefaultListableBeanFactory getBeanFactory(ProcessorContext processorContext){
-        return new PluginListableBeanFactory(processorContext);
-    }
-
-    public void setDefaultPluginConfig(){
-        setResourceLoader(resourceLoader);
-        setBannerMode(Banner.Mode.OFF);
-        setEnvironment(new StandardEnvironment());
-        setWebApplicationType(WebApplicationType.NONE);
-        setRegisterShutdownHook(false);
-        setLogStartupInfo(false);
+    protected GenericApplicationContext getApplicationContext() {
+        return (GenericApplicationContext) super.createApplicationContext();
     }
 
     @Override
@@ -99,6 +62,7 @@ public class PluginSpringApplication extends SpringApplication {
             processorContext.setApplicationContext(this.applicationContext);
             PluginContextHolder.initialize(processorContext);
             pluginProcessor.initialize(processorContext);
+            registerMainBean();
             return super.run(args);
         } catch (Exception e) {
             pluginProcessor.failure(processorContext);
@@ -114,6 +78,13 @@ public class PluginSpringApplication extends SpringApplication {
         pluginProcessor.refreshBefore(processorContext);
         super.refresh(applicationContext);
         pluginProcessor.refreshAfter(processorContext);
+    }
+
+    private void registerMainBean(){
+        DefaultListableBeanFactory beanFactory = applicationContext.getDefaultListableBeanFactory();
+        beanFactory.registerSingleton("extractFactory", new DefaultOpExtractFactory());
+        beanFactory.registerSingleton("pluginUser", new DefaultPluginUser(applicationContext));
+        beanFactory.registerSingleton("pluginOperator", new EmptyPluginOperator());
     }
 
 }

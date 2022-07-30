@@ -17,13 +17,23 @@
 package com.gitee.starblues.plugin.pack.main;
 
 import com.gitee.starblues.common.PackageType;
+import com.gitee.starblues.plugin.pack.Constant;
 import com.gitee.starblues.plugin.pack.RepackageMojo;
 import com.gitee.starblues.plugin.pack.Repackager;
 import com.gitee.starblues.utils.ObjectUtils;
+import com.gitee.starblues.utils.ReflectionUtils;
 import lombok.Getter;
+import org.apache.maven.artifact.Artifact;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.project.MavenProject;
+
+import java.io.File;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.net.URL;
+import java.net.URLClassLoader;
+import java.util.Set;
 
 /**
  * 主程序打包
@@ -44,6 +54,7 @@ public class MainRepackager implements Repackager {
     @Override
     public void repackage() throws MojoExecutionException, MojoFailureException {
         checkConfig();
+        setDevelopmentMode();
         String packageType = mainConfig.getPackageType();
         if(PackageType.MAIN_PACKAGE_TYPE_JAR.equalsIgnoreCase(packageType)){
             new JarNestPackager(this).repackage();
@@ -73,6 +84,46 @@ public class MainRepackager implements Repackager {
         String outputDirectory = mainConfig.getOutputDirectory();
         if(ObjectUtils.isEmpty(outputDirectory)){
             mainConfig.setOutputDirectory(repackageMojo.getOutputDirectory().getPath());
+        }
+    }
+
+    private void setDevelopmentMode() throws MojoFailureException{
+        String developmentMode = mainConfig.getDevelopmentMode();
+        if(!ObjectUtils.isEmpty(developmentMode)){
+            return;
+        }
+        try {
+            File file =  new File(repackageMojo.getProject().getBuild().getOutputDirectory());
+            Set<Artifact> artifacts = repackageMojo.getProject().getArtifacts();
+
+            URL[] urls = new URL[artifacts.size() + 1];
+            int i = 0;
+            for (Artifact artifact : artifacts) {
+                urls[i] = artifact.getFile().toURI().toURL();
+                i++;
+            }
+            urls[i] = file.toURI().toURL();
+            URLClassLoader urlClassLoader = new URLClassLoader(urls, null);
+
+            String mainClass = repackageMojo.getMainConfig().getMainClass();
+            if(ObjectUtils.isEmpty(mainClass)){
+                throw new Exception("mainConfig.mainClass config can't be empty");
+            }
+            Class<?> aClass = urlClassLoader.loadClass(mainClass);
+            Method method = ReflectionUtils.findMethod(aClass, Constant.DEVELOPMENT_MODE_METHOD_NAME);
+            String methodKey =  aClass.getName() + "#" + Constant.DEVELOPMENT_MODE_METHOD_NAME + "()";
+            if(method == null){
+                throw new Exception("Not found method : " + methodKey);
+            }
+            method.setAccessible(true);
+            Object o = aClass.getConstructor().newInstance();
+            Object result = method.invoke(o);
+            if(ObjectUtils.isEmpty(result)){
+                throw new Exception(methodKey + " return value can't be empty");
+            }
+            getMainConfig().setDevelopmentMode(String.valueOf(result));
+        } catch (Exception e) {
+            throw new MojoFailureException("Set developmentMode failure:" + e.getMessage());
         }
     }
 

@@ -41,6 +41,12 @@ public class Constant {
 
     public static final String PLUGIN_METE_COMMENTS = "plugin meta configuration";
 
+    /**
+     * 开发模式方法名称
+     */
+    public static final String DEVELOPMENT_MODE_METHOD_NAME = "developmentMode";
+
+
     public static boolean isPom(String packageType){
         return PACKAGING_POM.equalsIgnoreCase(packageType);
     }
