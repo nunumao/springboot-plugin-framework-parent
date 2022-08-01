@@ -16,11 +16,8 @@
 
 package com.gitee.starblues.plugin.pack.main;
 
-
-import com.gitee.starblues.common.PackageStructure;
 import lombok.Data;
 import org.apache.maven.plugins.annotations.Parameter;
-import com.gitee.starblues.plugin.pack.Constant;
 
 /**
  * 主程序打包配置
@@ -59,6 +56,12 @@ public class MainConfig {
      */
     private String outputDirectory;
 
-
+    /**
+     * 开发模式:
+     * isolation: 隔离模式[默认]
+     * coexist: 共享模式
+     * simple: 简单模式
+     */
+    private String developmentMode;
 
 }

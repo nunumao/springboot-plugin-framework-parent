@@ -55,6 +55,7 @@ public class ProdLauncher implements Launcher<ClassLoader>{
         File rootJarFile = getRootJarFile();
         String startClass = null;
         String mainPackageType;
+        String developmentMode;
         try (JarFile jarFile = new JarFile(rootJarFile)){
             Manifest manifest = jarFile.getManifest();
             IllegalStateException exception = new IllegalStateException("当前启动包非法包!");
@@ -67,7 +68,13 @@ public class ProdLauncher implements Launcher<ClassLoader>{
                 throw exception;
             }
             mainPackageType = mainAttributes.getValue(MAIN_PACKAGE_TYPE);
+            developmentMode = mainAttributes.getValue(MAIN_DEVELOPMENT_MODE);
         }
+
+        if(ObjectUtils.isEmpty(developmentMode)){
+            throw new RuntimeException("未发现 developmentMode 配置");
+        }
+        DevelopmentModeSetting.setDevelopmentMode(developmentMode);
 
         MethodRunner methodRunner = new MethodRunner(startClass, SPRING_BOOTSTRAP_RUN_METHOD, args);
         AbstractMainLauncher launcher;

@@ -38,7 +38,7 @@ public interface SpringBootstrap {
      *
      * @return DevelopmentMode
      */
-    default DevelopmentMode developmentMode(){
+    default String developmentMode(){
         return DevelopmentMode.ISOLATION;
     }
 

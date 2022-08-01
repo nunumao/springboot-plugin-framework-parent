@@ -27,6 +27,7 @@ import com.gitee.starblues.spring.SpringPluginHook;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.config.DependencyDescriptor;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
+import org.springframework.boot.SpringApplication;
 import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.core.env.ConfigurableEnvironment;
 
@@ -50,7 +51,7 @@ public class CoexistBootstrapLauncher implements BootstrapLauncher{
         ProcessorContext processorContext = new DefaultProcessorContext(
                 bootstrap.getRunMode(), bootstrap, pluginInteractive, bootstrap.getClass()
         );
-        CoexistSpringApplication springApplication = new CoexistSpringApplication(
+        SpringApplication springApplication = new CoexistSpringApplication(
                 pluginProcessor,
                 processorContext,
                 primarySources);

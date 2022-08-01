@@ -48,7 +48,7 @@ public class IsolationBaseLauncher extends AbstractMainLauncher {
     @Override
     protected ClassLoader createClassLoader(String... args) throws Exception {
         GenericClassLoader classLoader = new GenericClassLoader(MAIN_CLASS_LOADER_NAME, getParentClassLoader(),
-                getResourceLoaderFactory());
+                getResourceLoaderFactory(args));
         addResource(classLoader);
         return classLoader;
     }

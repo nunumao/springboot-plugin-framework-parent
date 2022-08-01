@@ -76,12 +76,12 @@ public abstract class AbstractMainLauncher extends AbstractLauncher<ClassLoader>
             classLoader.loadClass(SPRING_PLUGIN_BOOTSTRAP_PACKAGE_NAME);
             if(DevelopmentModeSetting.isolation()){
                 // 主程序加载到了
-                throw new RuntimeException("[" + DevelopmentMode.ISOLATION.getDevelopmentMode() + "]模式下" +
+                throw new RuntimeException("[" + DevelopmentMode.ISOLATION + "]模式下" +
                         "不能将[" + SPRING_PLUGIN_BOOTSTRAP_COORDINATE + "]依赖定义到主程序中, 只能依赖到插件中!");
             }
         } catch (ClassNotFoundException e) {
             if(!DevelopmentModeSetting.isolation()){
-                String mode = DevelopmentMode.COEXIST.getDevelopmentMode() + "/" + DevelopmentMode.SIMPLE.getDevelopmentMode();
+                String mode = DevelopmentMode.COEXIST + "/" + DevelopmentMode.SIMPLE;
                 throw new RuntimeException("[" + mode + "]模式" +
                         "需要将[" + SPRING_PLUGIN_BOOTSTRAP_COORDINATE + "]依赖定义到主程序中!");
             }

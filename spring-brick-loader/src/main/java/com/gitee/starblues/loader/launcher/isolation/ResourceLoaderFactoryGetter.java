@@ -80,12 +80,15 @@ public class ResourceLoaderFactoryGetter {
 
     public static SameRootResourceStorage getResourceStorage(String key, URL baseUrl){
         SameRootResourceStorage resourceStorage = null;
-        if(Objects.equals(resourceMode, RESOURCE_MODE_NO_CACHE)){
-            resourceStorage = new DefaultResourceStorage(baseUrl);
+        if(Objects.equals(resourceMode, RESOURCE_MODE_CACHE_ISOLATION)){
+            // 资源可缓存, 且隔离
+            resourceStorage = new CacheResourceStorage(baseUrl);
         } else if(Objects.equals(resourceMode, RESOURCE_MODE_CACHE_SHARE)){
+            // 资源可缓存, 共享式
             resourceStorage = new ShareResourceStorage(key, baseUrl);
         } else {
-            resourceStorage = new CacheResourceStorage(baseUrl);
+            // 资源不缓存
+            resourceStorage = new DefaultResourceStorage(baseUrl);
         }
         return resourceStorage;
     }

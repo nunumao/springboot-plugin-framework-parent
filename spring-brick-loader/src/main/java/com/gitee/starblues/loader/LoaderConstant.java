@@ -42,6 +42,7 @@ public class LoaderConstant {
     public static final String MAIN_LIB_INDEXES_SPLIT = " ";
 
     public static final String START_CLASS = "Start-Class";
+    public static final String MAIN_DEVELOPMENT_MODE = "Development-Mode";
     public static final String MAIN_PACKAGE_TYPE = "Main-Package-Type";
 
     public static final String MAIN_PACKAGE_TYPE_JAR = "jar";

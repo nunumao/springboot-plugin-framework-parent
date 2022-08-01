@@ -38,14 +38,20 @@ public class CoexistBaseLauncher extends AbstractMainLauncher {
 
     @Override
     protected ClassLoader createClassLoader(String... args) throws Exception {
-        return new GeneralUrlClassLoader(MAIN_CLASS_LOADER_NAME,
+        GeneralUrlClassLoader urlClassLoader = new GeneralUrlClassLoader(MAIN_CLASS_LOADER_NAME,
                 this.getClass().getClassLoader());
+        addResource(urlClassLoader);
+        return urlClassLoader;
     }
 
     @Override
     protected ClassLoader launch(ClassLoader classLoader, String... args) throws Exception {
         methodRunner.run(classLoader);
         return classLoader;
+    }
+
+    protected void addResource(GeneralUrlClassLoader classLoader) throws Exception{
+
     }
 
 }

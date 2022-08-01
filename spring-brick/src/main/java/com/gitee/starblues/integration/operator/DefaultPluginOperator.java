@@ -28,7 +28,6 @@ import com.gitee.starblues.integration.listener.PluginInitializerListenerFactory
 import com.gitee.starblues.integration.operator.upload.UploadByInputStreamParam;
 import com.gitee.starblues.integration.operator.upload.UploadByMultipartFileParam;
 import com.gitee.starblues.integration.operator.upload.UploadParam;
-import com.gitee.starblues.loader.DevelopmentMode;
 import com.gitee.starblues.loader.launcher.DevelopmentModeSetting;
 import com.gitee.starblues.spring.web.PluginStaticResourceConfig;
 import com.gitee.starblues.utils.*;
@@ -55,7 +54,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 /**
  * 默认的插件操作者
  * @author starBlues
- * @version 3.0.1
+ * @version 3.0.0
+ * @since 3.0.4
  */
 public class DefaultPluginOperator implements PluginOperator {
     protected final Logger log = LoggerFactory.getLogger(this.getClass());
@@ -86,7 +86,7 @@ public class DefaultPluginOperator implements PluginOperator {
         }
         try {
             log.info("插件加载环境: {}", configuration.environment().toString());
-            log.info("插件加载模式: {}", DevelopmentModeSetting.getDevelopmentMode().getDevelopmentMode());
+            log.info("插件加载模式: {}", DevelopmentModeSetting.getDevelopmentMode());
             pluginInitializerListenerFactory.addListener(pluginInitializerListener);
             List<String> pluginsRoots = pluginManager.getPluginsRoots();
             if(pluginsRoots.isEmpty()){

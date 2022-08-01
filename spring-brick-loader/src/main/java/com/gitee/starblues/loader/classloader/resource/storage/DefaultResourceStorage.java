@@ -49,8 +49,9 @@ public class DefaultResourceStorage extends SameRootResourceStorage{
 
     @Override
     public void add(String name, URL url, ResourceByteGetter byteGetter) throws Exception{
-        Assert.isNotEmpty(name, "name 不能为空");
-        Assert.isNotNull(url, "url 不能为空");
+        if(ObjectUtils.isEmpty(name) || url == null){
+            return;
+        }
         name = formatResourceName(name);
         if(resourceStorage.containsKey(name)){
             return;
@@ -61,6 +62,9 @@ public class DefaultResourceStorage extends SameRootResourceStorage{
 
     @Override
     public void add(String name, URL url) throws Exception{
+        if(ObjectUtils.isEmpty(name) || url == null){
+            return;
+        }
         this.add(name, url, null);
     }
 
@@ -74,8 +78,9 @@ public class DefaultResourceStorage extends SameRootResourceStorage{
     }
 
     protected void addResource(String name, Resource resource){
-        Assert.isNotEmpty(name, "name 不能为空");
-        Assert.isNotNull(resource, "resource 不能为空");
+        if(ObjectUtils.isEmpty(name) || resource == null){
+            return;
+        }
         resourceStorage.put(name, resource);
     }
 
