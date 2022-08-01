@@ -158,8 +158,11 @@ public abstract class AbstractPluginDescriptorLoader implements PluginDescriptor
         String pluginLibDir = descriptor.getPluginLibDir();
         boolean configPluginLibDir = false;
         if(!ObjectUtils.isEmpty(pluginLibDir)){
-            descriptor.setPluginLibDir(getLibDir(descriptor, pluginLibDir));
-            configPluginLibDir = true;
+            String libDir = getLibDir(descriptor, pluginLibDir);
+            if(!ObjectUtils.isEmpty(libDir)){
+                descriptor.setPluginLibDir(libDir);
+                configPluginLibDir = true;
+            }
         }
         if(ObjectUtils.isEmpty(dependenciesIndex)){
             return Collections.emptySet();
@@ -202,8 +205,7 @@ public abstract class AbstractPluginDescriptorLoader implements PluginDescriptor
         if(new File(resolveRelativePath).exists()){
             return resolveRelativePath;
         }
-        throw new PluginException("插件["+ MsgUtils.getPluginUnique(descriptor) +"]" +
-                "依赖目录[" + descriptor.getPluginLibDir() + "]不存在!");
+        return null;
     }
 
     protected String getLibPath(DefaultInsidePluginDescriptor descriptor, String index){

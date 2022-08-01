@@ -86,7 +86,7 @@ public class JarOuterPackager extends JarNestPackager {
         attributes.putValue(MAIN_CLASS, MAIN_CLASS_VALUE);
         attributes.putValue(MAIN_PACKAGE_TYPE, PackageType.MAIN_PACKAGE_TYPE_JAR_OUTER);
         attributes.putValue(MAIN_LIB_DIR, getLibPath());
-        attributes.putValue(MAIN_LIB_INDEXES, getLibIndexes());
+        attributes.putValue(DEVELOPMENT_MODE, mainConfig.getDevelopmentMode());
 
         // 增加jar包title和version属性
         MavenProject mavenProject = this.repackageMojo.getProject();

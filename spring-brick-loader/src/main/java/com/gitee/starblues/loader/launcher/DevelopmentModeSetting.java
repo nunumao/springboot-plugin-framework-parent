@@ -18,8 +18,6 @@ package com.gitee.starblues.loader.launcher;
 
 import com.gitee.starblues.loader.DevelopmentMode;
 
-import java.util.Objects;
-
 /**
  * DevelopmentMode 设置者
  *
@@ -29,26 +27,41 @@ import java.util.Objects;
  */
 public class DevelopmentModeSetting {
 
-    private static DevelopmentMode developmentMode;
+    private static String developmentMode = DevelopmentMode.ISOLATION;
 
-    static void setDevelopmentMode(DevelopmentMode developmentMode) {
-        DevelopmentModeSetting.developmentMode = developmentMode;
+    static void setDevelopmentMode(String developmentMode) {
+        DevelopmentModeSetting.developmentMode = checkModeKey(developmentMode);
     }
 
     public static boolean isolation(){
-        return Objects.equals(developmentMode, DevelopmentMode.ISOLATION);
+        return DevelopmentMode.ISOLATION.equalsIgnoreCase(developmentMode);
     }
 
     public static boolean coexist(){
-        return Objects.equals(developmentMode, DevelopmentMode.COEXIST);
+        return DevelopmentMode.COEXIST.equalsIgnoreCase(developmentMode);
     }
 
     public static boolean simple(){
-        return Objects.equals(developmentMode, DevelopmentMode.SIMPLE);
+        return DevelopmentMode.SIMPLE.equalsIgnoreCase(developmentMode);
     }
 
-    public static DevelopmentMode getDevelopmentMode(){
+    public static String getDevelopmentMode(){
         return developmentMode;
+    }
+
+    private static String checkModeKey(String developmentMode){
+        if(developmentMode == null || "".equals(developmentMode)){
+            throw new RuntimeException("developmentMode设置不能为空");
+        }
+        if(DevelopmentMode.ISOLATION.equalsIgnoreCase(developmentMode)){
+            return developmentMode;
+        } else if(DevelopmentMode.COEXIST.equalsIgnoreCase(developmentMode)){
+            return developmentMode;
+        } else if(DevelopmentMode.SIMPLE.equalsIgnoreCase(developmentMode)){
+            return developmentMode;
+        } else {
+            throw new RuntimeException("不支持开发模式: " + developmentMode);
+        }
     }
 
 }

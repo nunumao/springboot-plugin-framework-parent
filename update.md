@@ -4,3 +4,5 @@
 4. 【修复[#I5IFR4](https://gitee.com/starblues/springboot-plugin-framework-parent/issues/I5IFR3)】 `ExtractFactory#getExtractByCoordinate` 类型转换`Bug`
 5. 【修复[#I5GJO9](https://gitee.com/starblues/springboot-plugin-framework-parent/issues/I5GJO9)】`DefaultPluginManager#install` 异常无法抛出
 6. 【修复】修复插件无法加载其他包依赖中的`mybatis-xml`问题
+7. 【修复】修复插件子启动问题
+8. 【优化】优化依赖资源默认不缓存, 以减少内存
