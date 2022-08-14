@@ -27,7 +27,7 @@ import com.gitee.starblues.loader.DevelopmentMode;
  */
 public class DevelopmentModeSetting {
 
-    private static String developmentMode = DevelopmentMode.ISOLATION;
+    private static String developmentMode;
 
     static void setDevelopmentMode(String developmentMode) {
         DevelopmentModeSetting.developmentMode = checkModeKey(developmentMode);
@@ -41,26 +41,31 @@ public class DevelopmentModeSetting {
         return DevelopmentMode.COEXIST.equalsIgnoreCase(developmentMode);
     }
 
-    public static boolean simple(){
-        return DevelopmentMode.SIMPLE.equalsIgnoreCase(developmentMode);
-    }
-
     public static String getDevelopmentMode(){
         return developmentMode;
     }
 
+    public static IllegalStateException getUnknownModeException(){
+        return getUnknownModeException(null);
+    }
+
+    public static IllegalStateException getUnknownModeException(String developmentMode){
+        if(developmentMode == null || "".equals(developmentMode)){
+            developmentMode = DevelopmentModeSetting.developmentMode;
+        }
+        return new IllegalStateException("不支持开发模式:" + developmentMode);
+    }
+
     private static String checkModeKey(String developmentMode){
         if(developmentMode == null || "".equals(developmentMode)){
-            throw new RuntimeException("developmentMode设置不能为空");
+            throw new RuntimeException("developmentMode 设置不能为空");
         }
         if(DevelopmentMode.ISOLATION.equalsIgnoreCase(developmentMode)){
             return developmentMode;
         } else if(DevelopmentMode.COEXIST.equalsIgnoreCase(developmentMode)){
             return developmentMode;
-        } else if(DevelopmentMode.SIMPLE.equalsIgnoreCase(developmentMode)){
-            return developmentMode;
         } else {
-            throw new RuntimeException("不支持开发模式: " + developmentMode);
+            throw getUnknownModeException(developmentMode);
         }
     }
 

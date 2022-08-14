@@ -18,6 +18,7 @@ package com.gitee.starblues.bootstrap.processor;
 
 import com.gitee.starblues.bootstrap.SpringPluginBootstrap;
 import com.gitee.starblues.bootstrap.annotation.DisablePluginWeb;
+import com.gitee.starblues.bootstrap.processor.oneself.OneselfProcessor;
 import com.gitee.starblues.bootstrap.processor.web.PluginControllerProcessor;
 import com.gitee.starblues.bootstrap.processor.web.PluginInterceptorsProcessor;
 import com.gitee.starblues.bootstrap.processor.web.PluginSpringDocControllerProcessor;
@@ -72,6 +73,7 @@ public class ComposeSpringPluginProcessor implements SpringPluginProcessor {
         List<SpringPluginProcessor> processors = new ArrayList<>();
         addDefaultProcessors(context, processors);
         addDefaultWebEnvProcessors(context, processors);
+        addOneselfProcessors(context, processors);
         processors.addAll(this.processors);
         this.processors = processors.stream()
                 .filter(p->{
@@ -176,6 +178,15 @@ public class ComposeSpringPluginProcessor implements SpringPluginProcessor {
         processors.add(new PluginStaticResourceProcessor());
         processors.add(new PluginThymeleafProcessor());
         ProcessorUtils.add(processors, PluginSpringDocControllerProcessor::new);
+    }
+
+    /**
+     * 添加 Oneself 模式处理者
+     * @param context ProcessorContext
+     * @param processors 处理者容器集合
+     */
+    private void addOneselfProcessors(ProcessorContext context, List<SpringPluginProcessor> processors) {
+        processors.add(new OneselfProcessor());
     }
 
     private void processException(SpringPluginProcessor processor, String executeType,
