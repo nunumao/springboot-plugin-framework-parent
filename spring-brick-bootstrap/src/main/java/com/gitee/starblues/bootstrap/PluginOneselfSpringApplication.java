@@ -2,12 +2,9 @@ package com.gitee.starblues.bootstrap;
 
 import com.gitee.starblues.bootstrap.processor.ProcessorContext;
 import com.gitee.starblues.bootstrap.processor.SpringPluginProcessor;
-import com.gitee.starblues.integration.operator.EmptyPluginOperator;
-import com.gitee.starblues.integration.user.DefaultPluginUser;
-import com.gitee.starblues.spring.extract.DefaultOpExtractFactory;
+import com.gitee.starblues.bootstrap.processor.oneself.ConfigureMainPluginEnvironment;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.support.GenericApplicationContext;
@@ -49,6 +46,7 @@ public class PluginOneselfSpringApplication extends SpringApplication {
     protected void configureEnvironment(ConfigurableEnvironment environment, String[] args) {
         super.configureEnvironment(environment, args);
         configurePluginEnvironment.configureEnvironment(environment, args);
+        new ConfigureMainPluginEnvironment(processorContext).configureEnvironment(environment, args);
     }
 
     @Override
@@ -62,7 +60,6 @@ public class PluginOneselfSpringApplication extends SpringApplication {
             processorContext.setApplicationContext(this.applicationContext);
             PluginContextHolder.initialize(processorContext);
             pluginProcessor.initialize(processorContext);
-            registerMainBean();
             return super.run(args);
         } catch (Exception e) {
             pluginProcessor.failure(processorContext);
@@ -78,13 +75,6 @@ public class PluginOneselfSpringApplication extends SpringApplication {
         pluginProcessor.refreshBefore(processorContext);
         super.refresh(applicationContext);
         pluginProcessor.refreshAfter(processorContext);
-    }
-
-    private void registerMainBean(){
-        DefaultListableBeanFactory beanFactory = applicationContext.getDefaultListableBeanFactory();
-        beanFactory.registerSingleton("extractFactory", new DefaultOpExtractFactory());
-        beanFactory.registerSingleton("pluginUser", new DefaultPluginUser(applicationContext));
-        beanFactory.registerSingleton("pluginOperator", new EmptyPluginOperator());
     }
 
 }

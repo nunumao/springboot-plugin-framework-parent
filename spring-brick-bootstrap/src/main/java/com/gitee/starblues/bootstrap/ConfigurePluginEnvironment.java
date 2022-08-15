@@ -91,12 +91,6 @@ public class ConfigurePluginEnvironment {
         } catch (Exception ex){
             logger.error("LiveBeansView.registerApplicationContext失败. {}", ex.getMessage(), ex);
         }
-        if(processorContext.runMode() == ProcessorContext.RunMode.ONESELF){
-            ConfigureMainPluginEnvironment configureMainPluginEnvironment =
-                    new ConfigureMainPluginEnvironment(processorContext);
-            configureMainPluginEnvironment.configureEnvironment(environment, args);
-            env.put(AutoIntegrationConfiguration.ENABLE_STARTER_KEY, false);
-        }
 
         if(DevelopmentModeSetting.coexist()){
             env.put(AutoIntegrationConfiguration.ENABLE_STARTER_KEY, false);

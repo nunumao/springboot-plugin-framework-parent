@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 
-package com.gitee.starblues.bootstrap;
+package com.gitee.starblues.bootstrap.processor.oneself;
 
+import com.gitee.starblues.bootstrap.SpringPluginBootstrap;
 import com.gitee.starblues.bootstrap.annotation.OneselfConfig;
 import com.gitee.starblues.bootstrap.processor.ProcessorContext;
 import com.gitee.starblues.bootstrap.utils.AnnotationUtils;
@@ -41,12 +42,12 @@ import java.util.*;
  * @version 3.0.0
  * @since 3.0.0
  */
-class ConfigureMainPluginEnvironment {
+public class ConfigureMainPluginEnvironment {
 
     private final ProcessorContext processorContext;
     private final List<PropertySourceLoader> propertySourceLoaders;
 
-    ConfigureMainPluginEnvironment(ProcessorContext processorContext) {
+    public ConfigureMainPluginEnvironment(ProcessorContext processorContext) {
         this.processorContext = processorContext;
 
         this.propertySourceLoaders = new ArrayList<>(2);
@@ -54,7 +55,7 @@ class ConfigureMainPluginEnvironment {
         this.propertySourceLoaders.add(new PropertiesPropertySourceLoader());
     }
 
-    void configureEnvironment(ConfigurableEnvironment environment, String[] args) {
+    public void configureEnvironment(ConfigurableEnvironment environment, String[] args) {
         SpringPluginBootstrap springPluginBootstrap = processorContext.getSpringPluginBootstrap();
         OneselfConfig oneselfConfig = AnnotationUtils.findAnnotation(springPluginBootstrap.getClass(),
                 OneselfConfig.class);
@@ -104,5 +105,4 @@ class ConfigureMainPluginEnvironment {
             throw new RuntimeException(e);
         }
     }
-
 }

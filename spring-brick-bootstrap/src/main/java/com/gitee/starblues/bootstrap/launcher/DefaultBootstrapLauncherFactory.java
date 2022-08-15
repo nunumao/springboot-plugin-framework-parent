@@ -23,7 +23,6 @@ import com.gitee.starblues.bootstrap.processor.ProcessorContext;
 import com.gitee.starblues.bootstrap.processor.SpringPluginProcessor;
 import com.gitee.starblues.core.launcher.plugin.PluginInteractive;
 import com.gitee.starblues.loader.launcher.DevelopmentModeSetting;
-import com.gitee.starblues.loader.launcher.simple.SimpleBaseLauncher;
 
 import java.util.List;
 
@@ -48,8 +47,6 @@ public class DefaultBootstrapLauncherFactory implements BootstrapLauncherFactory
             bootstrapLauncher = new IsolationBootstrapLauncher(bootstrap, pluginProcessor, pluginInteractive);
         } else if(DevelopmentModeSetting.coexist()){
             bootstrapLauncher = new CoexistBootstrapLauncher(bootstrap, pluginProcessor, pluginInteractive);
-        } else if(DevelopmentModeSetting.simple()){
-            throw new RuntimeException("暂未实现[" + DevelopmentModeSetting.getDevelopmentMode().toString() + "]模式");
         } else {
             bootstrapLauncher = new OneselfBootstrapLauncher(bootstrap, pluginProcessor, pluginInteractive);
         }

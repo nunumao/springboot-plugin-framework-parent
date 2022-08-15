@@ -35,9 +35,4 @@ public abstract class DevelopmentMode {
      */
     public static final String COEXIST = "coexist";
 
-    /**
-     * 简单模式
-     */
-    public static final String SIMPLE = "simple";
-
 }
