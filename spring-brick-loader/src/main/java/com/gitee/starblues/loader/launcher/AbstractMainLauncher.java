@@ -81,8 +81,7 @@ public abstract class AbstractMainLauncher extends AbstractLauncher<ClassLoader>
             }
         } catch (ClassNotFoundException e) {
             if(!DevelopmentModeSetting.isolation()){
-                String mode = DevelopmentMode.COEXIST + "/" + DevelopmentMode.SIMPLE;
-                throw new RuntimeException("[" + mode + "]模式" +
+                throw new RuntimeException("[" + DevelopmentMode.COEXIST + "]模式" +
                         "需要将[" + SPRING_PLUGIN_BOOTSTRAP_COORDINATE + "]依赖定义到主程序中!");
             }
         }

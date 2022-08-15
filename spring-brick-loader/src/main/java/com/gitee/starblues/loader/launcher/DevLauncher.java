@@ -19,7 +19,6 @@ package com.gitee.starblues.loader.launcher;
 import com.gitee.starblues.loader.launcher.coexist.CoexistBaseLauncher;
 import com.gitee.starblues.loader.launcher.isolation.IsolationBaseLauncher;
 import com.gitee.starblues.loader.launcher.runner.MethodRunner;
-import com.gitee.starblues.loader.launcher.simple.SimpleBaseLauncher;
 import lombok.AllArgsConstructor;
 
 /**
@@ -39,12 +38,12 @@ public class DevLauncher implements Launcher<ClassLoader>{
         MethodRunner methodRunner = new MethodRunner(springBootstrap.getClass().getName(),
                 SPRING_BOOTSTRAP_RUN_METHOD, args);
         AbstractMainLauncher launcher;
-        if(DevelopmentModeSetting.coexist()){
-            launcher = new CoexistBaseLauncher(methodRunner);
-        } else if(DevelopmentModeSetting.simple()) {
-            launcher = new SimpleBaseLauncher(methodRunner);
-        } else {
+        if(DevelopmentModeSetting.isolation()){
             launcher = new IsolationBaseLauncher(methodRunner);
+        } else if(DevelopmentModeSetting.coexist()) {
+            launcher = new CoexistBaseLauncher(methodRunner);
+        } else {
+            throw DevelopmentModeSetting.getUnknownModeException();
         }
         return launcher.run(args);
     }

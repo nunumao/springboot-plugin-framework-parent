@@ -17,16 +17,12 @@
 package com.gitee.starblues.loader.launcher;
 
 import com.gitee.starblues.loader.jar.JarFile;
-import com.gitee.starblues.loader.launcher.coexist.CoexistBaseLauncher;
 import com.gitee.starblues.loader.launcher.coexist.CoexistFastJarLauncher;
 import com.gitee.starblues.loader.launcher.coexist.CoexistJarOuterLauncher;
-import com.gitee.starblues.loader.launcher.isolation.IsolationBaseLauncher;
 import com.gitee.starblues.loader.launcher.isolation.IsolationFastJarLauncher;
 import com.gitee.starblues.loader.launcher.isolation.IsolationJarOuterLauncher;
 import com.gitee.starblues.loader.launcher.runner.MethodRunner;
-import com.gitee.starblues.loader.launcher.simple.SimpleBaseLauncher;
 import com.gitee.starblues.loader.utils.ObjectUtils;
-import lombok.AllArgsConstructor;
 
 import java.io.File;
 import java.net.URI;
@@ -106,24 +102,24 @@ public class ProdLauncher implements Launcher<ClassLoader>{
 
     private AbstractMainLauncher getFastJarLauncher(MethodRunner methodRunner, File rootJarFile){
         AbstractMainLauncher launcher;
-        if(DevelopmentModeSetting.coexist()){
-            launcher = new CoexistFastJarLauncher(methodRunner, rootJarFile);
-        } else if(DevelopmentModeSetting.simple()) {
+        if(DevelopmentModeSetting.isolation()){
+            launcher = new IsolationFastJarLauncher(methodRunner, rootJarFile);
+        } else if(DevelopmentModeSetting.coexist()){
             launcher = new CoexistFastJarLauncher(methodRunner, rootJarFile);
         } else {
-            launcher = new IsolationFastJarLauncher(methodRunner, rootJarFile);
+            throw DevelopmentModeSetting.getUnknownModeException();
         }
         return launcher;
     }
 
     private AbstractMainLauncher getJarOuterLauncher(MethodRunner methodRunner, File rootJarFile){
         AbstractMainLauncher launcher;
-        if(DevelopmentModeSetting.coexist()){
-            launcher = new CoexistJarOuterLauncher(methodRunner, rootJarFile);
-        } else if(DevelopmentModeSetting.simple()) {
+        if(DevelopmentModeSetting.isolation()){
+            launcher = new IsolationJarOuterLauncher(methodRunner, rootJarFile);
+        } else if(DevelopmentModeSetting.coexist()){
             launcher = new CoexistJarOuterLauncher(methodRunner, rootJarFile);
         } else {
-            launcher = new IsolationJarOuterLauncher(methodRunner, rootJarFile);
+            throw DevelopmentModeSetting.getUnknownModeException();
         }
         return launcher;
     }
