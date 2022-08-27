@@ -46,11 +46,6 @@ public class ResourceLoaderFactoryGetter {
     private static final String RESOURCE_MODE_CACHE_SHARE = "cache-share";
 
 
-    /**
-     * 资源模式--不缓存模式
-     */
-    private static final String RESOURCE_MODE_NO_CACHE = "no-cache";
-
     private static volatile String resourceMode;
 
 
@@ -83,12 +78,9 @@ public class ResourceLoaderFactoryGetter {
         if(Objects.equals(resourceMode, RESOURCE_MODE_CACHE_ISOLATION)){
             // 资源可缓存, 且隔离
             resourceStorage = new CacheResourceStorage(baseUrl);
-        } else if(Objects.equals(resourceMode, RESOURCE_MODE_CACHE_SHARE)){
+        } else {
             // 资源可缓存, 共享式
             resourceStorage = new ShareResourceStorage(key, baseUrl);
-        } else {
-            // 资源不缓存
-            resourceStorage = new DefaultResourceStorage(baseUrl);
         }
         return resourceStorage;
     }

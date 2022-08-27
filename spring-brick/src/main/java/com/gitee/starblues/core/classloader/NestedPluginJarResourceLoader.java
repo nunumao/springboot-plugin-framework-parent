@@ -39,7 +39,7 @@ import java.util.zip.ZipEntry;
  * 嵌套插件jar加载者
  * @author starBlues
  * @since 3.0.0
- * @version 3.0.4
+ * @version 3.1.0
  */
 @Slf4j
 public class NestedPluginJarResourceLoader extends AbstractResourceLoader {
@@ -80,7 +80,7 @@ public class NestedPluginJarResourceLoader extends AbstractResourceLoader {
             }
             String realName = jarEntry.getName().replace(classesPath, "");
             URL url = new URL(baseUrl.toString() + jarEntry.getName());
-            resourceLoaderFactory.addResource(url);
+            resourceLoaderFactory.addResource(new DefaultResource(realName, baseUrl, url));
             resourceStorage.add(realName, url, ()->{
                 return getClassBytes(realName, jarFile.getInputStream(jarEntry), true);
             });

@@ -1,11 +1,12 @@
-/**
- * Copyright [2019-2022] [starBlues]
+/*
+ * Copyright 2012-2021 the original author or authors.
+ * Copy from spring-boot-loader
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *        http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -25,9 +26,18 @@ import java.util.jar.Manifest;
 import java.util.zip.ZipEntry;
 
 /**
- * copy from spring-boot-loader
- * @author starBlues
- * @version 3.0.0
+ * Provides access to entries from a {@link JarFile}. In order to reduce memory
+ * consumption entry details are stored using arrays. The {@code hashCodes} array stores
+ * the hash code of the entry name, the {@code centralDirectoryOffsets} provides the
+ * offset to the central directory record and {@code positions} provides the original
+ * order position of the entry. The arrays are stored in hashCode order so that a binary
+ * search can be used to find a name.
+ * <p>
+ * A typical Spring Boot application will have somewhere in the region of 10,500 entries
+ * which should consume about 122K.
+ *
+ * @author Phillip Webb
+ * @author Andy Wilkinson
  */
 public class JarFileEntries implements CentralDirectoryVisitor, Iterable<JarEntry> {
 

@@ -28,7 +28,7 @@ import java.util.stream.Collectors;
 /**
  * 默认的可扩展的工厂
  * @author starBlues
- * @version 3.0.4
+ * @version 3.1.0
  * @since 3.0.0
  */
 public class DefaultOpExtractFactory implements OpExtractFactory {

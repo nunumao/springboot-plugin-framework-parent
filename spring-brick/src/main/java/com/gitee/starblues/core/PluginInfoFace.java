@@ -20,6 +20,8 @@ import com.gitee.starblues.core.descriptor.PluginDescriptor;
 import com.gitee.starblues.utils.Assert;
 
 import java.util.Date;
+import java.util.Map;
+import java.util.function.Supplier;
 
 /**
  * 外部 PluginWrapperFace
@@ -31,6 +33,7 @@ public class PluginInfoFace implements PluginInfo {
     private final PluginDescriptor pluginDescriptor;
     private final PluginState pluginState;
     private final boolean followSystem;
+    private final Supplier<Map<String, Object>> extensionInfoSupplier;
 
     private final Date startTime;
     private final Date stopTime;
@@ -40,6 +43,7 @@ public class PluginInfoFace implements PluginInfo {
         this.pluginDescriptor = pluginInsideInfo.getPluginDescriptor().toPluginDescriptor();
         this.pluginState = pluginInsideInfo.getPluginState();
         this.followSystem = pluginInsideInfo.isFollowSystem();
+        this.extensionInfoSupplier = pluginInsideInfo.getExtensionInfoSupplier();
         this.startTime = pluginInsideInfo.getStartTime();
         this.stopTime = pluginInsideInfo.getStopTime();
     }
@@ -77,5 +81,10 @@ public class PluginInfoFace implements PluginInfo {
     @Override
     public boolean isFollowSystem() {
         return followSystem;
+    }
+
+    @Override
+    public Map<String, Object> getExtensionInfo() {
+        return extensionInfoSupplier.get();
     }
 }

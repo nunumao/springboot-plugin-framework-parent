@@ -16,7 +16,7 @@
 
 package com.gitee.starblues.core.launcher.plugin.involved;
 
-import com.gitee.starblues.core.descriptor.InsidePluginDescriptor;
+import com.gitee.starblues.core.PluginInsideInfo;
 import com.gitee.starblues.integration.IntegrationConfiguration;
 import com.gitee.starblues.spring.SpringPluginHook;
 import com.gitee.starblues.utils.OrderPriority;
@@ -25,7 +25,8 @@ import org.springframework.context.support.GenericApplicationContext;
 /**
  * 插件启动前后介入
  * @author starBlues
- * @version 3.0.0
+ * @since 3.0.0
+ * @version 3.1.0
  */
 public interface PluginLaunchInvolved {
 
@@ -38,38 +39,38 @@ public interface PluginLaunchInvolved {
 
     /**
      * 启动之前
-     * @param descriptor 插件信息
+     * @param pluginInsideInfo 插件信息
      * @param classLoader 插件classloader
      * @throws Exception 执行异常
      */
-    default void before(InsidePluginDescriptor descriptor, ClassLoader classLoader) throws Exception{}
+    default void before(PluginInsideInfo pluginInsideInfo, ClassLoader classLoader) throws Exception{}
 
     /**
      * 启动之后
-     * @param descriptor 插件信息
+     * @param pluginInsideInfo 插件信息
      * @param classLoader 插件classloader
      * @param pluginHook 启动成功后插件返回的钩子
      * @throws Exception 执行异常
      */
-    default void after(InsidePluginDescriptor descriptor, ClassLoader classLoader,
+    default void after(PluginInsideInfo pluginInsideInfo, ClassLoader classLoader,
                        SpringPluginHook pluginHook) throws Exception{}
 
     /**
      * 启动失败
-     * @param descriptor 插件信息
+     * @param pluginInsideInfo 插件信息
      * @param classLoader 插件classloader
      * @param throwable 异常信息
      * @throws Exception 执行异常
      */
-    default void failure(InsidePluginDescriptor descriptor, ClassLoader classLoader, Throwable throwable) throws Exception{}
+    default void failure(PluginInsideInfo pluginInsideInfo, ClassLoader classLoader, Throwable throwable) throws Exception{}
 
     /**
      * 关闭的时候
-     * @param descriptor 插件信息
+     * @param pluginInsideInfo 插件信息
      * @param classLoader 插件classloader
      * @throws Exception 执行异常
      */
-    default void close(InsidePluginDescriptor descriptor, ClassLoader classLoader) throws Exception{}
+    default void close(PluginInsideInfo pluginInsideInfo, ClassLoader classLoader) throws Exception{}
 
     /**
      * 执行顺序

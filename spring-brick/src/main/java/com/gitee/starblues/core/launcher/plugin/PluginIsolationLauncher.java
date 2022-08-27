@@ -16,6 +16,7 @@
 
 package com.gitee.starblues.core.launcher.plugin;
 
+import com.gitee.starblues.core.PluginInsideInfo;
 import com.gitee.starblues.core.classloader.*;
 import com.gitee.starblues.core.descriptor.InsidePluginDescriptor;
 import com.gitee.starblues.core.launcher.plugin.involved.PluginLaunchInvolved;
@@ -39,14 +40,14 @@ import java.util.WeakHashMap;
  *
  * @author starBlues
  * @since 3.0.0
- * @version 3.0.4
+ * @version 3.1.0
  */
 public class PluginIsolationLauncher extends AbstractLauncher<SpringPluginHook> {
 
     private static final Map<String, PluginClassLoader> CLASS_LOADER_CACHE = new WeakHashMap<>();
 
     protected final PluginInteractive pluginInteractive;
-    protected final InsidePluginDescriptor pluginDescriptor;
+    protected final PluginInsideInfo pluginInsideInfo;
     protected final MainResourceMatcher mainResourceMatcher;
 
     protected final PluginLaunchInvolved pluginLaunchInvolved;
@@ -54,7 +55,7 @@ public class PluginIsolationLauncher extends AbstractLauncher<SpringPluginHook> 
     public PluginIsolationLauncher(PluginInteractive pluginInteractive,
                                    PluginLaunchInvolved pluginLaunchInvolved) {
         this.pluginInteractive = pluginInteractive;
-        this.pluginDescriptor = pluginInteractive.getPluginDescriptor();
+        this.pluginInsideInfo = pluginInteractive.getPluginInsideInfo();
         this.mainResourceMatcher = getMainResourceMatcher(pluginInteractive);
         this.pluginLaunchInvolved = pluginLaunchInvolved;
     }
@@ -76,13 +77,13 @@ public class PluginIsolationLauncher extends AbstractLauncher<SpringPluginHook> 
     @Override
     protected ClassLoader createClassLoader(String... args) throws Exception {
         PluginClassLoader pluginClassLoader = getPluginClassLoader();
-        pluginClassLoader.addResource(pluginDescriptor);
+        pluginClassLoader.addResource(pluginInsideInfo.getPluginDescriptor());
         return pluginClassLoader;
     }
 
     protected synchronized PluginClassLoader getPluginClassLoader() throws Exception {
-        String pluginId = pluginDescriptor.getPluginId();
-        String key = MsgUtils.getPluginUnique(pluginDescriptor);
+        String pluginId = pluginInsideInfo.getPluginId();
+        String key = MsgUtils.getPluginUnique(pluginInsideInfo.getPluginDescriptor());
         PluginClassLoader classLoader = CLASS_LOADER_CACHE.get(key);
         if(classLoader != null){
             return classLoader;
@@ -95,7 +96,7 @@ public class PluginIsolationLauncher extends AbstractLauncher<SpringPluginHook> 
     }
 
     protected ResourceLoaderFactory getResourceLoaderFactory(){
-        return new DefaultResourceLoaderFactory(pluginDescriptor.getPluginId());
+        return new DefaultResourceLoaderFactory(pluginInsideInfo.getPluginId());
     }
 
     protected GenericClassLoader getParentClassLoader() throws Exception {
@@ -109,14 +110,14 @@ public class PluginIsolationLauncher extends AbstractLauncher<SpringPluginHook> 
 
     @Override
     protected SpringPluginHook launch(ClassLoader classLoader, String... args) throws Exception {
-        pluginLaunchInvolved.before(pluginDescriptor, classLoader);
+        pluginLaunchInvolved.before(pluginInsideInfo, classLoader);
         try {
             SpringPluginHook springPluginHook = (SpringPluginHook) new PluginMethodRunner(pluginInteractive)
                     .run(classLoader);
-            pluginLaunchInvolved.after(pluginDescriptor, classLoader, springPluginHook);
-            return new SpringPluginHookWrapper(springPluginHook, pluginDescriptor, pluginLaunchInvolved, classLoader);
+            pluginLaunchInvolved.after(pluginInsideInfo, classLoader, springPluginHook);
+            return new SpringPluginHookWrapper(springPluginHook, pluginInsideInfo, pluginLaunchInvolved, classLoader);
         } catch (Throwable throwable){
-            pluginLaunchInvolved.failure(pluginDescriptor,classLoader, throwable);
+            pluginLaunchInvolved.failure(pluginInsideInfo,classLoader, throwable);
             throw throwable;
         }
     }

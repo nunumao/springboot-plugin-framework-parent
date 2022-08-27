@@ -16,6 +16,7 @@
 
 package com.gitee.starblues.core.classloader;
 
+import com.gitee.starblues.loader.utils.IOUtils;
 import com.gitee.starblues.utils.ObjectUtils;
 
 import java.util.ArrayList;
@@ -27,7 +28,7 @@ import java.util.List;
  * @author starBlues
  * @version 3.0.3
  */
-public class ComposeMainResourceMatcher implements MainResourceMatcher{
+public class ComposeMainResourceMatcher implements MainResourceMatcher, AutoCloseable{
 
     private final List<MainResourceMatcher> resourceMatchers;
 
@@ -58,5 +59,14 @@ public class ComposeMainResourceMatcher implements MainResourceMatcher{
             }
         }
         return Boolean.FALSE;
+    }
+
+    @Override
+    public void close() throws Exception {
+        for (MainResourceMatcher resourceMatcher : resourceMatchers) {
+            if(resourceMatcher instanceof AutoCloseable){
+                IOUtils.closeQuietly((AutoCloseable)resourceMatcher);
+            }
+        }
     }
 }

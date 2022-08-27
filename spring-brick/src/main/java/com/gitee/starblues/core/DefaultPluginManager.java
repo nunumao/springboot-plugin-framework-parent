@@ -49,7 +49,7 @@ import java.util.stream.Collectors;
 /**
  * 抽象的插件管理者
  * @author starBlues
- * @version 3.0.4
+ * @version 3.1.0
  * @since 3.0.0
  */
 public class DefaultPluginManager implements PluginManager{
@@ -270,7 +270,7 @@ public class DefaultPluginManager implements PluginManager{
         PluginInfo pluginInfo = wrapperInside.toPluginInfo();
         if(wrapperInside.getPluginState() == PluginState.STARTED){
             try {
-                stop(wrapperInside);
+                stop(wrapperInside, true);
                 pluginListenerFactory.stopSuccess(pluginInfo);
             } catch (Throwable e) {
                 PluginException pluginException = PluginException.getPluginException(e,
@@ -356,7 +356,7 @@ public class DefaultPluginManager implements PluginManager{
         }
         PluginInfo pluginInfo = pluginInsideInfo.toPluginInfo();
         try {
-            stop(pluginInsideInfo);
+            stop(pluginInsideInfo, false);
             log.info("停止插件[{}]成功", MsgUtils.getPluginUnique(pluginInsideInfo.getPluginDescriptor()));
             pluginListenerFactory.stopSuccess(pluginInfo);
             return pluginInfo;
@@ -538,9 +538,10 @@ public class DefaultPluginManager implements PluginManager{
     /**
      * 统一停止插件操作
      * @param pluginInsideInfo PluginInsideInfo
+     * @param isUninstall 是否为卸载停止
      * @throws Exception 启动异常
      */
-    protected void stop(PluginInsideInfo pluginInsideInfo) throws Exception{
+    protected void stop(PluginInsideInfo pluginInsideInfo, boolean isUninstall) throws Exception{
         launcherChecker.checkCanStop(pluginInsideInfo);
         pluginInsideInfo.setPluginState(PluginState.STOPPED);
         stopFinish(pluginInsideInfo);

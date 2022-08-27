@@ -7,7 +7,7 @@ import java.util.Set;
  * 插件禁用的 AutoConfiguration 配置
  *
  * @author starBlues
- * @version 3.0.4
+ * @version 3.1.0
  * @since 3.0.4
  */
 public class PluginDisableAutoConfig {

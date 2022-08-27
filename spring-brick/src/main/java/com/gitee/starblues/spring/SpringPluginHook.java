@@ -25,7 +25,7 @@ import com.gitee.starblues.spring.web.thymeleaf.ThymeleafConfig;
  * @author starBlues
  * @version 3.0.0
  */
-public interface SpringPluginHook extends AutoCloseable{
+public interface SpringPluginHook {
 
     /**
      * 停止前校验. 如果抛出 PluginProhibitStopException 异常, 表示当前插件不可停止
@@ -50,5 +50,13 @@ public interface SpringPluginHook extends AutoCloseable{
      * @return ThymeleafConfig
      */
     ThymeleafConfig getThymeleafConfig();
+
+    /**
+     * 卸载调用
+     * @param isUninstall 是否是卸载关闭
+     * @since 3.1.0
+     * @throws Exception 关闭异常
+     */
+    void close(boolean isUninstall) throws Exception;
 
 }

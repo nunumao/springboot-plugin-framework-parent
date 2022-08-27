@@ -36,7 +36,7 @@ import java.util.List;
  * classloader 转换器
  *
  * @author starBlues
- * @version 3.0.4
+ * @version 3.1.0
  * @since 3.0.4
  */
 public class ClassLoaderTranslator implements ResourceLoaderFactory {
@@ -64,6 +64,11 @@ public class ClassLoaderTranslator implements ResourceLoaderFactory {
 
     @Override
     public void addResource(URL url) throws Exception {
+        throw new RuntimeException("Does not support!");
+    }
+
+    @Override
+    public void addResource(Resource resource) throws Exception {
         throw new RuntimeException("Does not support!");
     }
 

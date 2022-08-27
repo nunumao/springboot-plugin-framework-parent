@@ -19,6 +19,7 @@ package com.gitee.starblues.core;
 import com.gitee.starblues.core.descriptor.PluginDescriptor;
 
 import java.util.Date;
+import java.util.Map;
 
 /**
  * 插件信息
@@ -63,11 +64,16 @@ public interface PluginInfo {
      */
     Date getStopTime();
 
-
     /**
      * 是否跟随系统启动而加载的插件
      * @return true: 是, false: 否
      */
     boolean isFollowSystem();
+
+    /**
+     * 获取插件自主扩展信息
+     * @return 扩展信息Map
+     */
+    Map<String, Object> getExtensionInfo();
 
 }

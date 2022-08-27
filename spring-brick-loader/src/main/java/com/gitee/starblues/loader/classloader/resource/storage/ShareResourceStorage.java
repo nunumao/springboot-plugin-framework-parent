@@ -52,6 +52,11 @@ public class ShareResourceStorage extends DefaultResourceStorage{
         super.addResource(name, shareResource);
     }
 
+    @Override
+    public void close() throws Exception {
+        super.close();
+    }
+
     private static class ShareResource extends DefaultResource {
 
         private final static Map<String, ByteStore> BYTE_STORE_MAP = new ConcurrentHashMap<>();
@@ -73,7 +78,7 @@ public class ShareResourceStorage extends DefaultResourceStorage{
             if(byteStore == null){
                 byteStore = new ByteStore(name);
                 byteStore.addByte(key, bytes);
-                BYTE_STORE_MAP.put(getName(), byteStore);
+                BYTE_STORE_MAP.put(name, byteStore);
             } else {
                 byteStore.addByte(key, bytes);
             }

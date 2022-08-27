@@ -16,6 +16,7 @@
 
 package com.gitee.starblues.core.launcher.plugin;
 
+import com.gitee.starblues.core.PluginInsideInfo;
 import com.gitee.starblues.core.descriptor.InsidePluginDescriptor;
 import com.gitee.starblues.integration.IntegrationConfiguration;
 import com.gitee.starblues.spring.MainApplicationContext;
@@ -31,17 +32,17 @@ import com.gitee.starblues.spring.invoke.InvokeSupperCache;
  */
 public class DefaultPluginInteractive implements PluginInteractive{
 
-    private final InsidePluginDescriptor pluginDescriptor;
+    private final PluginInsideInfo pluginInsideInfo;
     private final MainApplicationContext mainApplicationContext;
     private final IntegrationConfiguration configuration;
     private final InvokeSupperCache invokeSupperCache;
     private final OpExtractFactory opExtractFactory;
 
-    public DefaultPluginInteractive(InsidePluginDescriptor pluginDescriptor,
+    public DefaultPluginInteractive(PluginInsideInfo pluginInsideInfo,
                                     MainApplicationContext mainApplicationContext,
                                     IntegrationConfiguration configuration,
                                     InvokeSupperCache invokeSupperCache) {
-        this.pluginDescriptor = pluginDescriptor;
+        this.pluginInsideInfo = pluginInsideInfo;
         this.mainApplicationContext = mainApplicationContext;
         this.configuration = configuration;
         this.invokeSupperCache = invokeSupperCache;
@@ -53,10 +54,14 @@ public class DefaultPluginInteractive implements PluginInteractive{
         return (OpExtractFactory) defaultExtractFactory.getTarget();
     }
 
-
     @Override
     public InsidePluginDescriptor getPluginDescriptor() {
-        return pluginDescriptor;
+        return pluginInsideInfo.getPluginDescriptor();
+    }
+
+    @Override
+    public PluginInsideInfo getPluginInsideInfo() {
+        return pluginInsideInfo;
     }
 
     @Override

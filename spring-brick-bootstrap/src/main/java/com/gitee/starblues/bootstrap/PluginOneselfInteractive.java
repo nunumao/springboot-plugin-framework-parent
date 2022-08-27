@@ -17,6 +17,8 @@
 package com.gitee.starblues.bootstrap;
 
 import com.gitee.starblues.common.PackageStructure;
+import com.gitee.starblues.core.DefaultPluginInsideInfo;
+import com.gitee.starblues.core.PluginInsideInfo;
 import com.gitee.starblues.core.descriptor.DevPluginDescriptorLoader;
 import com.gitee.starblues.core.descriptor.InsidePluginDescriptor;
 import com.gitee.starblues.core.descriptor.PluginDescriptorLoader;
@@ -37,27 +39,33 @@ import java.nio.file.Paths;
 /**
  * 插件自己的Interactive
  * @author starBlues
- * @version 3.0.0
+ * @version 3.1.0
  */
 public class PluginOneselfInteractive implements PluginInteractive {
 
-    private final InsidePluginDescriptor pluginDescriptor;
+    private final PluginInsideInfo pluginInsideInfo;
     private final MainApplicationContext mainApplicationContext;
     private final IntegrationConfiguration configuration;
     private final InvokeSupperCache invokeSupperCache;
     private final OpExtractFactory opExtractFactory;
 
     public PluginOneselfInteractive(){
-        this.pluginDescriptor = createPluginDescriptor();
+        this.pluginInsideInfo = createPluginInsideInfo();
         this.mainApplicationContext = new EmptyMainApplicationContext();
         this.configuration = new AutoIntegrationConfiguration();
         this.invokeSupperCache = new DefaultInvokeSupperCache();
         this.opExtractFactory = new DefaultOpExtractFactory();
     }
 
+
     @Override
     public InsidePluginDescriptor getPluginDescriptor() {
-        return pluginDescriptor;
+        return pluginInsideInfo.getPluginDescriptor();
+    }
+
+    @Override
+    public PluginInsideInfo getPluginInsideInfo() {
+        return pluginInsideInfo;
     }
 
     @Override
@@ -80,7 +88,7 @@ public class PluginOneselfInteractive implements PluginInteractive {
         return opExtractFactory;
     }
 
-    private InsidePluginDescriptor createPluginDescriptor(){
+    private PluginInsideInfo createPluginInsideInfo(){
         EmptyPluginDescriptorDecrypt descriptorDecrypt = new EmptyPluginDescriptorDecrypt();
         try (PluginDescriptorLoader pluginDescriptorLoader = new DevPluginDescriptorLoader(descriptorDecrypt)){
             Path classesPath = Paths.get(this.getClass().getResource("/").toURI()).getParent();
@@ -89,7 +97,7 @@ public class PluginOneselfInteractive implements PluginInteractive {
             if(pluginDescriptor == null){
                 throw new RuntimeException("没有发现插件信息, 请使用框架提供的Maven插件器对插件进行编译!");
             }
-            return pluginDescriptor;
+            return new DefaultPluginInsideInfo(pluginDescriptor);
         } catch (Exception e){
             throw new RuntimeException(e);
         }

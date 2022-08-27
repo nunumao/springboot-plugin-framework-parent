@@ -21,7 +21,9 @@ import com.gitee.starblues.core.descriptor.PluginLibInfo;
 import com.gitee.starblues.core.descriptor.PluginType;
 import com.gitee.starblues.core.exception.PluginException;
 import com.gitee.starblues.loader.classloader.*;
+import com.gitee.starblues.loader.classloader.resource.Resource;
 import com.gitee.starblues.loader.classloader.resource.loader.ResourceLoaderFactory;
+import com.gitee.starblues.loader.utils.IOUtils;
 import com.gitee.starblues.utils.Assert;
 import com.gitee.starblues.utils.FilesUtils;
 import com.gitee.starblues.utils.MsgUtils;
@@ -54,10 +56,6 @@ public class PluginClassLoader extends GenericClassLoader implements PluginResou
         super(name, parentClassLoader, resourceLoaderFactory);
         this.mainResourceMatcher = mainResourceMatcher;
         this.proxy = new PluginResourceLoaderFactoryProxy(resourceLoaderFactory, parentClassLoader);
-    }
-
-    public MainResourceMatcher getMainResourceMatcher() {
-        return mainResourceMatcher;
     }
 
     @Override
@@ -116,5 +114,6 @@ public class PluginClassLoader extends GenericClassLoader implements PluginResou
             }
         }
     }
+
 
 }

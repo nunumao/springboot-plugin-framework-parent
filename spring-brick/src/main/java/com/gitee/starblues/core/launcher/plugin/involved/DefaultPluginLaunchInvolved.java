@@ -16,32 +16,73 @@
 
 package com.gitee.starblues.core.launcher.plugin.involved;
 
+import com.gitee.starblues.core.PluginInsideInfo;
 import com.gitee.starblues.core.descriptor.InsidePluginDescriptor;
+import com.gitee.starblues.core.PluginExtensionInfo;
 import com.gitee.starblues.loader.PluginResourceStorage;
+import com.gitee.starblues.spring.ApplicationContext;
 import com.gitee.starblues.spring.SpringPluginHook;
 import com.gitee.starblues.spring.web.PluginStaticResourceResolver;
+import com.gitee.starblues.utils.ObjectUtils;
+import com.gitee.starblues.utils.SpringBeanCustomUtils;
+import lombok.extern.slf4j.Slf4j;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 默认的插件启动介入者
  * @author starBlues
- * @version 3.0.0
+ * @since 3.0.0
+ * @version 3.1.0
  */
+@Slf4j
 public class DefaultPluginLaunchInvolved implements PluginLaunchInvolved{
 
     @Override
-    public void before(InsidePluginDescriptor descriptor, ClassLoader classLoader) throws Exception {
+    public void before(PluginInsideInfo pluginInsideInfo, ClassLoader classLoader) throws Exception {
+        InsidePluginDescriptor descriptor = pluginInsideInfo.getPluginDescriptor();
         PluginResourceStorage.addPlugin(descriptor.getPluginId(), descriptor.getPluginFileName());
     }
 
     @Override
-    public void after(InsidePluginDescriptor descriptor, ClassLoader classLoader, SpringPluginHook pluginHook) throws Exception {
+    public void after(PluginInsideInfo pluginInsideInfo, ClassLoader classLoader, SpringPluginHook pluginHook) throws Exception {
+        InsidePluginDescriptor descriptor = pluginInsideInfo.getPluginDescriptor();
         PluginStaticResourceResolver.parse(descriptor, classLoader, pluginHook.getWebConfig());
+        setExtensionInfoSupplier(pluginInsideInfo, pluginHook);
     }
 
     @Override
-    public void close(InsidePluginDescriptor descriptor, ClassLoader classLoader) throws Exception {
+    public void close(PluginInsideInfo pluginInsideInfo, ClassLoader classLoader) throws Exception {
+        InsidePluginDescriptor descriptor = pluginInsideInfo.getPluginDescriptor();
         String pluginId = descriptor.getPluginId();
         PluginResourceStorage.removePlugin(pluginId);
         PluginStaticResourceResolver.remove(pluginId);
     }
+
+    private void setExtensionInfoSupplier(PluginInsideInfo pluginInsideInfo, SpringPluginHook pluginHook){
+        pluginInsideInfo.setExtensionInfoSupplier(()->{
+            // 设置插件自主扩展信息
+            ApplicationContext applicationContext = pluginHook.getApplicationContext();
+            List<PluginExtensionInfo> beans = SpringBeanCustomUtils.getBeans(applicationContext,
+                    PluginExtensionInfo.class);
+            if(ObjectUtils.isEmpty(beans)){
+                return new HashMap<>(0);
+            }
+            Map<String, Object> extensionInfos = new HashMap<>();
+            for (PluginExtensionInfo extensionInfoBean : beans) {
+                try {
+                    Map<String, Object> extensionInfo = extensionInfoBean.extensionInfo();
+                    if(!ObjectUtils.isEmpty(extensionInfo)){
+                        extensionInfos.putAll(extensionInfo);
+                    }
+                } catch (Exception e){
+                    log.error(e.getMessage(), e);
+                }
+            }
+            return extensionInfos;
+        });
+    }
+
 }

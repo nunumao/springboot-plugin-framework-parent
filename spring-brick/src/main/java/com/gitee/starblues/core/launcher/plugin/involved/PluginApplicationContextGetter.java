@@ -16,6 +16,7 @@
 
 package com.gitee.starblues.core.launcher.plugin.involved;
 
+import com.gitee.starblues.core.PluginInsideInfo;
 import com.gitee.starblues.core.descriptor.InsidePluginDescriptor;
 import com.gitee.starblues.spring.ApplicationContext;
 import com.gitee.starblues.spring.SpringPluginHook;
@@ -25,19 +26,22 @@ import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author starBlues
- * @version 3.0.0
+ * @since  3.0.0
+ * @version 3.1.0
  */
 public class PluginApplicationContextGetter implements PluginLaunchInvolved{
 
     private static final Map<String, ApplicationContext> PLUGIN_CONTEXTS = new ConcurrentHashMap<>();
 
     @Override
-    public void after(InsidePluginDescriptor descriptor, ClassLoader classLoader, SpringPluginHook pluginHook) throws Exception {
+    public void after(PluginInsideInfo pluginInsideInfo, ClassLoader classLoader, SpringPluginHook pluginHook) throws Exception {
+        InsidePluginDescriptor descriptor = pluginInsideInfo.getPluginDescriptor();
         PLUGIN_CONTEXTS.put(descriptor.getPluginId(), pluginHook.getApplicationContext());
     }
 
     @Override
-    public void close(InsidePluginDescriptor descriptor, ClassLoader classLoader) throws Exception {
+    public void close(PluginInsideInfo pluginInsideInfo, ClassLoader classLoader) throws Exception {
+        InsidePluginDescriptor descriptor = pluginInsideInfo.getPluginDescriptor();
         PLUGIN_CONTEXTS.remove(descriptor.getPluginId());
     }
 
