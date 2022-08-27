@@ -32,7 +32,7 @@ import java.util.Set;
  *
  * @author starBlues
  * @since 3.0.4
- * @version 3.0.4
+ * @version 3.1.0
  */
 public class DefaultAutowiredTypeResolver implements AutowiredTypeResolver{
 

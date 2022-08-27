@@ -97,13 +97,15 @@ public class PluginLauncherManager extends DefaultPluginManager{
         launcherChecker.checkCanStart(pluginInsideInfo);
         try {
             InsidePluginDescriptor pluginDescriptor = pluginInsideInfo.getPluginDescriptor();
-            PluginInteractive pluginInteractive = new DefaultPluginInteractive(pluginDescriptor,
+            PluginInteractive pluginInteractive = new DefaultPluginInteractive(pluginInsideInfo,
                     mainApplicationContext, configuration, invokeSupperCache);
             AbstractLauncher<SpringPluginHook> pluginLauncher;
             if(DevelopmentModeSetting.isolation()){
                 pluginLauncher = new PluginIsolationLauncher(pluginInteractive, pluginLaunchInvolved);
-            } else {
+            } else if(DevelopmentModeSetting.coexist()){
                 pluginLauncher = new PluginCoexistLauncher(pluginInteractive, pluginLaunchInvolved);
+            } else {
+                throw DevelopmentModeSetting.getUnknownModeException();
             }
             SpringPluginHook springPluginHook = pluginLauncher.run();
             RegistryPluginInfo registryPluginInfo = new RegistryPluginInfo(pluginDescriptor, springPluginHook);
@@ -117,11 +119,8 @@ public class PluginLauncherManager extends DefaultPluginManager{
         }
     }
 
-
-
-
     @Override
-    protected void stop(PluginInsideInfo pluginInsideInfo) throws Exception {
+    protected void stop(PluginInsideInfo pluginInsideInfo, boolean isUninstall) throws Exception {
         String pluginId = pluginInsideInfo.getPluginId();
         RegistryPluginInfo registryPluginInfo = registryInfo.get(pluginId);
         if(registryPluginInfo == null){
@@ -130,10 +129,10 @@ public class PluginLauncherManager extends DefaultPluginManager{
         try {
             SpringPluginHook springPluginHook = registryPluginInfo.getSpringPluginHook();
             springPluginHook.stopVerify();
-            springPluginHook.close();
+            springPluginHook.close(isUninstall);
             invokeSupperCache.remove(pluginId);
             registryInfo.remove(pluginId);
-            super.stop(pluginInsideInfo);
+            super.stop(pluginInsideInfo, isUninstall);
         } catch (Exception e){
             if(e instanceof PluginProhibitStopException){
                 // 禁止停止时, 不设置插件状态

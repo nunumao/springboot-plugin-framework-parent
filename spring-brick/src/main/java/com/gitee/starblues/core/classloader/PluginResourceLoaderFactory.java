@@ -23,7 +23,7 @@ import com.gitee.starblues.loader.classloader.resource.loader.ResourceLoaderFact
  * 插件资源工程
  *
  * @author starBlues
- * @version 3.0.4
+ * @version 3.1.0
  * @since 3.0.4
  */
 public interface PluginResourceLoaderFactory extends ResourceLoaderFactory {

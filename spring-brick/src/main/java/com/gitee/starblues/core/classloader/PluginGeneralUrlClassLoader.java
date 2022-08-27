@@ -18,13 +18,16 @@ package com.gitee.starblues.core.classloader;
 
 import com.gitee.starblues.core.descriptor.InsidePluginDescriptor;
 import com.gitee.starblues.loader.classloader.GeneralUrlClassLoader;
+import com.gitee.starblues.loader.utils.IOUtils;
 import lombok.extern.slf4j.Slf4j;
+
+import java.io.IOException;
 
 /**
  * 插件基本 url classLoader
  *
  * @author starBlues
- * @version 3.0.4
+ * @version 3.1.0
  * @since 3.0.4
  */
 @Slf4j
@@ -42,4 +45,8 @@ public class PluginGeneralUrlClassLoader extends GeneralUrlClassLoader implement
         proxy.addResource(descriptor);
     }
 
+    @Override
+    public void close() throws IOException {
+        super.close();
+    }
 }

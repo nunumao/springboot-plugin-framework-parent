@@ -35,7 +35,7 @@ import static com.gitee.starblues.loader.LoaderConstant.PROD_LIB_PATH;
  * fast jar 类型的 classpath 获取者
  *
  * @author starBlues
- * @version 3.0.4
+ * @version 3.1.0
  * @since 3.0.4
  */
 @AllArgsConstructor

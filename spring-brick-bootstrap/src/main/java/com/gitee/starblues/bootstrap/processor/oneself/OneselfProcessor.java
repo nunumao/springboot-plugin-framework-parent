@@ -29,7 +29,7 @@ import org.springframework.context.support.GenericApplicationContext;
  * 子启动处理器
  *
  * @author starBlues
- * @version 3.0.4
+ * @version 3.1.0
  * @since 3.0.4
  */
 public class OneselfProcessor implements SpringPluginProcessor {

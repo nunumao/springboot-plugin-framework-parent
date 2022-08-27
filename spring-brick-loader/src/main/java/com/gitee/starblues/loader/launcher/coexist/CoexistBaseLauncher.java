@@ -26,7 +26,7 @@ import com.gitee.starblues.loader.launcher.runner.MethodRunner;
  *
  * @author starBlues
  * @since 3.0.4
- * @version 3.0.4
+ * @version 3.1.0
  */
 public class CoexistBaseLauncher extends AbstractMainLauncher {
 

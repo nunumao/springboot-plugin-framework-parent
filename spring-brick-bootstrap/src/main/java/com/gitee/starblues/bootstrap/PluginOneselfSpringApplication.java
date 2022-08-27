@@ -14,7 +14,7 @@ import org.springframework.core.env.ConfigurableEnvironment;
  * 插件自主启动的 SpringApplication
  *
  * @author starBlues
- * @version 3.0.4
+ * @version 3.1.0
  * @since 3.0.4
  */
 public class PluginOneselfSpringApplication extends SpringApplication {

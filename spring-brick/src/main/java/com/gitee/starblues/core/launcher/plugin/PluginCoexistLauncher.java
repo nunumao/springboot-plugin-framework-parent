@@ -1,5 +1,6 @@
 package com.gitee.starblues.core.launcher.plugin;
 
+import com.gitee.starblues.core.PluginInsideInfo;
 import com.gitee.starblues.core.classloader.NestedPluginJarResourceLoader;
 import com.gitee.starblues.core.classloader.PluginGeneralUrlClassLoader;
 import com.gitee.starblues.core.descriptor.InsidePluginDescriptor;
@@ -24,7 +25,7 @@ import java.util.Set;
  *
  * @author starBlues
  * @since 3.0.4
- * @version 3.0.4
+ * @version 3.1.0
  */
 @Slf4j
 public class PluginCoexistLauncher extends AbstractLauncher<SpringPluginHook> {
@@ -50,17 +51,18 @@ public class PluginCoexistLauncher extends AbstractLauncher<SpringPluginHook> {
     @Override
     protected SpringPluginHook launch(ClassLoader classLoader, String... args) throws Exception {
         InsidePluginDescriptor pluginDescriptor = pluginInteractive.getPluginDescriptor();
-        pluginLaunchInvolved.before(pluginDescriptor, classLoader);
+        PluginInsideInfo pluginInsideInfo = pluginInteractive.getPluginInsideInfo();
+        pluginLaunchInvolved.before(pluginInsideInfo, classLoader);
         try {
             SpringPluginHook springPluginHook = (SpringPluginHook) new PluginMethodRunner(pluginInteractive)
                     .run(classLoader);
             if(springPluginHook == null){
                 throw new PluginException("插件返回的 SpringPluginHook 不能为空");
             }
-            pluginLaunchInvolved.after(pluginDescriptor, classLoader, springPluginHook);
-            return new SpringPluginHookWrapper(springPluginHook, pluginDescriptor, pluginLaunchInvolved, classLoader);
+            pluginLaunchInvolved.after(pluginInsideInfo, classLoader, springPluginHook);
+            return new SpringPluginHookWrapper(springPluginHook, pluginInsideInfo, pluginLaunchInvolved, classLoader);
         } catch (Throwable throwable){
-            pluginLaunchInvolved.failure(pluginDescriptor,classLoader, throwable);
+            pluginLaunchInvolved.failure(pluginInsideInfo,classLoader, throwable);
             throw throwable;
         }
     }

@@ -27,7 +27,7 @@ import java.util.List;
  * 空的资源存储
  *
  * @author starBlues
- * @version 3.0.4
+ * @version 3.1.0
  * @since 3.0.4
  */
 public class EmptyResourceStorage implements ResourceStorage{

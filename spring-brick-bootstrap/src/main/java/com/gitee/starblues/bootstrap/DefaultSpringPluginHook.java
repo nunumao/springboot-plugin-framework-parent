@@ -39,7 +39,7 @@ import java.util.Map;
  * 默认的插件钩子器
  * @author starBlues
  * @since 3.0.0
- * @version 3.0.4
+ * @version 3.1.0
  */
 public class DefaultSpringPluginHook implements SpringPluginHook {
 
@@ -77,14 +77,12 @@ public class DefaultSpringPluginHook implements SpringPluginHook {
 
 
     @Override
-    public void close() throws Exception{
+    public void close(boolean isUninstall) throws Exception{
         try {
             GenericApplicationContext applicationContext = processorContext.getApplicationContext();
-            callPluginCloseListener(applicationContext);
+            callPluginCloseListener(applicationContext, isUninstall);
             pluginProcessor.close(processorContext);
-            if(applicationContext != null){
-                applicationContext.close();
-            }
+            applicationContext.close();
             processorContext.clearRegistryInfo();
             DestroyUtils.destroyAll(null, SpringFactoriesLoader.class, "cache", Map.class);
         } catch (Exception e){
@@ -109,7 +107,7 @@ public class DefaultSpringPluginHook implements SpringPluginHook {
         return processorContext.getRegistryInfo(PluginThymeleafProcessor.CONFIG_KEY);
     }
 
-    private void callPluginCloseListener(GenericApplicationContext applicationContext){
+    private void callPluginCloseListener(GenericApplicationContext applicationContext, boolean isUninstall){
         List<PluginCloseListener> pluginCloseListeners = SpringBeanUtils.getBeans(
                 applicationContext, PluginCloseListener.class);
         if(pluginCloseListeners.isEmpty()){
@@ -117,7 +115,7 @@ public class DefaultSpringPluginHook implements SpringPluginHook {
         }
         for (PluginCloseListener pluginCloseListener : pluginCloseListeners) {
             try {
-                pluginCloseListener.close(processorContext.getPluginDescriptor());
+                pluginCloseListener.close(applicationContext, processorContext.getPluginInfo(), isUninstall);
             } catch (Exception e){
                 e.printStackTrace();
             }

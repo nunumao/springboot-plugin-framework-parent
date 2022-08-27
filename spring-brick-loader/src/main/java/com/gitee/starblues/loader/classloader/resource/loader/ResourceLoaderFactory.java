@@ -63,6 +63,13 @@ public interface ResourceLoaderFactory extends AutoCloseable {
     void addResource(URL url) throws Exception;
 
     /**
+     * 根据 Resource 添加
+     * @param resource 资源
+     * @throws Exception 添加资源异常
+     */
+    void addResource(Resource resource) throws Exception;
+
+    /**
      * 根据资源加载器添加资源
      * @param resourceLoader 资源加载者
      * @throws Exception 添加资源异常

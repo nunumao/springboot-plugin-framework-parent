@@ -21,7 +21,7 @@ package com.gitee.starblues.loader;
  *
  * @author starBlues
  * @since 3.0.4
- * @version 3.0.4
+ * @version 3.1.0
  */
 public abstract class DevelopmentMode {
 

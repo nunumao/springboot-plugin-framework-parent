@@ -12,7 +12,7 @@ import java.util.List;
  * 空操作的 PluginOperator
  *
  * @author starBlues
- * @version 3.0.4
+ * @version 3.1.0
  * @since 3.0.4
  */
 public class EmptyPluginOperator implements PluginOperator{

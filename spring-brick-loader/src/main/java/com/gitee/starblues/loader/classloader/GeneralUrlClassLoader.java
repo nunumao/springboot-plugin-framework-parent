@@ -37,7 +37,7 @@ import java.util.List;
  *
  * @author starBlues
  * @since 3.0.4
- * @version 3.0.4
+ * @version 3.1.0
  */
 public class GeneralUrlClassLoader extends URLClassLoader implements ResourceLoaderFactory {
 
@@ -77,6 +77,11 @@ public class GeneralUrlClassLoader extends URLClassLoader implements ResourceLoa
     @Override
     public void addResource(URL url) throws Exception {
         super.addURL(url);
+    }
+
+    @Override
+    public void addResource(Resource resource) throws Exception {
+        addResource(resource.getUrl());
     }
 
     @Override
