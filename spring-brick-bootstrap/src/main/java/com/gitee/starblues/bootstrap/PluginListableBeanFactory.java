@@ -34,6 +34,9 @@ import org.springframework.beans.factory.config.DependencyDescriptor;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.lang.Nullable;
 
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -138,12 +141,46 @@ public class PluginListableBeanFactory extends DefaultListableBeanFactory {
         try {
             dependencyObj = applicationContext.resolveDependency(requestingBeanName,
                     descriptor.getDependencyType());
+            if(dependencyObj != null) {
+                Class<?>[] interfaces = dependencyObj.getClass().getSuperclass().getInterfaces();
+                if(interfaces == null || interfaces.length==0){
+                    interfaces = dependencyObj.getClass().getInterfaces();
+                }
+                if(interfaces == null || interfaces.length==0){
+                    return dependencyObj;
+                }
+                ClassLoader curClassLoader = Thread.currentThread().getContextClassLoader();
+                MainProxyInvocationHandler proxyInvocationHandler = new MainProxyInvocationHandler(dependencyObj,curClassLoader);
+                dependencyObj = Proxy.newProxyInstance(ClassLoader.getSystemClassLoader(), interfaces, proxyInvocationHandler);
+            }
         } catch (Exception e){
             return null;
         }
         return dependencyObj;
     }
 
+    /**
+     * 主类方法增加classloader重置拦截
+     */
+    private class MainProxyInvocationHandler implements InvocationHandler {
+        private final ClassLoader curClassLoader;
+        private final Object target;
+        private MainProxyInvocationHandler(Object target,ClassLoader curClassLoader){
+            this.target = target;
+            this.curClassLoader = curClassLoader;
+        }
+        @Override
+        public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+            Thread thread = Thread.currentThread();
+            try{
+                thread.setContextClassLoader(target.getClass().getClassLoader());
+                return method.invoke(target, args);
+            }
+            finally {
+                thread.setContextClassLoader(this.curClassLoader);
+            }
+        }
+    }
     private void destroyAll(){
         ReflectionUtils.findField(this.getClass(), field -> {
             field.setAccessible(true);
@@ -156,7 +193,6 @@ public class PluginListableBeanFactory extends DefaultListableBeanFactory {
             return false;
         });
     }
-
 
     private class PluginObjectProviderWrapper implements ObjectProvider<Object> {
 
