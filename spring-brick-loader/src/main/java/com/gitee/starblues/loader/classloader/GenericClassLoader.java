@@ -28,7 +28,6 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.Path;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * 基本的 ClassLoader
@@ -43,7 +42,6 @@ public class GenericClassLoader extends URLClassLoader implements ResourceLoader
     protected final ResourceLoaderFactory resourceLoaderFactory;
 
     private final ResourceLoaderFactory classLoaderTranslator;
-    private final Map<String, Class<?>> pluginClassCache = new ConcurrentHashMap<>();
 
     public GenericClassLoader(String name, ResourceLoaderFactory resourceLoaderFactory) {
         this(name, null, resourceLoaderFactory);
@@ -79,6 +77,11 @@ public class GenericClassLoader extends URLClassLoader implements ResourceLoader
     @Override
     public void addResource(URL url) throws Exception {
         resourceLoaderFactory.addResource(url);
+    }
+
+    @Override
+    public void addResource(Resource resource) throws Exception {
+        resourceLoaderFactory.addResource(resource);
     }
 
     @Override
@@ -144,10 +147,6 @@ public class GenericClassLoader extends URLClassLoader implements ResourceLoader
     protected Class<?> findClassFromLocal(String name) {
         Class<?> aClass;
         String formatClassName = formatClassName(name);
-        aClass = pluginClassCache.get(formatClassName);
-        if (aClass != null) {
-            return aClass;
-        }
         Resource resource = resourceLoaderFactory.findFirstResource(formatClassName);
         byte[] bytes = null;
         if(resource != null){
@@ -159,17 +158,16 @@ public class GenericClassLoader extends URLClassLoader implements ResourceLoader
         if(bytes == null || bytes.length == 0){
             return null;
         }
-        aClass = defineClass(name, bytes, 0, bytes.length );
+        aClass = super.defineClass(name, bytes, 0, bytes.length );
         if(aClass == null) {
             return null;
         }
         if (aClass.getPackage() == null) {
             int lastDotIndex = name.lastIndexOf( '.' );
             String packageName = (lastDotIndex >= 0) ? name.substring( 0, lastDotIndex) : "";
-            definePackage(packageName, null, null, null,
+            super.definePackage(packageName, null, null, null,
                     null, null, null, null );
         }
-        pluginClassCache.put(name, aClass);
         return aClass;
     }
 
@@ -178,13 +176,20 @@ public class GenericClassLoader extends URLClassLoader implements ResourceLoader
         if(inputStream == null){
             return null;
         }
+        ByteArrayOutputStream output = new ByteArrayOutputStream();
         try {
-            return IOUtils.read(inputStream);
+            byte[] buffer = new byte[4096];
+            int n = 0;
+            while (-1 != (n = inputStream.read(buffer))) {
+                output.write(buffer, 0, n);
+            }
+            return output.toByteArray();
         } catch (Exception e){
             e.printStackTrace();
             return null;
         } finally {
             IOUtils.closeQuietly(inputStream);
+            IOUtils.closeQuietly(output);
         }
     }
 
@@ -297,10 +302,8 @@ public class GenericClassLoader extends URLClassLoader implements ResourceLoader
 
     @Override
     public void close() throws IOException {
-        synchronized (pluginClassCache){
-            pluginClassCache.clear();
-            IOUtils.closeQuietly(resourceLoaderFactory);
-        }
+        super.close();
+        IOUtils.closeQuietly(resourceLoaderFactory);
     }
 
     private String formatResourceName(String name) {

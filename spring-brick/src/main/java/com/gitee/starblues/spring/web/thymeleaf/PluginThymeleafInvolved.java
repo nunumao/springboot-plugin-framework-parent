@@ -16,6 +16,7 @@
 
 package com.gitee.starblues.spring.web.thymeleaf;
 
+import com.gitee.starblues.core.PluginInsideInfo;
 import com.gitee.starblues.core.descriptor.InsidePluginDescriptor;
 import com.gitee.starblues.core.launcher.plugin.involved.PluginLaunchInvolved;
 import com.gitee.starblues.integration.IntegrationConfiguration;
@@ -36,7 +37,8 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * 插件 Thymeleaf 注册
  * @author starBlues
- * @version 3.0.0
+ * @since 3.0.0
+ * @version 3.1.0
  */
 public class PluginThymeleafInvolved implements PluginLaunchInvolved {
 
@@ -52,7 +54,7 @@ public class PluginThymeleafInvolved implements PluginLaunchInvolved {
     }
 
     @Override
-    public void after(InsidePluginDescriptor descriptor, ClassLoader classLoader, SpringPluginHook pluginHook) throws Exception {
+    public void after(PluginInsideInfo pluginInsideInfo, ClassLoader classLoader, SpringPluginHook pluginHook) throws Exception {
         if(templateResolvers == null){
             return;
         }
@@ -93,14 +95,15 @@ public class PluginThymeleafInvolved implements PluginLaunchInvolved {
         }
         resolver.setCheckExistence(true);
         templateResolvers.add(resolver);
+        InsidePluginDescriptor descriptor = pluginInsideInfo.getPluginDescriptor();
         if(!pluginTemplateResolver.containsKey(descriptor.getPluginId())){
             pluginTemplateResolver.put(descriptor.getPluginId(), resolver);
         }
     }
 
     @Override
-    public void close(InsidePluginDescriptor descriptor, ClassLoader classLoader) throws Exception {
-        pluginTemplateResolver.remove(descriptor.getPluginId());
+    public void close(PluginInsideInfo pluginInsideInfo, ClassLoader classLoader) throws Exception {
+        pluginTemplateResolver.remove(pluginInsideInfo.getPluginId());
     }
 
     private SpringTemplateEngine getSpringTemplateEngine(GenericApplicationContext context){

@@ -27,7 +27,7 @@ import org.aspectj.lang.annotation.Pointcut;
  *
  * @author starBlues
  * @since 3.0.4
- * @version 3.0.4
+ * @version 3.1.0
  */
 @Aspect
 public class CoexistResolveClassLoaderAspect {

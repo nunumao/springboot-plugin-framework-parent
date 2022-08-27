@@ -20,7 +20,7 @@ package com.gitee.starblues.spring;
  * 自定义ApplicationContext
  * @author starBlues
  * @since 3.0.0
- * @version 3.0.4
+ * @version 3.1.0
  */
 public interface ApplicationContext extends AutoCloseable {
 

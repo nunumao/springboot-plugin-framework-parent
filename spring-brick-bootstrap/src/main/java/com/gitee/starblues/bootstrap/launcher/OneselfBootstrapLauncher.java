@@ -16,7 +16,7 @@ import org.springframework.boot.SpringApplication;
  * 插件自主启动配置
  *
  * @author starBlues
- * @version 3.0.4
+ * @version 3.1.0
  * @since 3.0.4
  */
 @AllArgsConstructor

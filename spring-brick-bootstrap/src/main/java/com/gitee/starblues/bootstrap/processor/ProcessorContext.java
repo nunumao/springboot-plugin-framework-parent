@@ -18,6 +18,7 @@ package com.gitee.starblues.bootstrap.processor;
 
 
 import com.gitee.starblues.bootstrap.SpringPluginBootstrap;
+import com.gitee.starblues.core.PluginInfo;
 import com.gitee.starblues.core.descriptor.InsidePluginDescriptor;
 import com.gitee.starblues.core.launcher.plugin.PluginInteractive;
 import com.gitee.starblues.core.launcher.plugin.RegistryInfo;
@@ -53,6 +54,12 @@ public interface ProcessorContext extends RegistryInfo {
      * @return PluginDescriptor
      */
     InsidePluginDescriptor getPluginDescriptor();
+
+    /**
+     * 得到插件信息 PluginInfo
+     * @return PluginInfo
+     */
+    PluginInfo getPluginInfo();
 
     /**
      * 得到启动的class类

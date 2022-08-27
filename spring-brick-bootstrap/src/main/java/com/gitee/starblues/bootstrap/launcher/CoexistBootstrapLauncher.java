@@ -36,7 +36,7 @@ import org.springframework.core.env.ConfigurableEnvironment;
  *
  * @author starBlues
  * @since 3.0.4
- * @version 3.0.4
+ * @version 3.1.0
  * @see com.gitee.starblues.loader.DevelopmentMode#COEXIST
  */
 @AllArgsConstructor

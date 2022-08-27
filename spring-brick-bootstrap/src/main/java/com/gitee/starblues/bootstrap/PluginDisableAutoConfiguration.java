@@ -29,7 +29,7 @@ import java.util.*;
  * 插件禁用的 AutoConfiguration
  *
  * @author starBlues
- * @version 3.0.4
+ * @version 3.1.0
  * @since 3.0.3
  */
 public class PluginDisableAutoConfiguration implements AutoConfigurationImportFilter {

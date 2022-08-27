@@ -40,7 +40,7 @@ import java.util.Set;
  * 插件资源加载工厂代理
  *
  * @author starBlues
- * @version 3.0.4
+ * @version 3.1.0
  * @since 13.0.4
  */
 @Slf4j
@@ -143,6 +143,11 @@ public class PluginResourceLoaderFactoryProxy implements PluginResourceLoaderFac
     @Override
     public void addResource(URL url) throws Exception {
         target.addResource(url);
+    }
+
+    @Override
+    public void addResource(Resource resource) throws Exception {
+        target.addResource(resource);
     }
 
     @Override

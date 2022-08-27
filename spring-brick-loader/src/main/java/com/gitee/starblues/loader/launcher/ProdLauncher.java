@@ -40,7 +40,7 @@ import static com.gitee.starblues.loader.LoaderConstant.*;
  *
  * @author starBlues
  * @since 3.0.4
- * @version 3.0.4
+ * @version 3.1.0
  */
 public class ProdLauncher implements Launcher<ClassLoader>{
 

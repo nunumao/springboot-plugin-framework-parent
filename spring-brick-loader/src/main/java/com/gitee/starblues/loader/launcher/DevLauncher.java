@@ -26,7 +26,7 @@ import lombok.AllArgsConstructor;
  *
  * @author starBlues
  * @since 3.0.4
- * @version 3.0.4
+ * @version 3.1.0
  */
 @AllArgsConstructor
 public class DevLauncher implements Launcher<ClassLoader>{

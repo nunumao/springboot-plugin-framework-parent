@@ -4,7 +4,7 @@
     <name>Spring Boot Plugin Maven Packager</name>
     <groupId>com.gitee.starblues</groupId>
     <artifactId>spring-brick-maven-packager</artifactId>
-    <version>3.0.4</version>
+    <version>3.1.0</version>
     <goalPrefix>spring-brick-packager</goalPrefix>
     <isolatedRealm>false</isolatedRealm>
     <inheritedByDefault>true</inheritedByDefault>

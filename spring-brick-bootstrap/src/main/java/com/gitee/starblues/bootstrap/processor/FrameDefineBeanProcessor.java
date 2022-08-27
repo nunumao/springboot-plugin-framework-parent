@@ -36,6 +36,7 @@ public class FrameDefineBeanProcessor implements SpringPluginProcessor {
         InsidePluginDescriptor pluginDescriptor = context.getPluginDescriptor();
         ConfigurableListableBeanFactory beanFactory = applicationContext.getBeanFactory();
         beanFactory.registerSingleton("pluginDescriptor", pluginDescriptor.toPluginDescriptor());
+        beanFactory.registerSingleton("pluginInfo", context.getPluginInfo());
         beanFactory.registerSingleton("mainApplicationContext", context.getMainApplicationContext());
     }
 

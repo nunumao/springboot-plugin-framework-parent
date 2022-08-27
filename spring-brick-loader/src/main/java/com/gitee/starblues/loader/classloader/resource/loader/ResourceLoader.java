@@ -34,6 +34,7 @@ public interface ResourceLoader extends AutoCloseable{
      */
     URL getBaseUrl();
 
+
     /**
      * 装载资源到ResourceStorage
      * @param resourceStorage 资源存储

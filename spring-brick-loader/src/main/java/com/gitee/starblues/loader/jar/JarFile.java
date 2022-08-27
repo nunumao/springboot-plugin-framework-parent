@@ -1,11 +1,12 @@
-/**
- * Copyright [2019-2022] [starBlues]
+/*
+ * Copyright 2012-2021 the original author or authors.
+ * Copy from spring-boot-loader
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *        http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -37,9 +38,18 @@ import java.util.stream.StreamSupport;
 import java.util.zip.ZipEntry;
 
 /**
- * copy from spring-boot-loader
- * @author starBlues
- * @version 3.0.0
+ * Extended variant of {@link java.util.jar.JarFile} that behaves in the same way but
+ * offers the following additional functionality.
+ * <ul>
+ * <li>A nested {@link JarFile} can be {@link #getNestedJarFile(ZipEntry) obtained} based
+ * on any directory entry.</li>
+ * <li>A nested {@link JarFile} can be {@link #getNestedJarFile(ZipEntry) obtained} for
+ * embedded JAR files (as long as their entry is not compressed).</li>
+ * </ul>
+ *
+ * @author Phillip Webb
+ * @author Andy Wilkinson
+ * @since 1.0.0
  */
 public class JarFile extends AbstractJarFile implements Iterable<java.util.jar.JarEntry> {
 

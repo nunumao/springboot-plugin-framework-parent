@@ -96,20 +96,30 @@ public class DefaultResourceLoaderFactory implements ResourceLoaderFactory{
     }
 
     @Override
-    public void addResource(ResourceLoader resourceLoader) throws Exception {
+    public void addResource(Resource resource) throws Exception {
+        SameRootResourceStorage resourceStorage = resourceLoaderMap.get(resource.getBaseUrl());
+        if (resourceStorage == null) {
+            resourceStorage = ResourceLoaderFactoryGetter.getResourceStorage(
+                    classLoaderName,
+                    resource.getBaseUrl());
+            resourceLoaderMap.put(resource.getBaseUrl(), resourceStorage);
+        }
+        resourceStorage.add(resource.getName(), resource.getUrl(), resource::getBytes);
+    }
+
+    @Override
+    public synchronized void addResource(ResourceLoader resourceLoader) throws Exception {
         if(resourceLoader == null){
             return;
         }
-        if (resourceLoaderMap.containsKey(resourceLoader.getBaseUrl())) {
-            return;
-        }
-        SameRootResourceStorage resourceStorage = ResourceLoaderFactoryGetter.getResourceStorage(
-                classLoaderName,
-                resourceLoader.getBaseUrl());
-        resourceLoader.load(resourceStorage);
-        if(!resourceStorage.isEmpty()){
+        SameRootResourceStorage resourceStorage = resourceLoaderMap.get(resourceLoader.getBaseUrl());
+        if (resourceStorage == null) {
+            resourceStorage = ResourceLoaderFactoryGetter.getResourceStorage(
+                    classLoaderName,
+                    resourceLoader.getBaseUrl());
             resourceLoaderMap.put(resourceLoader.getBaseUrl(), resourceStorage);
         }
+        resourceLoader.load(resourceStorage);
     }
 
     @Override
