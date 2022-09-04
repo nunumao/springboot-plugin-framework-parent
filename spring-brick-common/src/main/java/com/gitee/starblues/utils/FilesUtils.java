@@ -26,7 +26,8 @@ import java.io.IOException;
  * 文件工具类
  *
  * @author starBlues
- * @version 3.0.2
+ * @since 3.0.0
+ * @version 3.1.0
  */
 public class FilesUtils {
 
@@ -62,6 +63,7 @@ public class FilesUtils {
      *
      * @param paths 拼接的路径
      * @return 拼接的路径
+     * @since 3.0.0
      */
     public static String joiningFilePath(String ...paths) {
         if (paths == null || paths.length == 0) {
@@ -103,6 +105,7 @@ public class FilesUtils {
      *
      * @param paths 拼接的路径
      * @return 拼接的路径
+     * @since 3.1.0
      */
     public static String joiningZipPath(String ...paths){
         if(paths == null || paths.length == 0){

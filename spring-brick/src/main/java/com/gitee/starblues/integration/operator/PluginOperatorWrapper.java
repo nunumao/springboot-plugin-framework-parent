@@ -31,7 +31,8 @@ import java.util.List;
 /**
  * 插件操作包装者
  * @author starBlues
- * @version 3.0.0
+ * @since 3.0.0
+ * @version 3.1.0
  */
 public class PluginOperatorWrapper implements PluginOperator{
 

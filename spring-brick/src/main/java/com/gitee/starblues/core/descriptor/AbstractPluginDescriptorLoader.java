@@ -48,7 +48,8 @@ import static com.gitee.starblues.utils.PropertiesUtils.getValue;
 /**
  * 抽象的 PluginDescriptorLoader
  * @author starBlues
- * @version 3.0.2
+ * @since 3.0.0
+ * @version 3.1.0
  */
 @Slf4j
 public abstract class AbstractPluginDescriptorLoader implements PluginDescriptorLoader{
