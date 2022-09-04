@@ -23,7 +23,9 @@ import com.gitee.starblues.core.descriptor.InsidePluginDescriptor;
 import com.gitee.starblues.loader.classloader.*;
 import com.gitee.starblues.loader.classloader.resource.loader.*;
 import com.gitee.starblues.loader.classloader.resource.storage.ResourceStorage;
+import com.gitee.starblues.utils.FilesUtils;
 import com.gitee.starblues.utils.MsgUtils;
+import com.gitee.starblues.utils.ObjectUtils;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.InputStream;
@@ -92,7 +94,8 @@ public class NestedPluginJarResourceLoader extends AbstractResourceLoader {
         Set<PluginLibInfo> pluginLibInfos = pluginDescriptor.getPluginLibInfo();
         String pluginUnique = MsgUtils.getPluginUnique(pluginDescriptor);
         for (PluginLibInfo pluginLibInfo : pluginLibInfos) {
-            jarEntry = jarFile.getJarEntry(pluginLibInfo.getPath());
+            String entryName = pluginLibInfo.getPath();
+            jarEntry = jarFile.getJarEntry(entryName);
             if(jarEntry == null){
                 log.debug("Not found: " + pluginLibInfo.getPath());
                 continue;

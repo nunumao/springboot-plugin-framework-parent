@@ -16,6 +16,8 @@
 
 package com.gitee.starblues.common;
 
+import java.io.File;
+
 /**
  * 静态常量
  * @author starBlues

@@ -48,7 +48,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * 可引导启动的插件管理者
  * @author starBlues
  * @since 3.0.0
- * @version 3.0.3
+ * @version 3.1.0
  */
 public class PluginLauncherManager extends DefaultPluginManager{
 
@@ -121,6 +121,7 @@ public class PluginLauncherManager extends DefaultPluginManager{
 
     @Override
     protected void stop(PluginInsideInfo pluginInsideInfo, boolean isUninstall) throws Exception {
+        launcherChecker.checkCanStop(pluginInsideInfo);
         String pluginId = pluginInsideInfo.getPluginId();
         RegistryPluginInfo registryPluginInfo = registryInfo.get(pluginId);
         if(registryPluginInfo == null){

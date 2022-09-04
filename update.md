@@ -7,4 +7,8 @@
 5. 【修复[#I5GJO9](https://gitee.com/starblues/springboot-plugin-framework-parent/issues/I5GJO9)】`DefaultPluginManager#install` 异常无法抛出
 6. 【修复】修复插件无法加载其他包依赖中的`mybatis-xml`问题
 7. 【修复】修复插件子启动问题
-8. 【优化】优化依赖资源默认不缓存, 以减少内存
+8. 【修复】修复插件`load`解压异常
+9. 【修复】修复`jar`、`zip`加载依赖时未使用`libDir`配置前缀
+10.【优化】优化插件`parse`后为`parsed`状态
+11.【优化】优化依赖资源默认不缓存, 以减少内存
+

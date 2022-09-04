@@ -20,6 +20,7 @@ import com.gitee.starblues.core.descriptor.InsidePluginDescriptor;
 import com.gitee.starblues.utils.Assert;
 import lombok.Setter;
 
+import java.util.Collections;
 import java.util.Date;
 import java.util.Map;
 import java.util.function.Supplier;
@@ -39,7 +40,7 @@ public class DefaultPluginInsideInfo implements PluginInsideInfo {
     private Date startTime;
     private Date stopTime;
 
-    private Supplier<Map<String, Object>> extensionInfoSupplier;
+    private Supplier<Map<String, Object>> extensionInfoSupplier = Collections::emptyMap;
 
     public DefaultPluginInsideInfo(InsidePluginDescriptor pluginDescriptor) {
         this.pluginId = pluginDescriptor.getPluginId();

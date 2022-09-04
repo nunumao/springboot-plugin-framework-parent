@@ -180,6 +180,7 @@ public class DefaultPluginManager implements PluginManager{
         if(pluginInsideInfo == null){
             throw new PluginException("非法插件包: " + pluginPath);
         }
+        pluginInsideInfo.setPluginState(PluginState.PARSED);
         return pluginInsideInfo.toPluginInfo();
     }
 
@@ -350,7 +351,7 @@ public class DefaultPluginManager implements PluginManager{
         if(ObjectUtils.isEmpty(pluginId)){
             return null;
         }
-        PluginInsideInfo pluginInsideInfo = startedPlugins.get(pluginId);
+        PluginInsideInfo pluginInsideInfo = getPlugin(pluginId);
         if(pluginInsideInfo == null){
             throw new PluginException("没有发现插件: " + pluginId);
         }
@@ -546,7 +547,6 @@ public class DefaultPluginManager implements PluginManager{
         pluginInsideInfo.setPluginState(PluginState.STOPPED);
         stopFinish(pluginInsideInfo);
     }
-
     /**
      * 停止完成操作
      * @param pluginInsideInfo pluginInsideInfo

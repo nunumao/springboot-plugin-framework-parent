@@ -51,7 +51,12 @@ public enum PluginState {
     /**
      * 停止失败状态
      */
-    STOPPED_FAILURE("STOPPED_FAILURE");
+    STOPPED_FAILURE("STOPPED_FAILURE"),
+
+    /**
+     * 被解析状态. 仅仅用于解析插件后被展示的状态
+     */
+    PARSED("PARSED");
 
 
     private final String status;
