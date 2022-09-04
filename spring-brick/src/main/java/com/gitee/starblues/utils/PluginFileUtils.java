@@ -17,7 +17,9 @@
 package com.gitee.starblues.utils;
 
 
+import com.gitee.starblues.common.ManifestKey;
 import com.gitee.starblues.common.PackageStructure;
+import com.gitee.starblues.common.PackageType;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 
@@ -32,6 +34,7 @@ import java.nio.file.Paths;
 import java.security.MessageDigest;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.Objects;
 import java.util.jar.Attributes;
 import java.util.jar.Manifest;
 import java.util.zip.ZipEntry;
@@ -41,7 +44,8 @@ import java.util.zip.ZipFile;
  * 插件文件工具类
  *
  * @author starBlues
- * @version 3.0.0
+ * @since 3.0.0
+ * @version 3.1.0
  */
 public final class PluginFileUtils {
 
@@ -187,7 +191,9 @@ public final class PluginFileUtils {
         }
         File targetDirFile = new File(targetDir);
         if(!targetDirFile.exists()){
-            targetDirFile.mkdirs();
+            if(!targetDirFile.mkdirs()){
+                throw new IOException("创建目录异常: " + targetDir);
+            }
         }
         try (ZipFile zip = new ZipFile(zipFile, Charset.forName(PackageStructure.CHARSET_NAME))) {
             Enumeration<? extends ZipEntry> zipEnumeration = zip.entries();
@@ -201,23 +207,34 @@ public final class PluginFileUtils {
                 if (zipEntry.isDirectory()) {
                     FileUtils.forceMkdir(new File(currentTargetPath));
                     continue;
+                } else {
+                    FilesUtils.createFile(currentTargetPath);
                 }
-                InputStream in = null;
-                FileOutputStream out = null;
-                try {
-                    in = zip.getInputStream(zipEntry);
-                    out = new FileOutputStream(currentTargetPath);
-                    IOUtils.copy(in, out);
-                } finally {
-                    if (in != null) {
-                        IOUtils.closeQuietly(in);
-                    }
-                    if (out != null) {
-                        IOUtils.closeQuietly(out);
+                try (InputStream in = zip.getInputStream(zipEntry);
+                     FileOutputStream out = new FileOutputStream(currentTargetPath)){
+                    if(PackageStructure.PROD_MANIFEST_PATH.equals(zipEntryName)){
+                        // 如果为 Manifest 文件, 则将打包类型切换为 xx-outer
+                        resolveDecompressPluginType(in, out);
+                    } else {
+                        IOUtils.copy(in, out);
                     }
                 }
             }
         }
+    }
+
+
+    private static void resolveDecompressPluginType(InputStream inputStream, OutputStream outputStream) throws IOException{
+        Manifest manifest = new Manifest(inputStream);
+        Attributes mainAttributes = manifest.getMainAttributes();
+        String value = mainAttributes.getValue(ManifestKey.PLUGIN_PACKAGE_TYPE);
+        if(Objects.equals(value, PackageType.MAIN_PACKAGE_TYPE_JAR)){
+            value = PackageType.PLUGIN_PACKAGE_TYPE_DIR;
+        } else if(Objects.equals(value, PackageType.PLUGIN_PACKAGE_TYPE_ZIP)){
+            value = PackageType.PLUGIN_PACKAGE_TYPE_DIR;
+        }
+        mainAttributes.putValue(ManifestKey.PLUGIN_PACKAGE_TYPE, value);
+        manifest.write(outputStream);
     }
 
 }

@@ -17,6 +17,7 @@
 package com.gitee.starblues.utils;
 
 import com.gitee.starblues.common.Constants;
+import com.gitee.starblues.common.PackageStructure;
 
 import java.io.File;
 import java.io.IOException;
@@ -25,7 +26,8 @@ import java.io.IOException;
  * 文件工具类
  *
  * @author starBlues
- * @version 3.0.2
+ * @since 3.0.0
+ * @version 3.1.0
  */
 public class FilesUtils {
 
@@ -43,27 +45,49 @@ public class FilesUtils {
         return null;
     }
 
+    /**
+     * 是否存在文件
+     * @param path 文件路径
+     * @return boolean
+     */
+    public static boolean existFile(String path){
+        if(ObjectUtils.isEmpty(path)){
+            return false;
+        }
+        return new File(path).exists();
+    }
+
 
     /**
      * 拼接file路径
      *
      * @param paths 拼接的路径
      * @return 拼接的路径
+     * @since 3.0.0
      */
-    public static String joiningFilePath(String ...paths){
-        if(paths == null || paths.length == 0){
+    public static String joiningFilePath(String ...paths) {
+        if (paths == null || paths.length == 0) {
             return "";
         }
         StringBuilder stringBuilder = new StringBuilder();
         int length = paths.length;
         for (int i = 0; i < length; i++) {
             String path = paths[i];
-            if(ObjectUtils.isEmpty(path)) {
+            if (ObjectUtils.isEmpty(path)) {
                 continue;
             }
-            if(i > 0){
-                if(path.startsWith(File.separator) || path.startsWith("/") ||
-                        path.startsWith("\\") || path.startsWith("//")){
+            if (i < length - 1) {
+                if (path.endsWith("/")) {
+                    path = path.replace("/", "");
+                } else if (path.endsWith("\\")) {
+                    path = path.replace("\\", "");
+                } else if (path.endsWith("//")) {
+                    path = path.replace("//", "");
+                }
+            }
+            if (i > 0) {
+                if (path.startsWith(File.separator) || path.startsWith("/") ||
+                        path.startsWith("\\") || path.startsWith("//")) {
                     stringBuilder.append(path);
                 } else {
                     stringBuilder.append(File.separator).append(path);
@@ -76,9 +100,53 @@ public class FilesUtils {
         return stringBuilder.toString();
     }
 
+    /**
+     * 拼接 zip /jar 路径
+     *
+     * @param paths 拼接的路径
+     * @return 拼接的路径
+     * @since 3.1.0
+     */
+    public static String joiningZipPath(String ...paths){
+        if(paths == null || paths.length == 0){
+            return "";
+        }
+        StringBuilder stringBuilder = new StringBuilder();
+        int length = paths.length;
+        for (int i = 0; i < length; i++) {
+            String path = paths[i];
+            if(ObjectUtils.isEmpty(path)) {
+                continue;
+            }
+            if(i < length - 1){
+                if(path.endsWith("/")){
+                    path = path.replace("/", "");
+                } else if(path.endsWith("\\")){
+                    path = path.replace("\\", "");
+                } else if(path.endsWith("//")){
+                    path = path.replace("//", "");
+                }
+            }
+            if(i > 0){
+                if(path.startsWith(PackageStructure.SEPARATOR)){
+                    stringBuilder.append(path);
+                } else {
+                    stringBuilder.append(PackageStructure.SEPARATOR).append(path);
+                }
+            } else {
+                stringBuilder.append(path);
+            }
+        }
+
+        return stringBuilder.toString();
+    }
+
     public static File createFile(String path) throws IOException {
         try {
             File file = new File(path);
+            if(file.exists()){
+                return file;
+            }
             File parentFile = file.getParentFile();
             if(!parentFile.exists()){
                 if(!parentFile.mkdirs()){
