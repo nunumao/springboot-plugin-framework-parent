@@ -90,11 +90,19 @@ public class ProdPackagePluginDescriptorLoader extends AbstractPluginDescriptorL
     }
 
     @Override
-    protected String getLibPath(DefaultInsidePluginDescriptor descriptor, String index) {
+    protected String getLibPath(DefaultInsidePluginDescriptor descriptor, String configPluginLibDir, String index) {
         if(PluginType.isNestedPackage(descriptor.getType())){
-            return index;
+            String pluginLibDir = descriptor.getPluginLibDir();
+            if(ObjectUtils.isEmpty(pluginLibDir)){
+                return index;
+            }
+            if(index.startsWith(configPluginLibDir)){
+                // 兼容解决旧版本中 jar/zip 包中, 依赖前缀携带 配置的 lib 路径
+                return index;
+            }
+            return FilesUtils.joiningZipPath(pluginLibDir, index);
         } else {
-            return super.getLibPath(descriptor, index);
+            return super.getLibPath(descriptor, configPluginLibDir, index);
         }
     }
 

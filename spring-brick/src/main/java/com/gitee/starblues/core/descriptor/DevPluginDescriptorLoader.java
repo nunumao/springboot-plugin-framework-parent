@@ -58,7 +58,7 @@ public class DevPluginDescriptorLoader extends AbstractPluginDescriptorLoader{
     }
 
     @Override
-    protected String getLibPath(DefaultInsidePluginDescriptor descriptor, String index) {
+    protected String getLibPath(DefaultInsidePluginDescriptor descriptor, String configPluginLibDir, String index) {
         return index;
     }
 

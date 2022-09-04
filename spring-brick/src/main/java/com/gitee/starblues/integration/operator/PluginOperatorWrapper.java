@@ -99,7 +99,7 @@ public class PluginOperatorWrapper implements PluginOperator{
         if(isDisable()){
             return null;
         }
-        return pluginOperator.install(pluginPath, unpackPlugin);
+        return pluginOperator.load(pluginPath, unpackPlugin);
     }
 
     @Override

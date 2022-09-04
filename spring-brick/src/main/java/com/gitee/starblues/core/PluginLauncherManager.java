@@ -121,6 +121,7 @@ public class PluginLauncherManager extends DefaultPluginManager{
 
     @Override
     protected void stop(PluginInsideInfo pluginInsideInfo, boolean isUninstall) throws Exception {
+        launcherChecker.checkCanStop(pluginInsideInfo);
         String pluginId = pluginInsideInfo.getPluginId();
         RegistryPluginInfo registryPluginInfo = registryInfo.get(pluginId);
         if(registryPluginInfo == null){
