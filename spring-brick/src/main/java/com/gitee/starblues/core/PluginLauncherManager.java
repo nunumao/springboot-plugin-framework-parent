@@ -120,7 +120,7 @@ public class PluginLauncherManager extends DefaultPluginManager{
     }
 
     @Override
-    protected void stop(PluginInsideInfo pluginInsideInfo, boolean isUninstall) throws Exception {
+    protected void stop(PluginInsideInfo pluginInsideInfo, PluginCloseType closeType) throws Exception {
         launcherChecker.checkCanStop(pluginInsideInfo);
         String pluginId = pluginInsideInfo.getPluginId();
         RegistryPluginInfo registryPluginInfo = registryInfo.get(pluginId);
@@ -130,10 +130,10 @@ public class PluginLauncherManager extends DefaultPluginManager{
         try {
             SpringPluginHook springPluginHook = registryPluginInfo.getSpringPluginHook();
             springPluginHook.stopVerify();
-            springPluginHook.close(isUninstall);
+            springPluginHook.close(closeType);
             invokeSupperCache.remove(pluginId);
             registryInfo.remove(pluginId);
-            super.stop(pluginInsideInfo, isUninstall);
+            super.stop(pluginInsideInfo, closeType);
         } catch (Exception e){
             if(e instanceof PluginProhibitStopException){
                 // 禁止停止时, 不设置插件状态
