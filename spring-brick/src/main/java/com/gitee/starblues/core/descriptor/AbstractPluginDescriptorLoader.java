@@ -187,27 +187,21 @@ public abstract class AbstractPluginDescriptorLoader implements PluginDescriptor
     }
 
     protected String getLibDir(DefaultInsidePluginDescriptor descriptor, String configPluginLibDir){
-        if(FilesUtils.existFile(configPluginLibDir)){
+        if(FilesUtils.existFile(configPluginLibDir) || !FilesUtils.isRelativePath(configPluginLibDir)){
             return configPluginLibDir;
         }
         // 先检查插件相对目录
-        String resolveRelativePath = null;
-        if(FilesUtils.isRelativePath(configPluginLibDir)){
-            // 先相对当前插件目录
-            resolveRelativePath = FilesUtils.resolveRelativePath(descriptor.getPluginPath(), configPluginLibDir);
-        } else {
-            resolveRelativePath = FilesUtils.joiningFilePath(descriptor.getPluginPath(), configPluginLibDir);
-        }
+        String resolveRelativePath = FilesUtils.resolveRelativePath(descriptor.getPluginPath(), configPluginLibDir);
         if(FilesUtils.existFile(resolveRelativePath)){
             return resolveRelativePath;
         }
         // 再相对插件存放目录
-        resolveRelativePath = FilesUtils.joiningFilePath(new File(descriptor.getPluginPath()).getParent(), configPluginLibDir);
+        resolveRelativePath = FilesUtils.resolveRelativePath(new File(descriptor.getPluginPath()).getParent(), configPluginLibDir);
         if(FilesUtils.existFile(resolveRelativePath)){
             return resolveRelativePath;
         }
         // 最后相对主程序目录
-        resolveRelativePath = FilesUtils.joiningFilePath(new File("").getAbsolutePath(), configPluginLibDir);
+        resolveRelativePath = FilesUtils.resolveRelativePath(new File("").getAbsolutePath(), configPluginLibDir);
         if(FilesUtils.existFile(resolveRelativePath)){
             return resolveRelativePath;
         }

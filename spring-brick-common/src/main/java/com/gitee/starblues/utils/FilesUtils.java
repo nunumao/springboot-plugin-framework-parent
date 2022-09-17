@@ -32,6 +32,22 @@ import java.io.IOException;
 public class FilesUtils {
 
     /**
+     * 正斜杠
+     */
+    public static final String SLASH = "/";
+
+    /**
+     * 双正斜杠
+     */
+    public static final String DOUBLE_SLASH = "//";
+
+    /**
+     * 反斜杠
+     */
+    public static final String  BACKSLASH = "\\";
+
+
+    /**
      * 获取存在的文件
      *
      * @param pathStr 文件路径
@@ -77,17 +93,17 @@ public class FilesUtils {
                 continue;
             }
             if (i < length - 1) {
-                if (path.endsWith("/")) {
-                    path = path.replace("/", "");
-                } else if (path.endsWith("\\")) {
-                    path = path.replace("\\", "");
-                } else if (path.endsWith("//")) {
-                    path = path.replace("//", "");
+                if (path.endsWith(SLASH)) {
+                    path = path.replace(SLASH, "");
+                } else if (path.endsWith(BACKSLASH)) {
+                    path = path.replace(BACKSLASH, "");
+                } else if (path.endsWith(DOUBLE_SLASH)) {
+                    path = path.replace(DOUBLE_SLASH, "");
                 }
             }
             if (i > 0) {
-                if (path.startsWith(File.separator) || path.startsWith("/") ||
-                        path.startsWith("\\") || path.startsWith("//")) {
+                if (path.startsWith(File.separator) || path.startsWith(SLASH) ||
+                        path.startsWith(DOUBLE_SLASH) || path.startsWith(BACKSLASH)) {
                     stringBuilder.append(path);
                 } else {
                     stringBuilder.append(File.separator).append(path);
@@ -119,12 +135,12 @@ public class FilesUtils {
                 continue;
             }
             if(i < length - 1){
-                if(path.endsWith("/")){
-                    path = path.replace("/", "");
-                } else if(path.endsWith("\\")){
-                    path = path.replace("\\", "");
-                } else if(path.endsWith("//")){
-                    path = path.replace("//", "");
+                if(path.endsWith(SLASH)){
+                    path = path.replace(SLASH, "");
+                } else if(path.endsWith(BACKSLASH)){
+                    path = path.replace(BACKSLASH, "");
+                } else if(path.endsWith(DOUBLE_SLASH)){
+                    path = path.replace(DOUBLE_SLASH, "");
                 }
             }
             if(i > 0){
@@ -162,7 +178,6 @@ public class FilesUtils {
         }
     }
 
-
     /**
      * 解决相对路径
      * @param rootPath 根路径
@@ -191,5 +206,6 @@ public class FilesUtils {
         }
         return path.startsWith(Constants.RELATIVE_SIGN);
     }
+
 
 }
