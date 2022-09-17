@@ -85,6 +85,16 @@ public class ProdPackagePluginDescriptorLoader extends AbstractPluginDescriptorL
     protected String getLibDir(DefaultInsidePluginDescriptor descriptor, String configPluginLibDir) {
         if(PluginType.isNestedPackage(descriptor.getType())){
             return descriptor.getPluginLibDir();
+        } else if(PluginType.isOuterPackage(descriptor.getType())){
+            String pluginLibDir = descriptor.getPluginLibDir();
+            if(ObjectUtils.isEmpty(pluginLibDir)){
+                return super.getLibDir(descriptor, configPluginLibDir);
+            }
+            if(FilesUtils.isRelativePath(pluginLibDir)){
+                return super.getLibDir(descriptor, configPluginLibDir);
+            } else {
+                return descriptor.getPluginLibDir();
+            }
         } else {
             return super.getLibDir(descriptor, configPluginLibDir);
         }
