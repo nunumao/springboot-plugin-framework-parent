@@ -16,6 +16,7 @@
 
 package com.gitee.starblues.bootstrap.realize;
 
+import com.gitee.starblues.core.PluginCloseType;
 import com.gitee.starblues.core.PluginInfo;
 import com.gitee.starblues.core.descriptor.PluginDescriptor;
 import org.springframework.context.support.GenericApplicationContext;
@@ -40,11 +41,11 @@ public interface PluginCloseListener {
      * 关闭时调用
      * @param applicationContext 当前插件的ApplicationContext
      * @param pluginInfo 当前插件信息
-     * @param isUninstall 是否为卸载关闭。true: 为卸载, false 不为卸载
+     * @param closeType 停止类型
      * @since 3.1.0
      */
     default void close(GenericApplicationContext applicationContext,
-                       PluginInfo pluginInfo, boolean isUninstall){
+                       PluginInfo pluginInfo, PluginCloseType closeType){
         close(pluginInfo != null ? pluginInfo.getPluginDescriptor() : null);
     }
 
