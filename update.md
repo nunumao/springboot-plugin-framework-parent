@@ -1,4 +1,4 @@
-1. 【新增】增加主包MAINIFEST中title和version定义, 标准jar包中包含`Implementation-Version`和`Implementation-Title`属性
+1. 【新增】增加主包`MANIFEST.MF`中`title`和`version`定义, 标准jar包中包含`Implementation-Title`和`Implementation-Version`属性
 2. 【新增】新增根据个人需求选择开发模式，支持隔离式开发模式(目前已有的)、共享式开发模式
 3. 【新增】新增可自主实现扩展插件信息
 4. 【新增】新增插件停止类型

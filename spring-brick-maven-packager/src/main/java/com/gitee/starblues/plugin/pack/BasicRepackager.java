@@ -160,6 +160,10 @@ public class BasicRepackager implements Repackager{
         attributes.putValue(ManifestKey.MANIFEST_VERSION, ManifestKey.MANIFEST_VERSION_1_0);
         attributes.putValue(ManifestKey.PLUGIN_META_PATH, getPluginMetaInfoPath());
         attributes.putValue(ManifestKey.PLUGIN_PACKAGE_TYPE, PackageType.PLUGIN_PACKAGE_TYPE_DEV);
+        // 增加jar包title和version属性
+        MavenProject mavenProject = this.repackageMojo.getProject();
+        attributes.putValue(ManifestKey.IMPLEMENTATION_TITLE,mavenProject.getArtifactId());
+        attributes.putValue(ManifestKey.IMPLEMENTATION_VERSION,mavenProject.getVersion());
         return manifest;
     }
 
