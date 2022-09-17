@@ -23,6 +23,7 @@ import com.gitee.starblues.bootstrap.realize.PluginCloseListener;
 import com.gitee.starblues.bootstrap.realize.StopValidator;
 import com.gitee.starblues.bootstrap.utils.DestroyUtils;
 import com.gitee.starblues.bootstrap.utils.SpringBeanUtils;
+import com.gitee.starblues.core.PluginCloseType;
 import com.gitee.starblues.core.exception.PluginProhibitStopException;
 import com.gitee.starblues.spring.ApplicationContext;
 import com.gitee.starblues.spring.ApplicationContextProxy;
@@ -77,10 +78,10 @@ public class DefaultSpringPluginHook implements SpringPluginHook {
 
 
     @Override
-    public void close(boolean isUninstall) throws Exception{
+    public void close(PluginCloseType closeType) throws Exception{
         try {
             GenericApplicationContext applicationContext = processorContext.getApplicationContext();
-            callPluginCloseListener(applicationContext, isUninstall);
+            callPluginCloseListener(applicationContext, closeType);
             pluginProcessor.close(processorContext);
             applicationContext.close();
             processorContext.clearRegistryInfo();
@@ -107,7 +108,7 @@ public class DefaultSpringPluginHook implements SpringPluginHook {
         return processorContext.getRegistryInfo(PluginThymeleafProcessor.CONFIG_KEY);
     }
 
-    private void callPluginCloseListener(GenericApplicationContext applicationContext, boolean isUninstall){
+    private void callPluginCloseListener(GenericApplicationContext applicationContext, PluginCloseType closeType){
         List<PluginCloseListener> pluginCloseListeners = SpringBeanUtils.getBeans(
                 applicationContext, PluginCloseListener.class);
         if(pluginCloseListeners.isEmpty()){
@@ -115,7 +116,7 @@ public class DefaultSpringPluginHook implements SpringPluginHook {
         }
         for (PluginCloseListener pluginCloseListener : pluginCloseListeners) {
             try {
-                pluginCloseListener.close(applicationContext, processorContext.getPluginInfo(), isUninstall);
+                pluginCloseListener.close(applicationContext, processorContext.getPluginInfo(), closeType);
             } catch (Exception e){
                 e.printStackTrace();
             }

@@ -16,8 +16,8 @@
 
 package com.gitee.starblues.core.launcher.plugin;
 
+import com.gitee.starblues.core.PluginCloseType;
 import com.gitee.starblues.core.PluginInsideInfo;
-import com.gitee.starblues.core.descriptor.InsidePluginDescriptor;
 import com.gitee.starblues.core.exception.PluginProhibitStopException;
 import com.gitee.starblues.core.launcher.plugin.involved.PluginLaunchInvolved;
 import com.gitee.starblues.spring.ApplicationContext;
@@ -30,7 +30,8 @@ import lombok.extern.slf4j.Slf4j;
 /**
  * SpringPluginHook-Wrapper
  * @author starBlues
- * @version 3.0.0
+ * @since 3.0.0
+ * @version 3.1.0
  */
 @Slf4j
 public class SpringPluginHookWrapper implements SpringPluginHook {
@@ -70,14 +71,14 @@ public class SpringPluginHookWrapper implements SpringPluginHook {
     }
 
     @Override
-    public void close(boolean isUninstall) throws Exception {
+    public void close(PluginCloseType closeType) throws Exception {
         try {
             pluginLaunchInvolved.close(pluginInsideInfo, classLoader);
         } catch (Exception e){
             log.error("关闭插件异常: {}", e.getMessage(), e);
         }
         try {
-            target.close(isUninstall);
+            target.close(closeType);
         } finally {
             ResourceUtils.closeQuietly(classLoader);
         }

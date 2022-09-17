@@ -17,13 +17,15 @@
 package com.gitee.starblues.spring;
 
 
+import com.gitee.starblues.core.PluginCloseType;
 import com.gitee.starblues.core.exception.PluginProhibitStopException;
 import com.gitee.starblues.spring.web.thymeleaf.ThymeleafConfig;
 
 /**
  * 插件把柄接口
  * @author starBlues
- * @version 3.0.0
+ * @since 3.0.0
+ * @version 3.1.0
  */
 public interface SpringPluginHook {
 
@@ -52,11 +54,11 @@ public interface SpringPluginHook {
     ThymeleafConfig getThymeleafConfig();
 
     /**
-     * 卸载调用
-     * @param isUninstall 是否是卸载关闭
+     * 关闭调用
+     * @param closeType 关闭类型
      * @since 3.1.0
      * @throws Exception 关闭异常
      */
-    void close(boolean isUninstall) throws Exception;
+    void close(PluginCloseType closeType) throws Exception;
 
 }
