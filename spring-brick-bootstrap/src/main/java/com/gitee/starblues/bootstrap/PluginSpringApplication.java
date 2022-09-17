@@ -18,7 +18,6 @@ package com.gitee.starblues.bootstrap;
 
 import com.gitee.starblues.bootstrap.processor.ProcessorContext;
 import com.gitee.starblues.bootstrap.processor.SpringPluginProcessor;
-import com.gitee.starblues.spring.ApplicationContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
@@ -34,41 +33,35 @@ import org.springframework.core.io.ResourceLoader;
 /**
  * 插件SpringApplication实现
  * @author starBlues
- * @version 3.0.3
+ * @since 3.0.0
+ * @version 3.1.0
  */
 public class PluginSpringApplication extends SpringApplication {
 
     private final Logger logger = LoggerFactory.getLogger(PluginSpringApplication.class);
 
-    private final ProcessorContext.RunMode runMode;
+    protected final SpringPluginProcessor pluginProcessor;
+    protected final ProcessorContext processorContext;
 
-    private final SpringPluginProcessor pluginProcessor;
-    private final ProcessorContext processorContext;
-
-    private final GenericApplicationContext applicationContext;
-
-    private final DefaultListableBeanFactory beanFactory;
-    private final ResourceLoader resourceLoader;
     private final ConfigurePluginEnvironment configurePluginEnvironment;
+    private final GenericApplicationContext applicationContext;
+    private final ResourceLoader resourceLoader;
+
 
     public PluginSpringApplication(SpringPluginProcessor pluginProcessor,
                                    ProcessorContext processorContext,
                                    Class<?>... primarySources) {
         super(primarySources);
-        this.runMode = processorContext.runMode();
         this.pluginProcessor = pluginProcessor;
         this.processorContext = processorContext;
         this.resourceLoader = processorContext.getResourceLoader();
-        this.beanFactory = new PluginListableBeanFactory(processorContext);
         this.configurePluginEnvironment = new ConfigurePluginEnvironment(processorContext);
         this.applicationContext = getApplicationContext();
         setDefaultPluginConfig();
     }
 
     protected GenericApplicationContext getApplicationContext(){
-        if(runMode == ProcessorContext.RunMode.ONESELF){
-            return (GenericApplicationContext) super.createApplicationContext();
-        }
+        DefaultListableBeanFactory beanFactory = getBeanFactory(processorContext);
         if(processorContext.getMainApplicationContext().isWebEnvironment()){
             return new PluginWebApplicationContext(beanFactory, processorContext);
         } else {
@@ -76,15 +69,17 @@ public class PluginSpringApplication extends SpringApplication {
         }
     }
 
+    protected DefaultListableBeanFactory getBeanFactory(ProcessorContext processorContext){
+        return new PluginListableBeanFactory(processorContext);
+    }
+
     public void setDefaultPluginConfig(){
-        if(runMode == ProcessorContext.RunMode.PLUGIN){
-            setResourceLoader(resourceLoader);
-            setBannerMode(Banner.Mode.OFF);
-            setEnvironment(new StandardEnvironment());
-            setWebApplicationType(WebApplicationType.NONE);
-            setRegisterShutdownHook(false);
-            setLogStartupInfo(false);
-        }
+        setResourceLoader(resourceLoader);
+        setBannerMode(Banner.Mode.OFF);
+        setEnvironment(new StandardEnvironment());
+        setWebApplicationType(WebApplicationType.NONE);
+        setRegisterShutdownHook(false);
+        setLogStartupInfo(false);
     }
 
     @Override

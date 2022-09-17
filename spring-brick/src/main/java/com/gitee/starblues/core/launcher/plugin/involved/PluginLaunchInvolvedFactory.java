@@ -16,6 +16,7 @@
 
 package com.gitee.starblues.core.launcher.plugin.involved;
 
+import com.gitee.starblues.core.PluginInsideInfo;
 import com.gitee.starblues.core.descriptor.InsidePluginDescriptor;
 import com.gitee.starblues.integration.IntegrationConfiguration;
 import com.gitee.starblues.spring.SpringPluginHook;
@@ -32,7 +33,8 @@ import java.util.Map;
 /**
  * 插件启动介入工厂
  * @author starBlues
- * @version 3.0.0
+ * @since 3.0.0
+ * @version 3.1.0
  */
 public class PluginLaunchInvolvedFactory implements PluginLaunchInvolved{
 
@@ -75,24 +77,24 @@ public class PluginLaunchInvolvedFactory implements PluginLaunchInvolved{
     }
 
     @Override
-    public void before(InsidePluginDescriptor descriptor, ClassLoader classLoader) throws Exception {
+    public void before(PluginInsideInfo pluginInsideInfo, ClassLoader classLoader) throws Exception {
         for (PluginLaunchInvolved pluginLaunchInvolved : pluginLaunchInvolvedList) {
-            pluginLaunchInvolved.before(descriptor, classLoader);
+            pluginLaunchInvolved.before(pluginInsideInfo, classLoader);
         }
     }
 
     @Override
-    public void after(InsidePluginDescriptor descriptor, ClassLoader classLoader, SpringPluginHook pluginHook) throws Exception {
+    public void after(PluginInsideInfo pluginInsideInfo, ClassLoader classLoader, SpringPluginHook pluginHook) throws Exception {
         for (PluginLaunchInvolved pluginLaunchInvolved : pluginLaunchInvolvedList) {
-            pluginLaunchInvolved.after(descriptor, classLoader, pluginHook);
+            pluginLaunchInvolved.after(pluginInsideInfo, classLoader, pluginHook);
         }
     }
 
     @Override
-    public void failure(InsidePluginDescriptor descriptor, ClassLoader classLoader, Throwable throwable) throws Exception {
+    public void failure(PluginInsideInfo pluginInsideInfo, ClassLoader classLoader, Throwable throwable) throws Exception {
         for (PluginLaunchInvolved pluginLaunchInvolved : pluginLaunchInvolvedList) {
             try {
-                pluginLaunchInvolved.failure(descriptor, classLoader, throwable);
+                pluginLaunchInvolved.failure(pluginInsideInfo, classLoader, throwable);
             } catch (Exception e){
                 logger.error("[{}] execute failure exception : {}",
                         pluginLaunchInvolved.getClass().getName(), e.getMessage(), e);
@@ -101,10 +103,10 @@ public class PluginLaunchInvolvedFactory implements PluginLaunchInvolved{
     }
 
     @Override
-    public void close(InsidePluginDescriptor descriptor, ClassLoader classLoader) throws Exception {
+    public void close(PluginInsideInfo pluginInsideInfo, ClassLoader classLoader) throws Exception {
         for (PluginLaunchInvolved pluginLaunchInvolved : pluginLaunchInvolvedList) {
             try {
-                pluginLaunchInvolved.close(descriptor, classLoader);
+                pluginLaunchInvolved.close(pluginInsideInfo, classLoader);
             } catch (Exception e){
                 logger.error("[{}] execute close exception : {}",
                         pluginLaunchInvolved.getClass().getName(), e.getMessage(), e);

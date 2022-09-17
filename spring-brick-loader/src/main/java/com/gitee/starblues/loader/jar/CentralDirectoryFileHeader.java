@@ -1,11 +1,12 @@
-/**
- * Copyright [2019-2022] [starBlues]
+/*
+ * Copyright 2012-2021 the original author or authors.
+ * Copy from spring-boot-loader
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *        http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -24,9 +25,12 @@ import java.time.temporal.ChronoUnit;
 import java.time.temporal.ValueRange;
 
 /**
- * copy from spring-boot-loader
- * @author starBlues
- * @version 3.0.0
+ * A ZIP File "Central directory file header record" (CDFH).
+ *
+ * @author Phillip Webb
+ * @author Andy Wilkinson
+ * @author Dmytro Nosan
+ * @see <a href="https://en.wikipedia.org/wiki/Zip_%28file_format%29">Zip File Format</a>
  */
 public class CentralDirectoryFileHeader implements FileHeader {
 

@@ -16,7 +16,6 @@
 
 package com.gitee.starblues.loader.classloader.resource.loader;
 
-
 import com.gitee.starblues.loader.classloader.resource.storage.ResourceStorage;
 import com.gitee.starblues.loader.utils.IOUtils;
 
@@ -66,6 +65,7 @@ public abstract class AbstractResourceLoader implements ResourceLoader{
 
     /**
      * 子类初始化实现
+     * @param resourceStorage 资源存储
      * @throws Exception 初始异常
      */
     protected abstract void loadOfChild(ResourceStorage resourceStorage) throws Exception;

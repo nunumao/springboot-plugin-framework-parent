@@ -44,7 +44,7 @@ import static org.powermock.api.mockito.PowerMockito.*;
  * @version 3.0.0
  */
 @RunWith(PowerMockRunner.class)
-public class DefaultPluginLauncherCheckerTest extends TestCase {
+public class DefaultPluginIsolationLauncherCheckerTest extends TestCase {
 
     private DefaultPluginLauncherChecker launcherChecker;
 

@@ -25,13 +25,13 @@ import org.apache.commons.io.FileUtils;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.project.MavenProject;
 
 import java.io.File;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.jar.Attributes;
 import java.util.jar.Manifest;
-import java.util.stream.Stream;
 
 import static com.gitee.starblues.common.ManifestKey.*;
 
@@ -86,7 +86,12 @@ public class JarOuterPackager extends JarNestPackager {
         attributes.putValue(MAIN_CLASS, MAIN_CLASS_VALUE);
         attributes.putValue(MAIN_PACKAGE_TYPE, PackageType.MAIN_PACKAGE_TYPE_JAR_OUTER);
         attributes.putValue(MAIN_LIB_DIR, getLibPath());
-        attributes.putValue(MAIN_LIB_INDEXES, getLibIndexes());
+        attributes.putValue(DEVELOPMENT_MODE, mainConfig.getDevelopmentMode());
+
+        // 增加jar包title和version属性
+        MavenProject mavenProject = this.repackageMojo.getProject();
+        attributes.putValue(IMPLEMENTATION_TITLE, mavenProject.getArtifactId());
+        attributes.putValue(IMPLEMENTATION_VERSION, mavenProject.getVersion());
         return manifest;
     }
 

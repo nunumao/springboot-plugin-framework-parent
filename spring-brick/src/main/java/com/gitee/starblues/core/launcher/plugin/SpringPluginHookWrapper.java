@@ -16,7 +16,8 @@
 
 package com.gitee.starblues.core.launcher.plugin;
 
-import com.gitee.starblues.core.descriptor.InsidePluginDescriptor;
+import com.gitee.starblues.core.PluginCloseType;
+import com.gitee.starblues.core.PluginInsideInfo;
 import com.gitee.starblues.core.exception.PluginProhibitStopException;
 import com.gitee.starblues.core.launcher.plugin.involved.PluginLaunchInvolved;
 import com.gitee.starblues.spring.ApplicationContext;
@@ -24,24 +25,27 @@ import com.gitee.starblues.spring.SpringPluginHook;
 import com.gitee.starblues.spring.WebConfig;
 import com.gitee.starblues.spring.web.thymeleaf.ThymeleafConfig;
 import com.gitee.starblues.utils.ResourceUtils;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * SpringPluginHook-Wrapper
  * @author starBlues
- * @version 3.0.0
+ * @since 3.0.0
+ * @version 3.1.0
  */
+@Slf4j
 public class SpringPluginHookWrapper implements SpringPluginHook {
 
     private final SpringPluginHook target;
-    private final InsidePluginDescriptor descriptor;
+    private final PluginInsideInfo pluginInsideInfo;
     private final PluginLaunchInvolved pluginLaunchInvolved;
     private final ClassLoader classLoader;
 
-    public SpringPluginHookWrapper(SpringPluginHook target, InsidePluginDescriptor descriptor,
+    public SpringPluginHookWrapper(SpringPluginHook target, PluginInsideInfo pluginInsideInfo,
                                    PluginLaunchInvolved pluginLaunchInvolved,
                                    ClassLoader classLoader) {
         this.target = target;
-        this.descriptor = descriptor;
+        this.pluginInsideInfo = pluginInsideInfo;
         this.pluginLaunchInvolved = pluginLaunchInvolved;
         this.classLoader = classLoader;
     }
@@ -67,9 +71,16 @@ public class SpringPluginHookWrapper implements SpringPluginHook {
     }
 
     @Override
-    public void close() throws Exception {
-        pluginLaunchInvolved.close(descriptor, classLoader);
-        ResourceUtils.closeQuietly(target);
-        ResourceUtils.closeQuietly(classLoader);
+    public void close(PluginCloseType closeType) throws Exception {
+        try {
+            pluginLaunchInvolved.close(pluginInsideInfo, classLoader);
+        } catch (Exception e){
+            log.error("关闭插件异常: {}", e.getMessage(), e);
+        }
+        try {
+            target.close(closeType);
+        } finally {
+            ResourceUtils.closeQuietly(classLoader);
+        }
     }
 }

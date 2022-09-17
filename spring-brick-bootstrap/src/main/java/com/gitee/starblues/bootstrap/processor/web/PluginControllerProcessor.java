@@ -81,8 +81,8 @@ public class PluginControllerProcessor implements SpringPluginProcessor {
             return;
         }
         GenericApplicationContext applicationContext = processorContext.getApplicationContext();
-        applicationContext.registerBean("pluginControllerPostProcessor",
-                ControllerPostProcessor.class, ()-> new ControllerPostProcessor(processorContext));
+        applicationContext.getDefaultListableBeanFactory()
+                .addBeanPostProcessor(new ControllerPostProcessor(processorContext));
     }
 
     @Override

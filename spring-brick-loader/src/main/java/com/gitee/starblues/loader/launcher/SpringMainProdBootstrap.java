@@ -17,6 +17,8 @@
 package com.gitee.starblues.loader.launcher;
 
 import com.gitee.starblues.loader.jar.JarFile;
+import com.gitee.starblues.loader.launcher.isolation.IsolationJarOuterLauncher;
+import com.gitee.starblues.loader.launcher.isolation.IsolationFastJarLauncher;
 import com.gitee.starblues.loader.launcher.runner.MethodRunner;
 import com.gitee.starblues.loader.utils.ObjectUtils;
 
@@ -37,52 +39,14 @@ import static com.gitee.starblues.loader.LoaderConstant.*;
  */
 public class SpringMainProdBootstrap {
 
-
     public static void main(String[] args) throws Exception {
         JarFile.registerUrlProtocolHandler();
         new SpringMainProdBootstrap().run(args);
     }
 
     private void run(String[] args) throws Exception{
-        File rootJarFile = getRootJarFile();
-        String startClass = null;
-        String mainPackageType;
-        try (JarFile jarFile = new JarFile(rootJarFile)){
-            Manifest manifest = jarFile.getManifest();
-            IllegalStateException exception = new IllegalStateException("当前启动包非法包!");
-            if(manifest == null || manifest.getMainAttributes() == null){
-                throw exception;
-            }
-            Attributes mainAttributes = manifest.getMainAttributes();
-            startClass = mainAttributes.getValue(START_CLASS);
-            if (ObjectUtils.isEmpty(startClass)) {
-                throw exception;
-            }
-            mainPackageType = mainAttributes.getValue(MAIN_PACKAGE_TYPE);
-        }
-        MethodRunner methodRunner = new MethodRunner(startClass, SpringMainBootstrap.SPRING_BOOTSTRAP_RUN_METHOD, args);
-        Launcher<ClassLoader> launcher;
-        if(Objects.equals(mainPackageType, MAIN_PACKAGE_TYPE_JAR_OUTER)){
-            launcher = new MainJarOuterProgramLauncher(methodRunner, rootJarFile);
-        } else {
-            launcher = new MainJarProgramLauncher(methodRunner, rootJarFile);
-        }
+        Launcher<ClassLoader> launcher = new ProdLauncher();
         launcher.run(args);
-    }
-
-    private File getRootJarFile() throws URISyntaxException {
-        ProtectionDomain protectionDomain = SpringMainBootstrap.class.getProtectionDomain();
-        CodeSource codeSource = protectionDomain.getCodeSource();
-        URI location = (codeSource != null) ? codeSource.getLocation().toURI() : null;
-        String path = (location != null) ? location.getSchemeSpecificPart() : null;
-        if (path == null) {
-            throw new IllegalStateException("Unable to determine code source archive");
-        }
-        File root = new File(path);
-        if (!root.exists()) {
-            throw new IllegalStateException("Unable to determine code source archive from " + root);
-        }
-        return root;
     }
 
 }

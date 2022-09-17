@@ -32,8 +32,6 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class CacheResourceStorage extends DefaultResourceStorage{
 
-    protected final Map<String, Resource> resourceStorage = new ConcurrentHashMap<>();
-
     public CacheResourceStorage(URL baseUrl) {
         super(baseUrl);
     }

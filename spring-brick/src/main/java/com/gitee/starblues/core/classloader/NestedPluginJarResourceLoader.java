@@ -23,8 +23,9 @@ import com.gitee.starblues.core.descriptor.InsidePluginDescriptor;
 import com.gitee.starblues.loader.classloader.*;
 import com.gitee.starblues.loader.classloader.resource.loader.*;
 import com.gitee.starblues.loader.classloader.resource.storage.ResourceStorage;
-import com.gitee.starblues.loader.launcher.ResourceLoaderFactoryGetter;
+import com.gitee.starblues.utils.FilesUtils;
 import com.gitee.starblues.utils.MsgUtils;
+import com.gitee.starblues.utils.ObjectUtils;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.InputStream;
@@ -39,23 +40,28 @@ import java.util.zip.ZipEntry;
 /**
  * 嵌套插件jar加载者
  * @author starBlues
- * @version 3.0.0
+ * @since 3.0.0
+ * @version 3.1.0
  */
 @Slf4j
 public class NestedPluginJarResourceLoader extends AbstractResourceLoader {
 
     private final InsidePluginDescriptor pluginDescriptor;
-    private final GenericClassLoader parentClassLoader;
     private final ResourceLoaderFactory resourceLoaderFactory;
-
+    private final ResourceLoaderFactory parentResourceLoaderFactory;
 
     public NestedPluginJarResourceLoader(InsidePluginDescriptor pluginDescriptor,
-                                         GenericClassLoader parentClassLoader,
                                          ResourceLoaderFactory resourceLoaderFactory) throws Exception {
+        this(pluginDescriptor, resourceLoaderFactory, null);
+    }
+
+    public NestedPluginJarResourceLoader(InsidePluginDescriptor pluginDescriptor,
+                                         ResourceLoaderFactory resourceLoaderFactory,
+                                         ResourceLoaderFactory parentResourceLoaderFactory) throws Exception {
         super(new URL("jar:" + pluginDescriptor.getInsidePluginPath().toUri().toURL() + "!/"));
         this.pluginDescriptor = pluginDescriptor;
-        this.parentClassLoader = parentClassLoader;
         this.resourceLoaderFactory = resourceLoaderFactory;
+        this.parentResourceLoaderFactory = parentResourceLoaderFactory;
     }
 
     @Override
@@ -76,6 +82,7 @@ public class NestedPluginJarResourceLoader extends AbstractResourceLoader {
             }
             String realName = jarEntry.getName().replace(classesPath, "");
             URL url = new URL(baseUrl.toString() + jarEntry.getName());
+            resourceLoaderFactory.addResource(new DefaultResource(realName, baseUrl, url));
             resourceStorage.add(realName, url, ()->{
                 return getClassBytes(realName, jarFile.getInputStream(jarEntry), true);
             });
@@ -87,7 +94,8 @@ public class NestedPluginJarResourceLoader extends AbstractResourceLoader {
         Set<PluginLibInfo> pluginLibInfos = pluginDescriptor.getPluginLibInfo();
         String pluginUnique = MsgUtils.getPluginUnique(pluginDescriptor);
         for (PluginLibInfo pluginLibInfo : pluginLibInfos) {
-            jarEntry = jarFile.getJarEntry(pluginLibInfo.getPath());
+            String entryName = pluginLibInfo.getPath();
+            jarEntry = jarFile.getJarEntry(entryName);
             if(jarEntry == null){
                 log.debug("Not found: " + pluginLibInfo.getPath());
                 continue;
@@ -97,8 +105,8 @@ public class NestedPluginJarResourceLoader extends AbstractResourceLoader {
             }
             InputStream jarFileInputStream = jarFile.getInputStream(jarEntry);
             URL url = new URL(baseUrl.toString() + pluginLibInfo.getPath() + "!/");
-            if(pluginLibInfo.isLoadToMain()){
-                parentClassLoader.addResource(new JarResourceLoader(url, new JarInputStream(jarFileInputStream)));
+            if(parentResourceLoaderFactory != null && pluginLibInfo.isLoadToMain()){
+                parentResourceLoaderFactory.addResource(new JarResourceLoader(url, new JarInputStream(jarFileInputStream)));
                 log.debug("插件[{}]依赖被加载到主程序中: {}", pluginUnique, pluginLibInfo.getPath());
             } else {
                 JarResourceLoader jarResourceLoader = new JarResourceLoader(url, new JarInputStream(jarFileInputStream));
