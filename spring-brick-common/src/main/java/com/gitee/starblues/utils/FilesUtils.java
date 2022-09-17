@@ -189,9 +189,34 @@ public class FilesUtils {
             return relativePath;
         }
         if(isRelativePath(relativePath)){
-            return joiningFilePath(rootPath, relativePath.replaceFirst(Constants.RELATIVE_SIGN, ""));
+            String resolveRelativePath = relativePath.replaceFirst(Constants.RELATIVE_SIGN, "");
+            return joiningFilePath(rootPath, resolveRelativePath);
         } else {
             return relativePath;
+        }
+    }
+
+    /**
+     * 解决存在的相对路径
+     * @param rootPath 根路径
+     * @param path 以 ~ 开头的相对路径或者完整路径
+     * @return File 或者 null(不存在)
+     */
+    public static File resolveExistRelativePathFile(String rootPath, String path){
+        if(ObjectUtils.isEmpty(path)){
+            return null;
+        }
+        if(isRelativePath(path)){
+            String resolveRelativePath = path.replaceFirst(Constants.RELATIVE_SIGN, "");
+            String joiningFilePath = joiningFilePath(rootPath, resolveRelativePath);
+            return getExistFile(joiningFilePath);
+        } else {
+            File existFile = getExistFile(path);
+            if(existFile != null){
+                return existFile;
+            }
+            String joiningFilePath = joiningFilePath(rootPath, path);
+            return getExistFile(joiningFilePath);
         }
     }
 
