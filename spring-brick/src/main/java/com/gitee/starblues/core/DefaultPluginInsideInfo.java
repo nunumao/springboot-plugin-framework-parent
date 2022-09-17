@@ -18,8 +18,12 @@ package com.gitee.starblues.core;
 
 import com.gitee.starblues.core.descriptor.InsidePluginDescriptor;
 import com.gitee.starblues.utils.Assert;
+import lombok.Setter;
 
+import java.util.Collections;
 import java.util.Date;
+import java.util.Map;
+import java.util.function.Supplier;
 
 /**
  * 默认的内部PluginWrapperInside实现
@@ -36,6 +40,8 @@ public class DefaultPluginInsideInfo implements PluginInsideInfo {
     private Date startTime;
     private Date stopTime;
 
+    private Supplier<Map<String, Object>> extensionInfoSupplier = Collections::emptyMap;
+
     public DefaultPluginInsideInfo(InsidePluginDescriptor pluginDescriptor) {
         this.pluginId = pluginDescriptor.getPluginId();
         this.pluginDescriptor = pluginDescriptor;
@@ -50,6 +56,16 @@ public class DefaultPluginInsideInfo implements PluginInsideInfo {
     @Override
     public void setFollowSystem() {
         isFollowInitial = true;
+    }
+
+    @Override
+    public void setExtensionInfoSupplier(Supplier<Map<String, Object>> supplier) {
+        this.extensionInfoSupplier = supplier;
+    }
+
+    @Override
+    public Supplier<Map<String, Object>> getExtensionInfoSupplier() {
+        return extensionInfoSupplier;
     }
 
     @Override
@@ -90,6 +106,11 @@ public class DefaultPluginInsideInfo implements PluginInsideInfo {
     @Override
     public boolean isFollowSystem() {
         return isFollowInitial;
+    }
+
+    @Override
+    public Map<String, Object> getExtensionInfo() {
+        return extensionInfoSupplier.get();
     }
 
     private void resolveTime(PluginState pluginState){

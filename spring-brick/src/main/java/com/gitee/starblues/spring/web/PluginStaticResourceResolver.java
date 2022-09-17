@@ -252,7 +252,7 @@ public class PluginStaticResourceResolver extends AbstractResourceResolver {
     public static synchronized void parse(PluginDescriptor pluginDescriptor,
                                           ClassLoader pluginClassLoader,
                                           WebConfig webConfig){
-        if(!webConfig.isEnable()){
+        if(webConfig == null || !webConfig.isEnable()){
             return;
         }
         final Set<String> locations = webConfig.getResourceLocations();

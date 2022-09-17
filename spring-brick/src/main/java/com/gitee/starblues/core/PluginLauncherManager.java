@@ -23,12 +23,15 @@ import com.gitee.starblues.core.exception.PluginException;
 import com.gitee.starblues.core.exception.PluginProhibitStopException;
 import com.gitee.starblues.core.launcher.plugin.DefaultPluginInteractive;
 import com.gitee.starblues.core.launcher.plugin.PluginInteractive;
-import com.gitee.starblues.core.launcher.plugin.PluginLauncher;
+import com.gitee.starblues.core.launcher.plugin.PluginCoexistLauncher;
+import com.gitee.starblues.core.launcher.plugin.PluginIsolationLauncher;
 import com.gitee.starblues.core.launcher.plugin.involved.PluginLaunchInvolved;
 import com.gitee.starblues.core.launcher.plugin.involved.PluginLaunchInvolvedFactory;
 import com.gitee.starblues.integration.IntegrationConfiguration;
 import com.gitee.starblues.integration.listener.DefaultPluginListenerFactory;
 import com.gitee.starblues.integration.listener.PluginListenerFactory;
+import com.gitee.starblues.loader.launcher.AbstractLauncher;
+import com.gitee.starblues.loader.launcher.DevelopmentModeSetting;
 import com.gitee.starblues.spring.MainApplicationContext;
 import com.gitee.starblues.spring.MainApplicationContextProxy;
 import com.gitee.starblues.spring.SpringPluginHook;
@@ -45,7 +48,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * 可引导启动的插件管理者
  * @author starBlues
  * @since 3.0.0
- * @version 3.0.3
+ * @version 3.1.0
  */
 public class PluginLauncherManager extends DefaultPluginManager{
 
@@ -94,9 +97,16 @@ public class PluginLauncherManager extends DefaultPluginManager{
         launcherChecker.checkCanStart(pluginInsideInfo);
         try {
             InsidePluginDescriptor pluginDescriptor = pluginInsideInfo.getPluginDescriptor();
-            PluginInteractive pluginInteractive = new DefaultPluginInteractive(pluginDescriptor,
+            PluginInteractive pluginInteractive = new DefaultPluginInteractive(pluginInsideInfo,
                     mainApplicationContext, configuration, invokeSupperCache);
-            PluginLauncher pluginLauncher = new PluginLauncher(pluginInteractive, pluginLaunchInvolved);
+            AbstractLauncher<SpringPluginHook> pluginLauncher;
+            if(DevelopmentModeSetting.isolation()){
+                pluginLauncher = new PluginIsolationLauncher(pluginInteractive, pluginLaunchInvolved);
+            } else if(DevelopmentModeSetting.coexist()){
+                pluginLauncher = new PluginCoexistLauncher(pluginInteractive, pluginLaunchInvolved);
+            } else {
+                throw DevelopmentModeSetting.getUnknownModeException();
+            }
             SpringPluginHook springPluginHook = pluginLauncher.run();
             RegistryPluginInfo registryPluginInfo = new RegistryPluginInfo(pluginDescriptor, springPluginHook);
             registryInfo.put(pluginDescriptor.getPluginId(), registryPluginInfo);
@@ -109,9 +119,9 @@ public class PluginLauncherManager extends DefaultPluginManager{
         }
     }
 
-
     @Override
-    protected void stop(PluginInsideInfo pluginInsideInfo) throws Exception {
+    protected void stop(PluginInsideInfo pluginInsideInfo, PluginCloseType closeType) throws Exception {
+        launcherChecker.checkCanStop(pluginInsideInfo);
         String pluginId = pluginInsideInfo.getPluginId();
         RegistryPluginInfo registryPluginInfo = registryInfo.get(pluginId);
         if(registryPluginInfo == null){
@@ -120,10 +130,10 @@ public class PluginLauncherManager extends DefaultPluginManager{
         try {
             SpringPluginHook springPluginHook = registryPluginInfo.getSpringPluginHook();
             springPluginHook.stopVerify();
-            springPluginHook.close();
+            springPluginHook.close(closeType);
             invokeSupperCache.remove(pluginId);
             registryInfo.remove(pluginId);
-            super.stop(pluginInsideInfo);
+            super.stop(pluginInsideInfo, closeType);
         } catch (Exception e){
             if(e instanceof PluginProhibitStopException){
                 // 禁止停止时, 不设置插件状态

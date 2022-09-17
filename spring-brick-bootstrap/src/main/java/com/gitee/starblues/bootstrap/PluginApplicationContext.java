@@ -20,8 +20,6 @@ import com.gitee.starblues.bootstrap.processor.ProcessorContext;
 import com.gitee.starblues.core.descriptor.PluginDescriptor;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
-import org.springframework.boot.web.context.WebServerApplicationContext;
-import org.springframework.boot.web.server.WebServer;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 /**

@@ -27,24 +27,21 @@ import java.io.*;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.Path;
-import java.util.Enumeration;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.*;
 
 /**
  * 基本的 ClassLoader
  * @author starBlues
  * @version 3.0.0
  */
-public class GenericClassLoader extends URLClassLoader {
+public class GenericClassLoader extends URLClassLoader implements ResourceLoaderFactory{
 
     private final String name;
     private final ClassLoader parent;
 
     protected final ResourceLoaderFactory resourceLoaderFactory;
 
-    private final Map<String, Class<?>> pluginClassCache = new ConcurrentHashMap<>();
+    private final ResourceLoaderFactory classLoaderTranslator;
 
     public GenericClassLoader(String name, ResourceLoaderFactory resourceLoaderFactory) {
         this(name, null, resourceLoaderFactory);
@@ -55,36 +52,61 @@ public class GenericClassLoader extends URLClassLoader {
         this.name = Assert.isNotEmpty(name, "name 不能为空");
         this.resourceLoaderFactory = Assert.isNotNull(resourceLoaderFactory, "resourceLoaderFactory 不能为空");
         this.parent = parent;
-
+        this.classLoaderTranslator = new ClassLoaderTranslator(this);
     }
 
     public String getName() {
         return name;
     }
 
-
+    @Override
     public void addResource(String path) throws Exception {
         resourceLoaderFactory.addResource(path);
     }
 
+    @Override
     public void addResource(File file) throws Exception {
         resourceLoaderFactory.addResource(file);
     }
 
+    @Override
     public void addResource(Path path) throws Exception {
         resourceLoaderFactory.addResource(path);
     }
 
+    @Override
     public void addResource(URL url) throws Exception {
         resourceLoaderFactory.addResource(url);
     }
 
+    @Override
+    public void addResource(Resource resource) throws Exception {
+        resourceLoaderFactory.addResource(resource);
+    }
+
+    @Override
     public void addResource(ResourceLoader resourceLoader) throws Exception{
         resourceLoaderFactory.addResource(resourceLoader);
     }
 
-    public ClassLoader getParentClassLoader(){
-        return parent;
+    @Override
+    public Resource findFirstResource(String name) {
+        return classLoaderTranslator.findFirstResource(name);
+    }
+
+    @Override
+    public Enumeration<Resource> findAllResource(String name) {
+        return classLoaderTranslator.findAllResource(name);
+    }
+
+    @Override
+    public InputStream getInputStream(String name) {
+        return classLoaderTranslator.getInputStream(name);
+    }
+
+    @Override
+    public List<URL> getUrls() {
+        return classLoaderTranslator.getUrls();
     }
 
     @Override
@@ -125,11 +147,7 @@ public class GenericClassLoader extends URLClassLoader {
     protected Class<?> findClassFromLocal(String name) {
         Class<?> aClass;
         String formatClassName = formatClassName(name);
-        aClass = pluginClassCache.get(formatClassName);
-        if (aClass != null) {
-            return aClass;
-        }
-        Resource resource = resourceLoaderFactory.findResource(formatClassName);
+        Resource resource = resourceLoaderFactory.findFirstResource(formatClassName);
         byte[] bytes = null;
         if(resource != null){
             bytes = resource.getBytes();
@@ -140,17 +158,16 @@ public class GenericClassLoader extends URLClassLoader {
         if(bytes == null || bytes.length == 0){
             return null;
         }
-        aClass = defineClass(name, bytes, 0, bytes.length );
+        aClass = super.defineClass(name, bytes, 0, bytes.length );
         if(aClass == null) {
             return null;
         }
         if (aClass.getPackage() == null) {
             int lastDotIndex = name.lastIndexOf( '.' );
             String packageName = (lastDotIndex >= 0) ? name.substring( 0, lastDotIndex) : "";
-            definePackage(packageName, null, null, null,
+            super.definePackage(packageName, null, null, null,
                     null, null, null, null );
         }
-        pluginClassCache.put(name, aClass);
         return aClass;
     }
 
@@ -159,13 +176,20 @@ public class GenericClassLoader extends URLClassLoader {
         if(inputStream == null){
             return null;
         }
+        ByteArrayOutputStream output = new ByteArrayOutputStream();
         try {
-            return IOUtils.read(inputStream);
+            byte[] buffer = new byte[4096];
+            int n = 0;
+            while (-1 != (n = inputStream.read(buffer))) {
+                output.write(buffer, 0, n);
+            }
+            return output.toByteArray();
         } catch (Exception e){
             e.printStackTrace();
             return null;
         } finally {
             IOUtils.closeQuietly(inputStream);
+            IOUtils.closeQuietly(output);
         }
     }
 
@@ -218,7 +242,7 @@ public class GenericClassLoader extends URLClassLoader {
     }
 
     protected URL findResourceFromLocal(String name) {
-        Resource resource = resourceLoaderFactory.findResource(name);
+        Resource resource = resourceLoaderFactory.findFirstResource(name);
         if (resource == null) {
             return null;
         }
@@ -262,7 +286,7 @@ public class GenericClassLoader extends URLClassLoader {
     }
 
     protected Enumeration<URL> findResourcesFromLocal(String name) throws IOException{
-        Enumeration<Resource> enumeration = resourceLoaderFactory.findResources(name);
+        Enumeration<Resource> enumeration = resourceLoaderFactory.findAllResource(name);
         return new Enumeration<URL>() {
             @Override
             public boolean hasMoreElements() {
@@ -278,10 +302,8 @@ public class GenericClassLoader extends URLClassLoader {
 
     @Override
     public void close() throws IOException {
-        synchronized (pluginClassCache){
-            pluginClassCache.clear();
-            IOUtils.closeQuietly(resourceLoaderFactory);
-        }
+        super.close();
+        IOUtils.closeQuietly(resourceLoaderFactory);
     }
 
     private String formatResourceName(String name) {

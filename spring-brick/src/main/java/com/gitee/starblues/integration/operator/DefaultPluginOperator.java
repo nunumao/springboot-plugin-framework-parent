@@ -28,6 +28,7 @@ import com.gitee.starblues.integration.listener.PluginInitializerListenerFactory
 import com.gitee.starblues.integration.operator.upload.UploadByInputStreamParam;
 import com.gitee.starblues.integration.operator.upload.UploadByMultipartFileParam;
 import com.gitee.starblues.integration.operator.upload.UploadParam;
+import com.gitee.starblues.loader.launcher.DevelopmentModeSetting;
 import com.gitee.starblues.spring.web.PluginStaticResourceConfig;
 import com.gitee.starblues.utils.*;
 import org.apache.commons.io.FileUtils;
@@ -53,14 +54,15 @@ import java.util.concurrent.atomic.AtomicBoolean;
 /**
  * 默认的插件操作者
  * @author starBlues
- * @version 3.0.1
+ * @version 3.0.0
+ * @since 3.0.4
  */
 public class DefaultPluginOperator implements PluginOperator {
     protected final Logger log = LoggerFactory.getLogger(this.getClass());
 
     private final static DateTimeFormatter FORMAT = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
 
-    private final AtomicBoolean isInit = new AtomicBoolean(false);
+    private static final AtomicBoolean IS_INIT = new AtomicBoolean(false);
 
     private final GenericApplicationContext applicationContext;
     private final IntegrationConfiguration configuration;
@@ -79,11 +81,12 @@ public class DefaultPluginOperator implements PluginOperator {
 
     @Override
     public synchronized boolean initPlugins(PluginInitializerListener pluginInitializerListener) throws PluginException {
-        if(isInit.get()){
+        if(IS_INIT.get()){
             throw new RuntimeException("插件已经被初始化了, 不能再初始化.");
         }
         try {
             log.info("插件加载环境: {}", configuration.environment().toString());
+            log.info("插件加载模式: {}", DevelopmentModeSetting.getDevelopmentMode());
             pluginInitializerListenerFactory.addListener(pluginInitializerListener);
             List<String> pluginsRoots = pluginManager.getPluginsRoots();
             if(pluginsRoots.isEmpty()){
@@ -114,7 +117,7 @@ public class DefaultPluginOperator implements PluginOperator {
                     isFoundException = true;
                 }
             }
-            isInit.set(true);
+            IS_INIT.set(true);
             if(isFoundException){
                 log.error("插件初始化失败");
                 pluginInitializerListenerFactory.failure(new PluginException("插件初始化存在异常"));

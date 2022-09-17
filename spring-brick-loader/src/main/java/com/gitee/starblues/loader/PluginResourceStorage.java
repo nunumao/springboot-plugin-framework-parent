@@ -143,6 +143,12 @@ public class PluginResourceStorage {
                     IOUtils.closeQuietly(jarFile);
                 }
             }
+            for (JarFile jarFile : rootJarFileMap.values()) {
+                if(jarFile == null){
+                    continue;
+                }
+                IOUtils.closeQuietly(jarFile);
+            }
             jarFileMap.clear();
             rootJarFileMap.clear();
         }

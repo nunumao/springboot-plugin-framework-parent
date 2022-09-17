@@ -19,6 +19,7 @@ package com.gitee.starblues.integration;
 import com.gitee.starblues.core.DefaultRealizeProvider;
 import com.gitee.starblues.core.RealizeProvider;;
 import com.gitee.starblues.core.classloader.CacheMainResourceMatcher;
+import com.gitee.starblues.core.classloader.DefaultMainResourceMatcher;
 import com.gitee.starblues.core.classloader.MainResourceMatcher;
 import com.gitee.starblues.core.descriptor.decrypt.DefaultPluginDescriptorDecrypt;
 import com.gitee.starblues.core.descriptor.decrypt.PluginDescriptorDecrypt;
@@ -49,6 +50,7 @@ public class ExtendPointConfiguration {
                                     IntegrationConfiguration configuration) {
         this.applicationContext = applicationContext;
         this.configuration = configuration;
+        this.configuration.checkConfig();
     }
 
     @Bean
@@ -83,7 +85,7 @@ public class ExtendPointConfiguration {
 
     @Bean
     public MainResourceMatcher mainResourceMatcher(){
-        return new CacheMainResourceMatcher(new DefaultMainResourcePatternDefiner(
+        return new DefaultMainResourceMatcher(new DefaultMainResourcePatternDefiner(
                 configuration.mainPackage(),
                 applicationContext
         ));

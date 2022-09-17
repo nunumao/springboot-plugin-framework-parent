@@ -18,9 +18,14 @@ package com.gitee.starblues.core;
 
 import com.gitee.starblues.core.descriptor.InsidePluginDescriptor;
 
+import java.util.Map;
+import java.util.function.Supplier;
+
 /**
  * 内部的 PluginInfo
- * @version 3.0.0
+ *
+ * @since 3.0.0
+ * @version 3.1.0
  * @author starBlues
  */
 public interface PluginInsideInfo extends PluginInfo {
@@ -35,6 +40,18 @@ public interface PluginInsideInfo extends PluginInfo {
      * 设置是跟随系统启动而启动的插件
      */
     void setFollowSystem();
+
+    /**
+     * 设置插件扩展信息
+     * @param supplier 插件扩展信息自主提供者
+     */
+    void setExtensionInfoSupplier(Supplier<Map<String, Object>> supplier);
+
+    /**
+     * 获取插件信息提供者
+     * @return 插件扩展信息自主提供者
+     */
+    Supplier<Map<String, Object>> getExtensionInfoSupplier();
 
     /**
      * 得到插件描述

@@ -174,8 +174,10 @@ public class ZipProdRepackager extends DevRepackager {
             if(filterArtifact(artifact)){
                 continue;
             }
-            String dependencyIndexName = packageZip.writeDependency(artifact.getFile(), libDirEntryName);
-            dependencyIndexNames.add(dependencyIndexName);
+            File artifactFile = artifact.getFile();
+            packageZip.writeDependency(artifactFile, libDirEntryName);
+            // fix 解决依赖前缀携带, lib 配置的前缀
+            dependencyIndexNames.add(artifactFile.getName());
         }
         return dependencyIndexNames;
     }

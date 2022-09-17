@@ -19,6 +19,7 @@ package com.gitee.starblues.spring;
 import com.gitee.starblues.spring.environment.EnvironmentProvider;
 
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * 主程序 ApplicationContext 接口
@@ -57,5 +58,10 @@ public interface MainApplicationContext extends ApplicationContext {
      */
     boolean isWebEnvironment();
 
+    /**
+     * 得到原始的 ApplicationContext
+     * @return Object
+     */
+    Object getSourceApplicationContext();
 
 }

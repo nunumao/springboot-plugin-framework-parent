@@ -48,7 +48,8 @@ import static com.gitee.starblues.utils.PropertiesUtils.getValue;
 /**
  * 抽象的 PluginDescriptorLoader
  * @author starBlues
- * @version 3.0.2
+ * @since 3.0.0
+ * @version 3.1.0
  */
 @Slf4j
 public abstract class AbstractPluginDescriptorLoader implements PluginDescriptorLoader{
@@ -155,11 +156,14 @@ public abstract class AbstractPluginDescriptorLoader implements PluginDescriptor
     }
 
     protected Set<PluginLibInfo> getPluginLibInfo(DefaultInsidePluginDescriptor descriptor, Set<String> dependenciesIndex){
-        String pluginLibDir = descriptor.getPluginLibDir();
-        boolean configPluginLibDir = false;
-        if(!ObjectUtils.isEmpty(pluginLibDir)){
-            descriptor.setPluginLibDir(getLibDir(descriptor, pluginLibDir));
-            configPluginLibDir = true;
+        String configPluginLibDir = descriptor.getPluginLibDir();
+        boolean isConfigPluginLibDir = false;
+        if(!ObjectUtils.isEmpty(configPluginLibDir)){
+            String libDir = getLibDir(descriptor, configPluginLibDir);
+            if(!ObjectUtils.isEmpty(libDir)){
+                descriptor.setPluginLibDir(libDir);
+                isConfigPluginLibDir = true;
+            }
         }
         if(ObjectUtils.isEmpty(dependenciesIndex)){
             return Collections.emptySet();
@@ -174,8 +178,8 @@ public abstract class AbstractPluginDescriptorLoader implements PluginDescriptor
                 loadToMain = false;
             }
             String libPath = index;
-            if(configPluginLibDir){
-                libPath = getLibPath(descriptor, index);
+            if(isConfigPluginLibDir){
+                libPath = getLibPath(descriptor, configPluginLibDir, index);
             }
             pluginLibInfos.add(new PluginLibInfo(libPath, loadToMain));
         }
@@ -183,31 +187,49 @@ public abstract class AbstractPluginDescriptorLoader implements PluginDescriptor
     }
 
     protected String getLibDir(DefaultInsidePluginDescriptor descriptor, String configPluginLibDir){
-        if(!FilesUtils.isRelativePath(configPluginLibDir)){
+        if(FilesUtils.existFile(configPluginLibDir)){
             return configPluginLibDir;
         }
-        // 是相对路径
-        // 先相对当前插件目录
-        String resolveRelativePath = FilesUtils.resolveRelativePath(descriptor.getPluginPath(), configPluginLibDir);
-        if(new File(resolveRelativePath).exists()){
+        // 先检查插件相对目录
+        String resolveRelativePath = null;
+        if(FilesUtils.isRelativePath(configPluginLibDir)){
+            // 先相对当前插件目录
+            resolveRelativePath = FilesUtils.resolveRelativePath(descriptor.getPluginPath(), configPluginLibDir);
+        } else {
+            resolveRelativePath = FilesUtils.joiningFilePath(descriptor.getPluginPath(), configPluginLibDir);
+        }
+        if(FilesUtils.existFile(resolveRelativePath)){
             return resolveRelativePath;
         }
         // 再相对插件存放目录
-        resolveRelativePath = FilesUtils.resolveRelativePath(new File(descriptor.getPluginPath()).getParent(), configPluginLibDir);
-        if(new File(resolveRelativePath).exists()){
+        resolveRelativePath = FilesUtils.joiningFilePath(new File(descriptor.getPluginPath()).getParent(), configPluginLibDir);
+        if(FilesUtils.existFile(resolveRelativePath)){
             return resolveRelativePath;
         }
         // 最后相对主程序目录
-        resolveRelativePath = FilesUtils.resolveRelativePath(new File("").getAbsolutePath(), configPluginLibDir);
-        if(new File(resolveRelativePath).exists()){
+        resolveRelativePath = FilesUtils.joiningFilePath(new File("").getAbsolutePath(), configPluginLibDir);
+        if(FilesUtils.existFile(resolveRelativePath)){
             return resolveRelativePath;
         }
-        throw new PluginException("插件["+ MsgUtils.getPluginUnique(descriptor) +"]" +
-                "依赖目录[" + descriptor.getPluginLibDir() + "]不存在!");
+        return null;
     }
 
-    protected String getLibPath(DefaultInsidePluginDescriptor descriptor, String index){
-        return FilesUtils.joiningFilePath(descriptor.getPluginLibDir(), index);
+    protected String getLibPath(DefaultInsidePluginDescriptor descriptor, String configPluginLibDir, String index){
+        String pluginLibDir = descriptor.getPluginLibDir();
+        if(ObjectUtils.isEmpty(pluginLibDir)){
+            return index;
+        }
+        String joiningFilePath = FilesUtils.joiningFilePath(descriptor.getPluginLibDir(), index);
+        if(index.startsWith(configPluginLibDir)){
+            // 如果 index 中前缀配置了 PLUGIN.META 中的 plugin.libDir  则尝试判断完整拼接的依赖路径文件是否存在
+            // 如果存在, 则返回, 如果不存在, 则去掉重复前缀, 返回。该处是为了兼容解压后的jar中index存在 libDir 前缀
+            if(FilesUtils.existFile(joiningFilePath)){
+                return joiningFilePath;
+            }
+            return FilesUtils.joiningFilePath(descriptor.getPluginLibDir(),
+                    index.replace(configPluginLibDir, ""));
+        }
+        return joiningFilePath;
     }
 
     protected Properties getDecryptProperties(InputStream inputStream) throws Exception{

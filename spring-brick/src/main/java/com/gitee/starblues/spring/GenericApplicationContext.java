@@ -28,6 +28,7 @@ public class GenericApplicationContext implements ApplicationContext{
     public final AutoCloseable autoCloseable;
 
     protected SpringBeanFactory springBeanFactory;
+    protected Object sourcesBeanFactory;
 
     public GenericApplicationContext() {
         this(null);
@@ -41,10 +42,20 @@ public class GenericApplicationContext implements ApplicationContext{
         this.springBeanFactory = Assert.isNotNull(springBeanFactory, "参数 springBeanFactory 不能为空");
     }
 
+    public void setSourcesBeanFactory(Object sourcesBeanFactory) {
+        this.sourcesBeanFactory = sourcesBeanFactory;
+    }
+
     @Override
     public SpringBeanFactory getSpringBeanFactory() {
         return springBeanFactory;
     }
+
+    @Override
+    public Object getSourceBeanFactory() {
+        return sourcesBeanFactory;
+    }
+
 
     @Override
     public void close() throws Exception {

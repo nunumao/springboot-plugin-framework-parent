@@ -23,6 +23,7 @@ import com.gitee.starblues.bootstrap.realize.PluginCloseListener;
 import com.gitee.starblues.bootstrap.realize.StopValidator;
 import com.gitee.starblues.bootstrap.utils.DestroyUtils;
 import com.gitee.starblues.bootstrap.utils.SpringBeanUtils;
+import com.gitee.starblues.core.PluginCloseType;
 import com.gitee.starblues.core.exception.PluginProhibitStopException;
 import com.gitee.starblues.spring.ApplicationContext;
 import com.gitee.starblues.spring.ApplicationContextProxy;
@@ -38,12 +39,13 @@ import java.util.Map;
 /**
  * 默认的插件钩子器
  * @author starBlues
- * @version 3.0.0
+ * @since 3.0.0
+ * @version 3.1.0
  */
 public class DefaultSpringPluginHook implements SpringPluginHook {
 
-    private final SpringPluginProcessor pluginProcessor;
-    private final ProcessorContext processorContext;
+    protected final SpringPluginProcessor pluginProcessor;
+    protected final ProcessorContext processorContext;
     private final StopValidator stopValidator;
 
     public DefaultSpringPluginHook(SpringPluginProcessor pluginProcessor,
@@ -76,18 +78,18 @@ public class DefaultSpringPluginHook implements SpringPluginHook {
 
 
     @Override
-    public void close() throws Exception{
+    public void close(PluginCloseType closeType) throws Exception{
         try {
             GenericApplicationContext applicationContext = processorContext.getApplicationContext();
-            callPluginCloseListener(applicationContext);
+            callPluginCloseListener(applicationContext, closeType);
             pluginProcessor.close(processorContext);
-            if(applicationContext != null){
-                applicationContext.close();
-            }
+            applicationContext.close();
             processorContext.clearRegistryInfo();
             DestroyUtils.destroyAll(null, SpringFactoriesLoader.class, "cache", Map.class);
         } catch (Exception e){
             e.printStackTrace();
+        } finally {
+            SpringPluginBootstrapBinder.remove();
         }
     }
 
@@ -106,7 +108,7 @@ public class DefaultSpringPluginHook implements SpringPluginHook {
         return processorContext.getRegistryInfo(PluginThymeleafProcessor.CONFIG_KEY);
     }
 
-    private void callPluginCloseListener(GenericApplicationContext applicationContext){
+    private void callPluginCloseListener(GenericApplicationContext applicationContext, PluginCloseType closeType){
         List<PluginCloseListener> pluginCloseListeners = SpringBeanUtils.getBeans(
                 applicationContext, PluginCloseListener.class);
         if(pluginCloseListeners.isEmpty()){
@@ -114,7 +116,7 @@ public class DefaultSpringPluginHook implements SpringPluginHook {
         }
         for (PluginCloseListener pluginCloseListener : pluginCloseListeners) {
             try {
-                pluginCloseListener.close(processorContext.getPluginDescriptor());
+                pluginCloseListener.close(applicationContext, processorContext.getPluginInfo(), closeType);
             } catch (Exception e){
                 e.printStackTrace();
             }

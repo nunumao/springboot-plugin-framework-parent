@@ -22,6 +22,7 @@ import com.gitee.starblues.bootstrap.utils.DestroyUtils;
 import com.gitee.starblues.spring.MainApplicationContext;
 import com.gitee.starblues.spring.SpringBeanFactory;
 import com.gitee.starblues.utils.ReflectionUtils;
+import lombok.Setter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
@@ -49,11 +50,17 @@ public class PluginListableBeanFactory extends DefaultListableBeanFactory {
     private static final Logger LOG = LoggerFactory.getLogger(PluginListableBeanFactory.class);
 
     private final MainApplicationContext applicationContext;
-    private final AutowiredTypeResolver autowiredTypeResolver;
+
+    @Setter
+    private AutowiredTypeResolver autowiredTypeResolver;
 
     public PluginListableBeanFactory(ProcessorContext processorContext) {
         this.applicationContext = processorContext.getMainApplicationContext();
-        this.autowiredTypeResolver = new AutowiredTypeResolver(processorContext);
+        this.autowiredTypeResolver = getAutowiredTypeResolver(processorContext);
+    }
+
+    protected AutowiredTypeResolver getAutowiredTypeResolver(ProcessorContext processorContext){
+        return new DefaultAutowiredTypeResolver(processorContext);
     }
 
     @SuppressWarnings("unchecked")

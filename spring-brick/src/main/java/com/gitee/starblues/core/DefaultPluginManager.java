@@ -49,7 +49,8 @@ import java.util.stream.Collectors;
 /**
  * 抽象的插件管理者
  * @author starBlues
- * @version 3.0.3
+ * @since 3.0.0
+ * @version 3.1.0
  */
 public class DefaultPluginManager implements PluginManager{
 
@@ -179,6 +180,7 @@ public class DefaultPluginManager implements PluginManager{
         if(pluginInsideInfo == null){
             throw new PluginException("非法插件包: " + pluginPath);
         }
+        pluginInsideInfo.setPluginState(PluginState.PARSED);
         return pluginInsideInfo.toPluginInfo();
     }
 
@@ -251,7 +253,8 @@ public class DefaultPluginManager implements PluginManager{
             }
             PluginException pluginException = PluginException.getPluginException(e, ()-> {
                 unLoad(loadPluginInfo.getPluginId());
-                throw new PluginException("插件包[ " + pluginPath + " ]安装: " + e.getMessage(), e);
+                // fix https://gitee.com/starblues/springboot-plugin-framework-parent/issues/I5GJO9
+                return new PluginException("插件包[ " + pluginPath + " ]安装: " + e.getMessage(), e);
             });
             pluginListenerFactory.startFailure(pluginInfo, pluginException);
             throw pluginException;
@@ -260,27 +263,9 @@ public class DefaultPluginManager implements PluginManager{
 
     @Override
     public synchronized void uninstall(String pluginId) throws PluginException {
-        Assert.isNotNull(pluginId, "参数pluginId不能为空");
-        PluginInsideInfo wrapperInside = getPlugin(pluginId);
-        if(wrapperInside == null){
-            throw new PluginException("没有发现插件: " + pluginId);
-        }
-        PluginInfo pluginInfo = wrapperInside.toPluginInfo();
-        if(wrapperInside.getPluginState() == PluginState.STARTED){
-            try {
-                stop(wrapperInside);
-                pluginListenerFactory.stopSuccess(pluginInfo);
-            } catch (Throwable e) {
-                PluginException pluginException = PluginException.getPluginException(e,
-                        ()-> new PluginException("停止", pluginId, e));
-                pluginListenerFactory.stopFailure(pluginInfo, pluginException);
-                throw pluginException;
-            }
-        }
-        startedPlugins.remove(pluginId);
-        unLoad(pluginId);
-        LogUtils.info(log, wrapperInside.getPluginDescriptor(), "卸载成功");
+        uninstall(pluginId, PluginCloseType.UNINSTALL);
     }
+
 
     @Override
     public synchronized PluginInfo upgrade(Path pluginPath, boolean unpackPlugin) throws PluginException {
@@ -304,7 +289,7 @@ public class DefaultPluginManager implements PluginManager{
         checkVersion(oldPlugin.getPluginDescriptor(), upgradePluginDescriptor);
         if(oldPlugin.getPluginState() == PluginState.STARTED){
             // 如果插件被启动, 则卸载旧的插件
-            uninstall(pluginId);
+            uninstall(pluginId, PluginCloseType.UPGRADE_UNINSTALL);
         } else if(oldPlugin.getPluginState() == PluginState.LOADED){
             // 如果插件被load
             unLoad(pluginId);
@@ -348,13 +333,13 @@ public class DefaultPluginManager implements PluginManager{
         if(ObjectUtils.isEmpty(pluginId)){
             return null;
         }
-        PluginInsideInfo pluginInsideInfo = startedPlugins.get(pluginId);
+        PluginInsideInfo pluginInsideInfo = getPlugin(pluginId);
         if(pluginInsideInfo == null){
             throw new PluginException("没有发现插件: " + pluginId);
         }
         PluginInfo pluginInfo = pluginInsideInfo.toPluginInfo();
         try {
-            stop(pluginInsideInfo);
+            stop(pluginInsideInfo, PluginCloseType.STOP);
             log.info("停止插件[{}]成功", MsgUtils.getPluginUnique(pluginInsideInfo.getPluginDescriptor()));
             pluginListenerFactory.stopSuccess(pluginInfo);
             return pluginInfo;
@@ -393,6 +378,35 @@ public class DefaultPluginManager implements PluginManager{
             pluginDescriptors.add(wrapperInside.toPluginInfo());
         }
         return pluginDescriptors;
+    }
+
+    /**
+     * 卸载插件
+     * @param pluginId 插件id
+     * @param closeType 关闭类型
+     * @throws PluginException 卸载异常
+     */
+    protected void uninstall(String pluginId, PluginCloseType closeType) throws PluginException{
+        Assert.isNotNull(pluginId, "参数pluginId不能为空");
+        PluginInsideInfo wrapperInside = getPlugin(pluginId);
+        if(wrapperInside == null){
+            throw new PluginException("没有发现插件: " + pluginId);
+        }
+        PluginInfo pluginInfo = wrapperInside.toPluginInfo();
+        if(wrapperInside.getPluginState() == PluginState.STARTED){
+            try {
+                stop(wrapperInside, closeType);
+                pluginListenerFactory.stopSuccess(pluginInfo);
+            } catch (Throwable e) {
+                PluginException pluginException = PluginException.getPluginException(e,
+                        ()-> new PluginException("停止", pluginId, e));
+                pluginListenerFactory.stopFailure(pluginInfo, pluginException);
+                throw pluginException;
+            }
+        }
+        startedPlugins.remove(pluginId);
+        unLoad(pluginId);
+        LogUtils.info(log, wrapperInside.getPluginDescriptor(), "卸载成功");
     }
 
     protected PluginInsideInfo loadPlugin(Path pluginPath, boolean resolvePath) {
@@ -536,14 +550,14 @@ public class DefaultPluginManager implements PluginManager{
     /**
      * 统一停止插件操作
      * @param pluginInsideInfo PluginInsideInfo
+     * @param closeType 停止类型
      * @throws Exception 启动异常
      */
-    protected void stop(PluginInsideInfo pluginInsideInfo) throws Exception{
+    protected void stop(PluginInsideInfo pluginInsideInfo, PluginCloseType closeType) throws Exception{
         launcherChecker.checkCanStop(pluginInsideInfo);
         pluginInsideInfo.setPluginState(PluginState.STOPPED);
         stopFinish(pluginInsideInfo);
     }
-
     /**
      * 停止完成操作
      * @param pluginInsideInfo pluginInsideInfo

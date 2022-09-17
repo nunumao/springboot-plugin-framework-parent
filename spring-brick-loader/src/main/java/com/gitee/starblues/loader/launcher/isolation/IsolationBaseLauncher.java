@@ -14,10 +14,11 @@
  *    limitations under the License.
  */
 
-package com.gitee.starblues.loader.launcher;
+package com.gitee.starblues.loader.launcher.isolation;
 
 import com.gitee.starblues.loader.classloader.GenericClassLoader;
 import com.gitee.starblues.loader.classloader.resource.loader.ResourceLoaderFactory;
+import com.gitee.starblues.loader.launcher.AbstractMainLauncher;
 import com.gitee.starblues.loader.launcher.runner.MethodRunner;
 import com.gitee.starblues.loader.utils.ObjectUtils;
 
@@ -31,20 +32,23 @@ import java.net.URLClassLoader;
  * @author starBlues
  * @version 3.0.0
  */
-public class MainProgramLauncher extends AbstractMainLauncher<ClassLoader>{
-
-    public static final String MAIN_CLASS_LOADER_NAME = "MainProgramLauncherClassLoader";
+public class IsolationBaseLauncher extends AbstractMainLauncher {
 
     private final MethodRunner methodRunner;
 
-    public MainProgramLauncher(MethodRunner methodRunner) {
+    public IsolationBaseLauncher(MethodRunner methodRunner) {
         this.methodRunner = methodRunner;
+    }
+
+    @Override
+    protected boolean resolveThreadClassLoader() {
+        return false;
     }
 
     @Override
     protected ClassLoader createClassLoader(String... args) throws Exception {
         GenericClassLoader classLoader = new GenericClassLoader(MAIN_CLASS_LOADER_NAME, getParentClassLoader(),
-                getResourceLoaderFactory());
+                getResourceLoaderFactory(args));
         addResource(classLoader);
         return classLoader;
     }
@@ -60,7 +64,7 @@ public class MainProgramLauncher extends AbstractMainLauncher<ClassLoader>{
     }
 
     protected ClassLoader getParentClassLoader(){
-        return MainProgramLauncher.class.getClassLoader();
+        return IsolationBaseLauncher.class.getClassLoader();
     }
 
     protected void addResource(GenericClassLoader classLoader) throws Exception{

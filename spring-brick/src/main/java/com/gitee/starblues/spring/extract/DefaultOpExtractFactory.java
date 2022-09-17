@@ -28,7 +28,8 @@ import java.util.stream.Collectors;
 /**
  * 默认的可扩展的工厂
  * @author starBlues
- * @version 3.0.0
+ * @version 3.1.0
+ * @since 3.0.0
  */
 public class DefaultOpExtractFactory implements OpExtractFactory {
 
@@ -93,11 +94,12 @@ public class DefaultOpExtractFactory implements OpExtractFactory {
         if(extractCoordinates  == null){
             throw new RuntimeException("Not found " + coordinate + " from plugin '" + pluginId + "'");
         }
-        Object extracts = extractCoordinates.get(coordinate);
+        ExtractWrapper extracts = extractCoordinates.get(coordinate);
         if(extracts == null){
             throw new RuntimeException("Not found " + coordinate + " from plugin '" + pluginId + "'");
         }
-        return (T) extracts;
+        // fix https://gitee.com/starblues/springboot-plugin-framework-parent/issues/I5IFR4
+        return (T) extracts.getObject();
     }
 
     @SuppressWarnings("unchecked")

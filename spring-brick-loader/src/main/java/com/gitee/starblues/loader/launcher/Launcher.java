@@ -23,6 +23,8 @@ package com.gitee.starblues.loader.launcher;
  */
 public interface Launcher<R> {
 
+    String SPRING_BOOTSTRAP_RUN_METHOD = "run";
+
     /**
      * 启动运行
      * @param args 启动传入的参数

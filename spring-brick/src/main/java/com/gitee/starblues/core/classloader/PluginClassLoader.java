@@ -21,7 +21,9 @@ import com.gitee.starblues.core.descriptor.PluginLibInfo;
 import com.gitee.starblues.core.descriptor.PluginType;
 import com.gitee.starblues.core.exception.PluginException;
 import com.gitee.starblues.loader.classloader.*;
+import com.gitee.starblues.loader.classloader.resource.Resource;
 import com.gitee.starblues.loader.classloader.resource.loader.ResourceLoaderFactory;
+import com.gitee.starblues.loader.utils.IOUtils;
 import com.gitee.starblues.utils.Assert;
 import com.gitee.starblues.utils.FilesUtils;
 import com.gitee.starblues.utils.MsgUtils;
@@ -39,89 +41,27 @@ import java.util.Set;
  * 插件 classLoader
  * @author starBlues
  * @version 3.0.3
+ * @since 3.0.0
  */
 @Slf4j
-public class PluginClassLoader extends GenericClassLoader {
+public class PluginClassLoader extends GenericClassLoader implements PluginResourceLoaderFactory{
 
-    private final GenericClassLoader parentClassLoader;
     private final MainResourceMatcher mainResourceMatcher;
+
+    private final PluginResourceLoaderFactory proxy;
 
     public PluginClassLoader(String name, GenericClassLoader parentClassLoader,
                              ResourceLoaderFactory resourceLoaderFactory,
                              MainResourceMatcher mainResourceMatcher) {
         super(name, parentClassLoader, resourceLoaderFactory);
-        this.parentClassLoader = parentClassLoader;
         this.mainResourceMatcher = mainResourceMatcher;
+        this.proxy = new PluginResourceLoaderFactoryProxy(resourceLoaderFactory, parentClassLoader);
     }
 
-    public MainResourceMatcher getMainResourceMatcher() {
-        return mainResourceMatcher;
-    }
-
+    @Override
     public void addResource(InsidePluginDescriptor descriptor) throws Exception {
-        PluginType pluginType = descriptor.getType();
-        if(PluginType.isNestedPackage(pluginType)){
-            NestedPluginJarResourceLoader resourceLoader =
-                    new NestedPluginJarResourceLoader(descriptor, parentClassLoader, resourceLoaderFactory);
-            resourceLoaderFactory.addResource(resourceLoader);
-        } else if(PluginType.isOuterPackage(pluginType)){
-            addOuterPluginClasspath(descriptor);
-            addLibFile(descriptor);
-        } else {
-            addDirPluginClasspath(descriptor);
-            addLibFile(descriptor);
-        }
+        proxy.addResource(descriptor);
     }
-
-    private void addOuterPluginClasspath(InsidePluginDescriptor descriptor) throws Exception{
-        String pluginPath = descriptor.getPluginPath();
-        File existFile = FilesUtils.getExistFile(pluginPath);
-        if(existFile != null){
-            addResource(existFile);
-            log.debug("插件[{}]Classpath已被加载: {}", MsgUtils.getPluginUnique(descriptor), existFile.getPath());
-        } else {
-            throw new PluginException("没有发现插件路径: " + pluginPath);
-        }
-    }
-
-    private void addDirPluginClasspath(InsidePluginDescriptor descriptor) throws Exception {
-        String pluginClassPath = descriptor.getPluginClassPath();
-        File existFile = FilesUtils.getExistFile(pluginClassPath);
-        if(existFile != null){
-            addResource(existFile);
-            log.debug("插件[{}]Classpath已被加载: {}", MsgUtils.getPluginUnique(descriptor), existFile.getPath());
-        }
-    }
-
-    private void addLibFile(InsidePluginDescriptor pluginDescriptor) throws Exception {
-        Set<PluginLibInfo> pluginLibInfos = pluginDescriptor.getPluginLibInfo();
-        if(ObjectUtils.isEmpty(pluginLibInfos)){
-            return;
-        }
-        String pluginUnique = MsgUtils.getPluginUnique(pluginDescriptor);
-        String pluginLibDir = pluginDescriptor.getPluginLibDir();
-        if(!ObjectUtils.isEmpty(pluginLibDir)){
-            log.info("插件[{}]依赖加载目录: {}", pluginUnique, pluginLibDir);
-        }
-        if(pluginLibInfos.isEmpty()){
-            log.warn("插件[{}]依赖为空！", pluginUnique);
-            return;
-        }
-        for (PluginLibInfo pluginLibInfo : pluginLibInfos) {
-            File existFile = FilesUtils.getExistFile(pluginLibInfo.getPath());
-            if(existFile != null){
-                if(pluginLibInfo.isLoadToMain()){
-                    // 加载到主程序中
-                    parentClassLoader.addResource(existFile);
-                    log.debug("插件[{}]依赖被加载到主程序中: {}", pluginUnique, existFile.getPath());
-                } else {
-                    addResource(existFile);
-                    log.debug("插件[{}]依赖被加载: {}", pluginUnique, existFile.getPath());
-                }
-            }
-        }
-    }
-
 
     @Override
     protected Class<?> findClassFromParent(String className) throws ClassNotFoundException {
@@ -174,5 +114,6 @@ public class PluginClassLoader extends GenericClassLoader {
             }
         }
     }
+
 
 }

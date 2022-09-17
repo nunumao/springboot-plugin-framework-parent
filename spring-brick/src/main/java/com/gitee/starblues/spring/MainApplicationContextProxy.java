@@ -95,6 +95,16 @@ public class MainApplicationContextProxy extends ApplicationContextProxy impleme
         return isWebEnvironment;
     }
 
+    @Override
+    public Object getSourceApplicationContext() {
+        return applicationContext;
+    }
+
+    @Override
+    public Object getSourceBeanFactory() {
+        return applicationContext.getBeanFactory();
+    }
+
     private boolean getIsWebEnvironment(GenericApplicationContext applicationContext){
         return applicationContext instanceof AnnotationConfigServletWebServerApplicationContext
                 || applicationContext instanceof AnnotationConfigReactiveWebServerApplicationContext;

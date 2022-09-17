@@ -1,11 +1,12 @@
-/**
- * Copyright [2019-2022] [starBlues]
+/*
+ * Copyright 2012-2021 the original author or authors.
+ * Copy from spring-boot-loader
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *        http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -19,9 +20,11 @@ package com.gitee.starblues.loader.jar;
 import java.util.Objects;
 
 /**
- * copy from spring-boot-loader
- * @author starBlues
- * @version 3.0.0
+ * A {@link CharSequence} backed by a single shared {@link String}. Unlike a regular
+ * {@link String}, {@link #subSequence(int, int)} operations will not copy the underlying
+ * character array.
+ *
+ * @author Phillip Webb
  */
 public class StringSequence implements CharSequence {
 

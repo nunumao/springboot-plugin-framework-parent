@@ -23,7 +23,6 @@ import com.gitee.starblues.integration.operator.PluginOperator;
 import com.gitee.starblues.integration.operator.PluginOperatorWrapper;
 import com.gitee.starblues.integration.user.PluginUser;
 import com.gitee.starblues.spring.extract.DefaultExtractFactory;
-import com.gitee.starblues.spring.extract.DefaultOpExtractFactory;
 import com.gitee.starblues.spring.extract.ExtractFactory;
 import com.gitee.starblues.spring.extract.OpExtractFactory;
 import com.gitee.starblues.utils.ObjectUtils;
@@ -150,8 +149,7 @@ public class DefaultPluginApplication extends AbstractPluginApplication {
      * 直接将 PluginOperator 和 PluginUser 注入到ApplicationContext容器中
      * @param applicationContext ApplicationContext
      */
-    @Deprecated
-    private void setBeanFactory(GenericApplicationContext applicationContext){
+    protected void setBeanFactory(GenericApplicationContext applicationContext){
         DefaultListableBeanFactory defaultListableBeanFactory = applicationContext.getDefaultListableBeanFactory();
         defaultListableBeanFactory.registerSingleton(pluginOperator.getClass().getName(), pluginOperator);
         defaultListableBeanFactory.registerSingleton(pluginUser.getClass().getName(), pluginUser);

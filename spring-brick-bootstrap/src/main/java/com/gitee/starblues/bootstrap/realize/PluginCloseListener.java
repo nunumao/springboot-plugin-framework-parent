@@ -16,20 +16,37 @@
 
 package com.gitee.starblues.bootstrap.realize;
 
+import com.gitee.starblues.core.PluginCloseType;
+import com.gitee.starblues.core.PluginInfo;
 import com.gitee.starblues.core.descriptor.PluginDescriptor;
+import org.springframework.context.support.GenericApplicationContext;
 
 /**
  * 插件被停止监听者。用于自定义关闭资源
  * @author starBlues
  * @since 3.0.0
- * @version 3.0.0
+ * @version 3.1.0
  */
 public interface PluginCloseListener {
 
     /**
      * 关闭时调用
      * @param descriptor 当前插件描述者
+     * @deprecated 在 3.1.1 版本会被删除
+     * @since 3.0.0
      */
-    void close(PluginDescriptor descriptor);
+    default void close(PluginDescriptor descriptor){}
+
+    /**
+     * 关闭时调用
+     * @param applicationContext 当前插件的ApplicationContext
+     * @param pluginInfo 当前插件信息
+     * @param closeType 停止类型
+     * @since 3.1.0
+     */
+    default void close(GenericApplicationContext applicationContext,
+                       PluginInfo pluginInfo, PluginCloseType closeType){
+        close(pluginInfo != null ? pluginInfo.getPluginDescriptor() : null);
+    }
 
 }
