@@ -39,7 +39,8 @@ import java.util.Map;
 /**
  * 插件环境配置
  * @author starBlues
- * @version 3.0.0
+ * @since 3.0.0
+ * @version 3.1.0
  */
 public class ConfigurePluginEnvironment {
     private final Logger logger = LoggerFactory.getLogger(ConfigurePluginEnvironment.class);
@@ -100,11 +101,12 @@ public class ConfigurePluginEnvironment {
     }
 
     private String getConfigFileLocation(String configFileLocation){
-        String s = FilesUtils.resolveRelativePath(new File("").getAbsolutePath(), configFileLocation);
-        if(s.endsWith("/") || s.endsWith(File.separator)){
-            return s;
+        String path = FilesUtils.resolveRelativePath(new File("").getAbsolutePath(), configFileLocation);
+        // 拼接最后字符斜杠
+        if(path.endsWith(FilesUtils.SLASH) || path.endsWith(File.separator)){
+            return path;
         } else {
-            return s + File.separator;
+            return path + File.separator;
         }
     }
 
