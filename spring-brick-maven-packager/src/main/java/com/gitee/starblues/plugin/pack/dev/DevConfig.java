@@ -22,7 +22,9 @@ import java.util.List;
 
 /**
  * 开发模式配置
+ *
  * @author starBlues
+ * @since 3.0.0
  * @version 3.0.0
  */
 @Data

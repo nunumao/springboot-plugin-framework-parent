@@ -25,6 +25,8 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
+ * 插件 applicationContext 获取者
+ *
  * @author starBlues
  * @since  3.0.0
  * @version 3.1.0

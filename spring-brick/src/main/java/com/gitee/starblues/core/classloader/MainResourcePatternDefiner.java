@@ -20,7 +20,9 @@ import java.util.Set;
 
 /**
  * 主程序定义者, 从主程序加载资源的定义者
+ *
  * @author starBlues
+ * @since 3.0.0
  * @version 3.0.0
  */
 public interface MainResourcePatternDefiner {

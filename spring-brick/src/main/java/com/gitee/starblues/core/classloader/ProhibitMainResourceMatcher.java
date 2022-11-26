@@ -18,7 +18,9 @@ package com.gitee.starblues.core.classloader;
 
 /**
  * 禁止匹配所有主程序资源
+ *
  * @author starBlues
+ * @since 3.0.0
  * @version 3.0.3
  */
 public class ProhibitMainResourceMatcher implements MainResourceMatcher{

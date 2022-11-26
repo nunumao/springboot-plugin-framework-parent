@@ -23,6 +23,7 @@ import java.util.function.Supplier;
  * 参数校验工具类
  *
  * @author starBlues
+ * @since 3.0.0
  * @version 3.0.0
  */
 public abstract class Assert {

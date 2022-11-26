@@ -23,7 +23,10 @@ import com.gitee.starblues.core.exception.PluginException;
 import java.util.Objects;
 
 /**
+ * 插件类型
+ *
  * @author starBlues
+ * @since 3.0.0
  * @version 3.0.2
  */
 public enum PluginType {

@@ -26,7 +26,9 @@ import java.util.Set;
 
 /**
  * 插件 ResourcesDefine 文件定义
+ *
  * @author starBlues
+ * @since 3.0.0
  * @version 3.0.0
  */
 public class PluginResourcesConfig {

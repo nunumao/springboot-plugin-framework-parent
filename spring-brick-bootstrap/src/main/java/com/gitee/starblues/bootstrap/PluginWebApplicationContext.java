@@ -28,6 +28,7 @@ import org.springframework.boot.web.server.WebServerException;
  * 主程序为 web 类型时创建的插件 ApplicationContext
  *
  * @author starBlues
+ * @since 3.0.0
  * @version 3.0.3
  */
 public class PluginWebApplicationContext extends PluginApplicationContext implements WebServerApplicationContext {

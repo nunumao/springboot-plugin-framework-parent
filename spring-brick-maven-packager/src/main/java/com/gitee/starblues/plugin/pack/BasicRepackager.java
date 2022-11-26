@@ -43,7 +43,9 @@ import static com.gitee.starblues.common.PluginDescriptorKey.*;
 
 /**
  * 基础打包
+ *
  * @author starBlues
+ * @since 3.0.0
  * @version 3.0.0
  */
 public class BasicRepackager implements Repackager{

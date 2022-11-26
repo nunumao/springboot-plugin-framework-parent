@@ -28,7 +28,9 @@ import java.util.Set;
 
 /**
  * 插件web资源处理器. 获取资源配置
+ *
  * @author starBlues
+ * @since 3.0.0
  * @version 3.0.0
  */
 public class PluginStaticResourceProcessor implements SpringPluginProcessor {

@@ -93,6 +93,11 @@ public abstract class DefaultIntegrationConfiguration implements IntegrationConf
     }
 
     @Override
+    public boolean pluginFollowProfile() {
+        return false;
+    }
+
+    @Override
     public DecryptConfiguration decrypt() {
         DecryptConfiguration decryptConfiguration = new DecryptConfiguration();
         decryptConfiguration.setEnable(false);

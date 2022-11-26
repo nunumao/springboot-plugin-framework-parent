@@ -24,6 +24,7 @@ import java.util.Properties;
  * 插件描述文件解密器
  *
  * @author starBlues
+ * @since 3.0.0
  * @version 3.0.1
  */
 public interface PluginDescriptorDecrypt {

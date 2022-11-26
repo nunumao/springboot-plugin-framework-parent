@@ -18,7 +18,9 @@ package com.gitee.starblues.loader.launcher;
 
 /**
  * 抽象的启动引导者
+ *
  * @author starBlues
+ * @since 3.0.0
  * @version 3.0.2
  */
 public abstract class AbstractLauncher<R> implements Launcher<R> {

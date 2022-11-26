@@ -31,7 +31,9 @@ import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * 插件资源存储者
+ *
  * @author starBlues
+ * @since 3.0.0
  * @version 3.0.0
  */
 public class PluginResourceStorage {

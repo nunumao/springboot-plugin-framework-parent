@@ -18,7 +18,9 @@ package com.gitee.starblues.bootstrap.processor.interceptor;
 
 /**
  * 插件拦截器注册者
+ *
  * @author starBlues
+ * @since 3.0.0
  * @version 3.0.0
  */
 public interface PluginInterceptorRegister {

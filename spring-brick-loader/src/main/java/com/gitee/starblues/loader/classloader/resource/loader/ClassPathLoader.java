@@ -22,13 +22,15 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Objects;
 
 /**
  * classpath 资源加载者
  * @author starBlues
- * @version 3.0.0
+ * @since 3.0.0
+ * @version 3.1.1
  */
 public class ClassPathLoader extends AbstractResourceLoader {
 
@@ -88,7 +90,7 @@ public class ClassPathLoader extends AbstractResourceLoader {
     private void addResource(ResourceStorage resourceStorage, File file, String packageName) throws Exception {
         resourceStorage.add(packageName, new URL(url.toString() + packageName), ()->{
             if(file.exists() && file.isFile()){
-                return getClassBytes(file.getPath(), new FileInputStream(file), true);
+                return getClassBytes(file.getPath(), Files.newInputStream(file.toPath()), true);
             } else {
                 return null;
             }

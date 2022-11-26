@@ -26,6 +26,7 @@ import java.util.List;
  * 组合的 MainResourcePatternDefiner
  *
  * @author starBlues
+ * @since 3.0.0
  * @version 3.0.3
  */
 public class ComposeMainResourceMatcher implements MainResourceMatcher, AutoCloseable{

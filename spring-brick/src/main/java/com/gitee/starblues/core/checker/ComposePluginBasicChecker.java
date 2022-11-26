@@ -27,7 +27,9 @@ import java.util.List;
 
 /**
  * 组合插件检查者
+ *
  * @author starBlues
+ * @since 3.0.0
  * @version 3.0.0
  */
 public class ComposePluginBasicChecker implements PluginBasicChecker {

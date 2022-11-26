@@ -32,7 +32,9 @@ import java.util.Objects;
 
 /**
  * 插件依赖的插件检查者
+ *
  * @author starBlues
+ * @since 3.0.0
  * @version 3.0.0
  */
 public class DependencyPluginLauncherChecker implements PluginLauncherChecker {

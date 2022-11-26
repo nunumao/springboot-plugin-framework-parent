@@ -38,7 +38,9 @@ import java.nio.file.Paths;
 
 /**
  * 插件自己的Interactive
+ *
  * @author starBlues
+ * @since 3.0.0
  * @version 3.1.0
  */
 public class PluginOneselfInteractive implements PluginInteractive {

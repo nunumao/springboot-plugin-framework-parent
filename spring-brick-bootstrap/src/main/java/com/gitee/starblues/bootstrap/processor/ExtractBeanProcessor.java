@@ -28,7 +28,9 @@ import java.util.Map;
 
 /**
  * Extract 扩展Bean注册处理者
+ *
  * @author starBlues
+ * @since 3.0.0
  * @version 3.0.0
  */
 public class ExtractBeanProcessor implements SpringPluginProcessor {

@@ -28,6 +28,7 @@ import java.util.stream.Collectors;
  * resolve config HttpMessageConverters bean
  *
  * @author starBlues
+ * @since 3.0.0
  * @version 3.0.3
  */
 public class ResolveHttpMessageConvertersConfiguration {

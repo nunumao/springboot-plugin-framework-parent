@@ -22,12 +22,20 @@ import lombok.Data;
  * 加密配置
  *
  * @author starBlues
+ * @since 3.0.1
  * @version 3.0.1
  */
 @Data
 public class EncryptConfig {
 
+    /**
+     * rsa 配置
+     */
     private RsaConfig rsa;
+
+    /**
+     * aes 配置
+     */
     private AesConfig aes;
 
 }

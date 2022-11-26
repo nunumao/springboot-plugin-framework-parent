@@ -22,7 +22,9 @@ import org.springframework.context.annotation.ClassPathBeanDefinitionScanner;
 
 /**
  * 插件自定义 classpath bean 扫描
+ *
  * @author starBlues
+ * @since 3.0.0
  * @version 3.0.0
  */
 public class PluginClassPathBeanDefinitionScanner extends ClassPathBeanDefinitionScanner {

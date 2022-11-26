@@ -18,10 +18,14 @@ package com.gitee.starblues.loader.utils;
 
 import java.io.File;
 import java.net.URL;
+import java.util.Objects;
+import java.util.function.Consumer;
 
 /**
  * 资源工具
+ *
  * @author starBlues
+ * @since 3.0.0
  * @version 3.0.0
  */
 public class ResourceUtils {
@@ -117,6 +121,31 @@ public class ResourceUtils {
             return PACKAGE_SPLIT;
         }
         return newPath.toString();
+    }
+
+    /**
+     * 释放资源
+     * @param object 释放资源的对象
+     */
+    public static void release(final Object object) {
+        release(object, null);
+    }
+
+    /**
+     * 释放资源
+     * @param object 释放资源的对象
+     * @param consumer 释放异常消费
+     */
+    public static void release(final Object object, final Consumer<Exception> consumer) {
+        if (object instanceof Release) {
+            try {
+                ((Release)object).release();
+            } catch (final Exception e) {
+                if (consumer != null) {
+                    consumer.accept(e);
+                }
+            }
+        }
     }
 
 }

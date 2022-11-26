@@ -24,7 +24,9 @@ import java.util.*;
 
 /**
  * 插件bean工具类
+ *
  * @author starBlues
+ * @since 3.0.0
  * @version 3.0.0
  */
 public class SpringBeanUtils {

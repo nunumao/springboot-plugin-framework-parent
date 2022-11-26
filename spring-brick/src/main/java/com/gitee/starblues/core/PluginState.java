@@ -19,6 +19,8 @@ package com.gitee.starblues.core;
 /**
  * 插件状态枚举
  * @author starBlues
+ *
+ * @since 3.0.0
  * @version 3.0.0
  */
 public enum PluginState {

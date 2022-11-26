@@ -119,6 +119,12 @@ public interface IntegrationConfiguration {
     boolean exactVersion();
 
     /**
+     * 插件的配置文件 Profile 是否跟随主程序的 Profile 配置动态切换
+     * @return true: 跟随, false: 不跟随
+     */
+    boolean pluginFollowProfile();
+
+    /**
      * 解密配置
      * @return DecryptConfiguration
      */

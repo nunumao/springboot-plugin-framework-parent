@@ -22,6 +22,7 @@ import java.util.Properties;
  * 操作 Manifest 工具类
  *
  * @author starBlues
+ * @since 3.0.0
  * @version 3.0.0
  */
 public abstract class PropertiesUtils {

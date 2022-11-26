@@ -22,6 +22,7 @@ import java.lang.reflect.Field;
  * 文过滤接口
  *
  * @author starBlues
+ * @since 3.0.0
  * @version 3.0.0
  */
 @FunctionalInterface

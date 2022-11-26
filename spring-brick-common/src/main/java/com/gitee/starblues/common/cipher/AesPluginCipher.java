@@ -30,6 +30,7 @@ import java.util.Base64;
  * AES 加密
  *
  * @author starBlues
+ * @since 3.0.1
  * @version 3.0.1
  */
 public class AesPluginCipher extends AbstractPluginCipher{

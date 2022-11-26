@@ -26,6 +26,7 @@ import java.util.Set;
 /**
  * 定义插件从主程序加载资源的匹配
  * @author starBlues
+ * @since 3.0.0
  * @version 3.0.3
  */
 public class PluginMainResourcePatternDefiner implements MainResourcePatternDefiner {

@@ -30,7 +30,9 @@ import java.util.stream.Collectors;
 
 /**
  * 插件拦截器添加者
+ *
  * @author starBlues
+ * @since 3.0.0
  * @version 3.0.0
  */
 public class PluginInterceptorRegistry {

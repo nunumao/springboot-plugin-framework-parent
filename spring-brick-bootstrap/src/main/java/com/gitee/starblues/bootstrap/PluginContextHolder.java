@@ -26,6 +26,7 @@ import com.gitee.starblues.spring.environment.EnvironmentProvider;
  * 提供插件上下文的工具类
  *
  * @author starBlues
+ * @since 3.0.0
  * @version 3.0.3
  */
 public abstract class PluginContextHolder {

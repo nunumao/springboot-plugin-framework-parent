@@ -29,6 +29,7 @@ import java.util.List;
 /**
  * 生产环境目录解决器
  * @author starBlues
+ * @since 3.0.0
  * @version 3.0.0
  */
 public class ProdPathResolve implements PathResolve{

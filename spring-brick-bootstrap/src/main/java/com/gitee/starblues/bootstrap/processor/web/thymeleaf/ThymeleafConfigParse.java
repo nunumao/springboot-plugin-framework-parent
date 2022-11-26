@@ -22,7 +22,9 @@ import org.springframework.core.env.Environment;
 
 /**
  * 解析ThymeleafConfig配置
+ *
  * @author starBlues
+ * @since 3.0.0
  * @version 3.0.0
  */
 public class ThymeleafConfigParse {

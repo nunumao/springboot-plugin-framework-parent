@@ -38,6 +38,7 @@ import java.util.Map;
 
 /**
  * 默认的插件钩子器
+ *
  * @author starBlues
  * @since 3.0.0
  * @version 3.1.0

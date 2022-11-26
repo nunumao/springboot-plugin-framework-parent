@@ -18,7 +18,9 @@ package com.gitee.starblues.plugin.pack.filter;
 
 /**
  * 排除的依赖定义
+ *
  * @author starBlues
+ * @since 3.0.0
  * @version 3.0.0
  */
 public class Exclude extends FilterableDependency{

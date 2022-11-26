@@ -22,7 +22,9 @@ import java.nio.file.Path;
 
 /**
  * 插件描述加载者
+ *
  * @author starBlues
+ * @since 3.0.0
  * @version 3.0.0
  */
 public interface PluginDescriptorLoader extends AutoCloseable{

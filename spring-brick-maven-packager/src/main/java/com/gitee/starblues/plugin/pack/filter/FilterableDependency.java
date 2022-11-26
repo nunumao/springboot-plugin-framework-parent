@@ -21,7 +21,9 @@ import org.apache.maven.plugins.annotations.Parameter;
 
 /**
  * 可过滤依赖bean
+ *
  * @author starBlues
+ * @since 3.0.0
  * @version 3.0.0
  */
 @Data

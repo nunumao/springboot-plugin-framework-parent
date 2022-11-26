@@ -23,7 +23,9 @@ import com.github.zafarkhaja.semver.Version;
 
 /**
  * Semver标准版本检查
+ *
  * @author starBlues
+ * @since 3.0.0
  * @version 3.0.1
  */
 public class SemverVersionInspector implements VersionInspector{

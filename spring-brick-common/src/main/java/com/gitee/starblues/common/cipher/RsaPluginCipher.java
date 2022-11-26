@@ -33,6 +33,7 @@ import java.util.Base64;
  * 非对称插件加解密
  *
  * @author starBlues
+ * @since 3.0.1
  * @version 3.0.1
  */
 public class RsaPluginCipher extends AbstractPluginCipher{

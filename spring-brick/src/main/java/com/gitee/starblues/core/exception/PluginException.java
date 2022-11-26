@@ -25,6 +25,7 @@ import java.util.function.Supplier;
 /**
  * 插件异常
  * @author starBlues
+ * @since 3.0.0
  * @version 3.0.0
  */
 public class PluginException extends RuntimeException{

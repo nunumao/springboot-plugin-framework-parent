@@ -41,7 +41,9 @@ import java.util.Map;
 
 /**
  * 插件拦截器处理者
+ *
  * @author starBlues
+ * @since 3.0.0
  * @version 3.0.0
  */
 public class PluginInterceptorsProcessor implements SpringPluginProcessor {

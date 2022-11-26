@@ -22,6 +22,7 @@ import java.util.Properties;
  * 空的插件解密
  *
  * @author starBlues
+ * @since 3.0.0
  * @version 3.0.1
  */
 public class EmptyPluginDescriptorDecrypt implements PluginDescriptorDecrypt{

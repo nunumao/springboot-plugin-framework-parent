@@ -25,7 +25,9 @@ import org.springframework.context.support.GenericApplicationContext;
 
 /**
  * 框架内置bean注册
+ *
  * @author starBlues
+ * @since 3.0.0
  * @version 3.0.0
  */
 public class FrameDefineBeanProcessor implements SpringPluginProcessor {

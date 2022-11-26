@@ -26,7 +26,8 @@ import java.net.URL;
 /**
  * 抽象的资源加载者
  * @author starBlues
- * @version 3.0.0
+ * @since 3.0.0
+ * @version 3.1.1
  */
 public abstract class AbstractResourceLoader implements ResourceLoader{
 
@@ -74,15 +75,12 @@ public abstract class AbstractResourceLoader implements ResourceLoader{
         if(!isClass(path)){
             return null;
         }
-        final ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         try {
-            IOUtils.copy(inputStream, byteArrayOutputStream);
-            return byteArrayOutputStream.toByteArray();
+            return IOUtils.read(inputStream);
         } finally {
             if(isClose){
                 IOUtils.closeQuietly(inputStream);
             }
-            IOUtils.closeQuietly(byteArrayOutputStream);
         }
     }
 

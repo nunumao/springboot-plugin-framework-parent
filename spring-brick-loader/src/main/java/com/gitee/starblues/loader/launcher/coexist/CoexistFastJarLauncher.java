@@ -28,7 +28,9 @@ import java.util.Objects;
 
 /**
  * 主程序jar in jar 模式启动者
+ *
  * @author starBlues
+ * @since 3.0.2
  * @version 3.0.2
  */
 public class CoexistFastJarLauncher extends CoexistBaseLauncher {

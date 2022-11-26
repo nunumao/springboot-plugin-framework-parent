@@ -37,7 +37,9 @@ import static com.gitee.starblues.common.ManifestKey.*;
 
 /**
  * jar 外置包
+ *
  * @author starBlues
+ * @since 3.0.0
  * @version 3.0.2
  */
 public class JarOuterPackager extends JarNestPackager {

@@ -26,7 +26,9 @@ import org.springframework.context.support.GenericApplicationContext;
 
 /**
  * 插件 Thymeleaf 注册
+ *
  * @author starBlues
+ * @since 3.0.0
  * @version 3.0.0
  */
 public class PluginThymeleafProcessor implements SpringPluginProcessor {

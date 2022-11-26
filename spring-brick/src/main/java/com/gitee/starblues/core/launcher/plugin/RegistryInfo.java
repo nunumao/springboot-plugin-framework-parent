@@ -20,6 +20,7 @@ import java.util.function.Supplier;
 /**
  * 注册的信息接口
  * @author starBlues
+ * @since 3.0.0
  * @version 3.0.0
  */
 public interface RegistryInfo {

@@ -21,6 +21,7 @@ import java.nio.file.Path;
 /**
  * 从路径中发现合适的插件
  * @author starBlues
+ * @since 3.0.0
  * @version 3.0.0
  */
 public interface PathResolve {

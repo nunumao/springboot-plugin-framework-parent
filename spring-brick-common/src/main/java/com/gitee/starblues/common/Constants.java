@@ -16,11 +16,12 @@
 
 package com.gitee.starblues.common;
 
-import java.io.File;
 
 /**
  * 静态常量
+ *
  * @author starBlues
+ * @since 3.0.0
  * @version 3.0.0
  */
 public abstract class Constants {

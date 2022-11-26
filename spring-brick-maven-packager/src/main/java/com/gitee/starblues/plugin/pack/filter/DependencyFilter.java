@@ -27,7 +27,9 @@ import java.util.Set;
 
 /**
  * 依赖过滤
+ *
  * @author starBlues
+ * @since 3.0.0
  * @version 3.0.0
  */
 public abstract class DependencyFilter extends AbstractArtifactsFilter {

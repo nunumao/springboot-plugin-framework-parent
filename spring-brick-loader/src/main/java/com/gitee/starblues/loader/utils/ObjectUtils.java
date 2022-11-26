@@ -25,6 +25,7 @@ import java.util.Optional;
  * object utils
  *
  * @author starBlues
+ * @since 3.0.0
  * @version 3.0.0
  */
 public class ObjectUtils {

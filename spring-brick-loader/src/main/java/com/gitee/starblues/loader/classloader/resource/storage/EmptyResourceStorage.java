@@ -27,8 +27,8 @@ import java.util.List;
  * 空的资源存储
  *
  * @author starBlues
- * @version 3.1.0
  * @since 3.0.4
+ * @version 3.1.1
  */
 public class EmptyResourceStorage implements ResourceStorage{
     @Override
@@ -54,16 +54,6 @@ public class EmptyResourceStorage implements ResourceStorage{
     @Override
     public InputStream getInputStream(String name) {
         return null;
-    }
-
-    @Override
-    public List<Resource> getAll() {
-        return null;
-    }
-
-    @Override
-    public boolean isEmpty() {
-        return false;
     }
 
     @Override

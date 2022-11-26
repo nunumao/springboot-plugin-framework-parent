@@ -18,6 +18,7 @@ package com.gitee.starblues.bootstrap.realize;
 
 /**
  * 插件停止校验器. 自主实现判断是否可卸载
+ *
  * @author starBlues
  * @since 3.0.0
  * @version 3.0.3

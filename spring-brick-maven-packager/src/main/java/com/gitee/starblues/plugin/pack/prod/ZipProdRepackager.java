@@ -47,7 +47,9 @@ import static com.gitee.starblues.common.PackageStructure.*;
 
 /**
  * zip 打包
+ *
  * @author starBlues
+ * @since 3.0.0
  * @version 3.0.0
  */
 public class ZipProdRepackager extends DevRepackager {

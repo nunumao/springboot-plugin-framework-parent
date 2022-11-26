@@ -20,6 +20,7 @@ package com.gitee.starblues.loader.utils;
  * 比较两个类类型
  *
  * @author starBlues
+ * @since 3.0.0
  * @version 3.0.0
  */
 public class CompareClassTypeUtils {

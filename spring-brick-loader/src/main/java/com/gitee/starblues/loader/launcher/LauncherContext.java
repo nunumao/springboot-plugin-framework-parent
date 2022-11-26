@@ -17,9 +17,10 @@
 package com.gitee.starblues.loader.launcher;
 
 /**
- * LauncherContext
+ * 启动上下文
  *
  * @author starBlues
+ * @since 3.0.0
  * @version 3.0.2
  */
 public class LauncherContext {

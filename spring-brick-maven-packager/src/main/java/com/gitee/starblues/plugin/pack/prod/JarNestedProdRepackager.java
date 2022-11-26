@@ -38,7 +38,9 @@ import static com.gitee.starblues.common.PackageStructure.PROD_RESOURCES_DEFINE_
 
 /**
  * jar包生成
+ *
  * @author starBlues
+ * @since 3.0.0
  * @version 3.0.0
  */
 public class JarNestedProdRepackager extends ZipProdRepackager {

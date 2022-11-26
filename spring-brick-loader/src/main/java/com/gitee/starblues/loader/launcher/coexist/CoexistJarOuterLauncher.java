@@ -31,6 +31,7 @@ import java.util.Objects;
  * 主程序jar-outer 模式启动者
  *
  * @author starBlues
+ * @since 3.0.2
  * @version 3.0.2
  */
 public class CoexistJarOuterLauncher extends CoexistBaseLauncher {

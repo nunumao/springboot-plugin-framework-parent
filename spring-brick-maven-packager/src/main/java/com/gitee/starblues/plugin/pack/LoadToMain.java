@@ -22,7 +22,9 @@ import java.util.List;
 
 /**
  * 定义依赖加载到主程序中
+ *
  * @author starBlues
+ * @since 3.0.0
  * @version 3.0.0
  */
 @Data

@@ -38,7 +38,9 @@ import java.util.stream.Collectors;
 
 /**
  * 组合的处理器
+ *
  * @author starBlues
+ * @since 3.0.0
  * @version 3.0.3
  */
 public class ComposeSpringPluginProcessor implements SpringPluginProcessor {

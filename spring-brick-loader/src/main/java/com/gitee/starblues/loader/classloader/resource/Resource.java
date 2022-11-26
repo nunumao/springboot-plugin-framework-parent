@@ -16,6 +16,8 @@
 
 package com.gitee.starblues.loader.classloader.resource;
 
+import com.gitee.starblues.loader.utils.Release;
+
 import java.net.URL;
 
 /**
@@ -23,7 +25,7 @@ import java.net.URL;
  * @author starBlues
  * @version 3.0.0
  */
-public interface Resource extends AutoCloseable{
+public interface Resource extends AutoCloseable, Release {
 
     String PACKAGE_SPLIT = "/";
 
@@ -58,5 +60,6 @@ public interface Resource extends AutoCloseable{
      */
     void setBytes(ResourceByteGetter byteGetter) throws Exception;
 
+    void release();
 
 }

@@ -18,13 +18,12 @@ package com.gitee.starblues.core.launcher.plugin;
 
 import com.gitee.starblues.core.PluginInsideInfo;
 import com.gitee.starblues.core.classloader.*;
-import com.gitee.starblues.core.descriptor.InsidePluginDescriptor;
 import com.gitee.starblues.core.launcher.plugin.involved.PluginLaunchInvolved;
 import com.gitee.starblues.loader.classloader.GenericClassLoader;
 import com.gitee.starblues.loader.classloader.resource.loader.DefaultResourceLoaderFactory;
 import com.gitee.starblues.loader.classloader.resource.loader.ResourceLoaderFactory;
-import com.gitee.starblues.loader.launcher.AbstractLauncher;
 import com.gitee.starblues.loader.launcher.LauncherContext;
+import com.gitee.starblues.loader.utils.ResourceUtils;
 import com.gitee.starblues.spring.MainApplicationContext;
 import com.gitee.starblues.spring.SpringPluginHook;
 import com.gitee.starblues.utils.MsgUtils;
@@ -42,22 +41,18 @@ import java.util.WeakHashMap;
  * @since 3.0.0
  * @version 3.1.0
  */
-public class PluginIsolationLauncher extends AbstractLauncher<SpringPluginHook> {
+public class PluginIsolationLauncher extends AbstractPluginLauncher {
 
     private static final Map<String, PluginClassLoader> CLASS_LOADER_CACHE = new WeakHashMap<>();
 
-    protected final PluginInteractive pluginInteractive;
     protected final PluginInsideInfo pluginInsideInfo;
     protected final MainResourceMatcher mainResourceMatcher;
 
-    protected final PluginLaunchInvolved pluginLaunchInvolved;
-
     public PluginIsolationLauncher(PluginInteractive pluginInteractive,
                                    PluginLaunchInvolved pluginLaunchInvolved) {
-        this.pluginInteractive = pluginInteractive;
+        super(pluginInteractive, pluginLaunchInvolved);
         this.pluginInsideInfo = pluginInteractive.getPluginInsideInfo();
         this.mainResourceMatcher = getMainResourceMatcher(pluginInteractive);
-        this.pluginLaunchInvolved = pluginLaunchInvolved;
     }
 
     protected MainResourceMatcher getMainResourceMatcher(PluginInteractive pluginInteractive){
@@ -75,10 +70,17 @@ public class PluginIsolationLauncher extends AbstractLauncher<SpringPluginHook> 
     }
 
     @Override
-    protected ClassLoader createClassLoader(String... args) throws Exception {
+    protected ClassLoader createPluginClassLoader(String... args) throws Exception {
         PluginClassLoader pluginClassLoader = getPluginClassLoader();
         pluginClassLoader.addResource(pluginInsideInfo.getPluginDescriptor());
         return pluginClassLoader;
+    }
+
+    @Override
+    protected SpringPluginHook launch(ClassLoader classLoader, String... args) throws Exception {
+        SpringPluginHook springPluginHook = super.launch(classLoader, args);
+        ResourceUtils.release(classLoader);
+        return springPluginHook;
     }
 
     protected synchronized PluginClassLoader getPluginClassLoader() throws Exception {
@@ -89,7 +91,8 @@ public class PluginIsolationLauncher extends AbstractLauncher<SpringPluginHook> 
             return classLoader;
         }
         PluginClassLoader pluginClassLoader = new PluginClassLoader(
-                pluginId, getParentClassLoader(), getResourceLoaderFactory(), mainResourceMatcher
+                pluginId, getParentClassLoader(),  getParentClassLoader(), getResourceLoaderFactory(),
+                mainResourceMatcher
         );
         CLASS_LOADER_CACHE.put(key, pluginClassLoader);
         return pluginClassLoader;
@@ -105,20 +108,6 @@ public class PluginIsolationLauncher extends AbstractLauncher<SpringPluginHook> 
             return (GenericClassLoader) contextClassLoader;
         } else {
             throw new Exception("非法父类加载器: " + contextClassLoader.getClass().getName());
-        }
-    }
-
-    @Override
-    protected SpringPluginHook launch(ClassLoader classLoader, String... args) throws Exception {
-        pluginLaunchInvolved.before(pluginInsideInfo, classLoader);
-        try {
-            SpringPluginHook springPluginHook = (SpringPluginHook) new PluginMethodRunner(pluginInteractive)
-                    .run(classLoader);
-            pluginLaunchInvolved.after(pluginInsideInfo, classLoader, springPluginHook);
-            return new SpringPluginHookWrapper(springPluginHook, pluginInsideInfo, pluginLaunchInvolved, classLoader);
-        } catch (Throwable throwable){
-            pluginLaunchInvolved.failure(pluginInsideInfo,classLoader, throwable);
-            throw throwable;
         }
     }
 

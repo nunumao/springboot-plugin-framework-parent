@@ -21,7 +21,9 @@ import org.apache.maven.plugins.annotations.Parameter;
 
 /**
  * 从主程序加载资源配置
+ *
  * @author starBlues
+ * @since 3.0.0
  * @version 3.0.0
  */
 @Data

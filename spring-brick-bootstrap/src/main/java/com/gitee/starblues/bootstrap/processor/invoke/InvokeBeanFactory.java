@@ -24,7 +24,9 @@ import java.lang.reflect.Proxy;
 
 /**
  * 反射调用其他插件定义的接口bean工厂
+ *
  * @author starBlues
+ * @since 3.0.0
  * @version 3.0.0
  */
 public class InvokeBeanFactory<T> implements FactoryBean<T> {

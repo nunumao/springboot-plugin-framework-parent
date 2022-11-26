@@ -24,6 +24,7 @@ import org.springframework.context.support.GenericApplicationContext;
 
 /**
  * 插件启动前后介入
+ *
  * @author starBlues
  * @since 3.0.0
  * @version 3.1.0

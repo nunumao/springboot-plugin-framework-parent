@@ -28,6 +28,7 @@ import com.gitee.starblues.spring.invoke.InvokeSupperCache;
 /**
  * 默认的插件交互实现
  * @author starBlues
+ * @since 3.0.0
  * @version 3.0.0
  */
 public class DefaultPluginInteractive implements PluginInteractive{

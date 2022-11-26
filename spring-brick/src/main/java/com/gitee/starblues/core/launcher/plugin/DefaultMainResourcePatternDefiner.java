@@ -30,6 +30,7 @@ import java.util.Set;
  * 主程序资源匹配定义
  *
  * @author starBlues
+ * @since 3.0.0
  * @version 3.0.3
  */
 public class DefaultMainResourcePatternDefiner extends JavaMainResourcePatternDefiner {

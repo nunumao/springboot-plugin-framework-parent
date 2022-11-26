@@ -23,7 +23,9 @@ import lombok.ToString;
 
 /**
  * 插件依赖包信息
+ *
  * @author starBlues
+ * @since 3.0.0
  * @version 3.0.0
  */
 @AllArgsConstructor

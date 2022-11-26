@@ -29,7 +29,9 @@ import org.apache.maven.plugin.MojoFailureException;
 
 /**
  * 生产环境打包
+ *
  * @author starBlues
+ * @since 3.0.0
  * @version 3.0.0
  */
 public class ProdRepackager implements Repackager {

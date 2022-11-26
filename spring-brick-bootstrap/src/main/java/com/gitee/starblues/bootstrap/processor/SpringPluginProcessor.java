@@ -21,7 +21,9 @@ import com.gitee.starblues.utils.OrderPriority;
 
 /**
  * spring plugin 处理器
+ *
  * @author starBlues
+ * @since 3.0.0
  * @version 3.0.0
  */
 public interface SpringPluginProcessor extends Order {

@@ -20,6 +20,7 @@ package com.gitee.starblues.common.cipher;
  * 插件密码接口
  *
  * @author starBlues
+ * @since 3.0.1
  * @version 3.0.1
  */
 public interface PluginCipher {

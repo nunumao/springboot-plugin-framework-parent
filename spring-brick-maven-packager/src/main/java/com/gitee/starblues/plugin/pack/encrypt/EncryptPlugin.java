@@ -22,6 +22,7 @@ import com.gitee.starblues.plugin.pack.PluginInfo;
  * 加密插件
  *
  * @author starBlues
+ * @since 3.0.1
  * @version 3.0.1
  */
 public interface EncryptPlugin {

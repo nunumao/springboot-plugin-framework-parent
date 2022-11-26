@@ -24,7 +24,8 @@ import java.net.URL;
 /**
  * 默认的资源信息
  * @author starBlues
- * @version 3.0.0
+ * @since 3.0.0
+ * @version 3.1.1
  */
 public class DefaultResource implements Resource {
 
@@ -65,6 +66,11 @@ public class DefaultResource implements Resource {
 
     @Override
     public void close() throws Exception {
+
+    }
+
+    @Override
+    public void release() {
 
     }
 }

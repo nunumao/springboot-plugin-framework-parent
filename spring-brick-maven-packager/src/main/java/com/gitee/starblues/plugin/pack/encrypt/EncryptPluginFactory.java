@@ -25,6 +25,7 @@ import java.util.List;
  * 加密插件工厂
  *
  * @author starBlues
+ * @since 3.0.1
  * @version 3.0.1
  */
 public class EncryptPluginFactory implements EncryptPlugin {

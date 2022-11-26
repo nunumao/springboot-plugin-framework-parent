@@ -27,8 +27,10 @@ import java.util.Set;
 
 /**
  * 空的MainApplicationContext实现
+ *
  * @author starBlues
- * @version 3.0.3
+ * @since 3.0.0
+ * @version 3.1.1
  */
 public class EmptyMainApplicationContext implements MainApplicationContext {
 
@@ -57,6 +59,16 @@ public class EmptyMainApplicationContext implements MainApplicationContext {
     @Override
     public EnvironmentProvider getEnvironmentProvider() {
         return new EmptyEnvironmentProvider();
+    }
+
+    @Override
+    public String[] getActiveProfiles() {
+        return new String[0];
+    }
+
+    @Override
+    public String[] getDefaultProfiles() {
+        return new String[0];
     }
 
     @Override

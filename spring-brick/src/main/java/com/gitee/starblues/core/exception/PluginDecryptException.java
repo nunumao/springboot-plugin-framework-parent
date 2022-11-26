@@ -22,6 +22,7 @@ import com.gitee.starblues.core.descriptor.PluginDescriptor;
  * 插件解密异常
  *
  * @author starBlues
+ * @since 3.0.0
  * @version 3.0.1
  */
 public class PluginDecryptException extends PluginException{

@@ -43,7 +43,9 @@ import static com.gitee.starblues.common.PackageStructure.*;
 
 /**
  * zip-outer 包生成
+ *
  * @author starBlues
+ * @since 3.0.0
  * @version 3.0.0
  */
 public class ZipOuterProdRepackager extends DirProdRepackager {

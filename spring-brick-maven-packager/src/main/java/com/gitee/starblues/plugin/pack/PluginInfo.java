@@ -23,7 +23,9 @@ import java.util.List;
 
 /**
  * 插件信息
+ *
  * @author starBlues
+ * @since 3.0.0
  * @version 3.0.0
  */
 @Data

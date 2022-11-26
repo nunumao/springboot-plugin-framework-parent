@@ -27,7 +27,9 @@ import java.nio.file.Files;
 
 /**
  * jar 打包工具
+ *
  * @author starBlues
+ * @since 3.0.0
  * @version 3.0.0
  */
 public class PackageJar extends PackageZip{

@@ -20,7 +20,9 @@ import java.util.Set;
 
 /**
  * 空的 MainResourceDefiner
+ *
  * @author starBlues
+ * @since 3.0.0
  * @version 3.0.0
  */
 public class EmptyMainResourcePatternDefiner implements MainResourcePatternDefiner {

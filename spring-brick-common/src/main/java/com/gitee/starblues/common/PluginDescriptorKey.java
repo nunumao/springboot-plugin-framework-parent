@@ -20,6 +20,7 @@ package com.gitee.starblues.common;
  * 插件描述文件配置key
  *
  * @author starBlues
+ * @since 3.0.0
  * @version 3.0.0
  */
 public class PluginDescriptorKey {

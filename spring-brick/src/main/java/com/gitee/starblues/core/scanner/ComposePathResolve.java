@@ -26,6 +26,7 @@ import java.util.List;
 /**
  * 组合的PathResolve
  * @author starBlues
+ * @since 3.0.0
  * @version 3.0.0
  */
 public class ComposePathResolve implements PathResolve{

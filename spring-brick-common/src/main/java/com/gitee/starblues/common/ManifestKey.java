@@ -22,6 +22,7 @@ import java.util.jar.Attributes;
  * Manifest-Key
  *
  * @author starBlues
+ * @since 3.0.0
  * @version 3.0.0
  */
 public class ManifestKey {

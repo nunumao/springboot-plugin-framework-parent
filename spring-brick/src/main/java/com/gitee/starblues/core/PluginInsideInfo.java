@@ -24,9 +24,9 @@ import java.util.function.Supplier;
 /**
  * 内部的 PluginInfo
  *
- * @since 3.0.0
- * @version 3.1.0
  * @author starBlues
+ * @since 3.0.0
+ * @version 3.1.1
  */
 public interface PluginInsideInfo extends PluginInfo {
 
@@ -46,6 +46,12 @@ public interface PluginInsideInfo extends PluginInfo {
      * @param supplier 插件扩展信息自主提供者
      */
     void setExtensionInfoSupplier(Supplier<Map<String, Object>> supplier);
+
+    /**
+     * 设置插件的 classLoader
+     * @param classLoader ClassLoader
+     */
+    void setClassLoader(ClassLoader classLoader);
 
     /**
      * 获取插件信息提供者

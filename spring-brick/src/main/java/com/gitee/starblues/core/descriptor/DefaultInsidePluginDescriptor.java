@@ -26,6 +26,7 @@ import java.util.jar.Manifest;
 /**
  * 内部的默认插件描述者
  * @author starBlues
+ * @since 3.0.0
  * @version 3.0.2
  */
 public class DefaultInsidePluginDescriptor extends DefaultPluginDescriptor implements InsidePluginDescriptor {

@@ -23,6 +23,7 @@ import com.gitee.starblues.core.version.VersionInspector;
 /**
  * 插件扩展配置
  * @author starBlues
+ * @since 3.0.0
  * @version 3.0.0
  */
 public interface RealizeProvider {

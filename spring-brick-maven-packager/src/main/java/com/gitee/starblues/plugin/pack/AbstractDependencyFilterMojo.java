@@ -39,7 +39,9 @@ import java.util.Set;
 
 /**
  * 抽象可过滤依赖的 mojo
+ *
  * @author starBlues
+ * @since 3.0.0
  * @version 3.0.0
  */
 @EqualsAndHashCode(callSuper = true)

@@ -36,7 +36,8 @@ import java.util.concurrent.ConcurrentHashMap;
  * 默认的资源加载工厂
  *
  * @author starBlues
- * @version 3.0.0
+ * @since 3.0.0
+ * @version 3.1.1
  */
 public class DefaultResourceLoaderFactory implements ResourceLoaderFactory{
 
@@ -47,7 +48,6 @@ public class DefaultResourceLoaderFactory implements ResourceLoaderFactory{
     public DefaultResourceLoaderFactory(String classLoaderName) {
         this.classLoaderName = classLoaderName;
     }
-
 
     @Override
     public void addResource(String path) throws Exception{
@@ -113,13 +113,14 @@ public class DefaultResourceLoaderFactory implements ResourceLoaderFactory{
             return;
         }
         SameRootResourceStorage resourceStorage = resourceLoaderMap.get(resourceLoader.getBaseUrl());
-        if (resourceStorage == null) {
-            resourceStorage = ResourceLoaderFactoryGetter.getResourceStorage(
-                    classLoaderName,
-                    resourceLoader.getBaseUrl());
-            resourceLoaderMap.put(resourceLoader.getBaseUrl(), resourceStorage);
+        if (resourceStorage != null) {
+            return;
         }
+        resourceStorage = ResourceLoaderFactoryGetter.getResourceStorage(
+                classLoaderName,
+                resourceLoader.getBaseUrl());
         resourceLoader.load(resourceStorage);
+        resourceLoaderMap.put(resourceLoader.getBaseUrl(), resourceStorage);
     }
 
     @Override
@@ -207,4 +208,10 @@ public class DefaultResourceLoaderFactory implements ResourceLoaderFactory{
         resourceLoaderMap.clear();
     }
 
+    @Override
+    public void release() {
+        for (SameRootResourceStorage resourceStorage : resourceLoaderMap.values()) {
+            ResourceUtils.release(resourceStorage);
+        }
+    }
 }

@@ -27,12 +27,15 @@ import java.io.File;
 import java.net.URL;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 import static com.gitee.starblues.loader.LoaderConstant.*;
 
 /**
  * 主程序jar in jar 模式启动者
+ *
  * @author starBlues
+ * @since 3.0.2
  * @version 3.0.2
  */
 public class IsolationFastJarLauncher extends IsolationBaseLauncher {
@@ -46,15 +49,24 @@ public class IsolationFastJarLauncher extends IsolationBaseLauncher {
     }
 
     @Override
+    protected ClassLoader createClassLoader(String... args) throws Exception {
+        GenericClassLoader classLoader = (GenericClassLoader) super.createClassLoader(args);
+        addResource(classLoader);
+        return classLoader;
+    }
+
+    @Override
     protected boolean resolveThreadClassLoader() {
         return true;
     }
 
-    @Override
-    protected void addResource(GenericClassLoader classLoader) throws Exception {
-        super.addResource(classLoader);
+    private void addResource(GenericClassLoader classLoader) throws Exception {
+        Set<URL> baseResource = getBaseResource();
         List<URL> classpath = classpathResource.getClasspath();
-        for (URL url : classpath) {
+        if(classpath != null){
+            baseResource.addAll(classpath);
+        }
+        for (URL url : baseResource) {
             String path = url.getPath();
             if(path.contains(PROD_CLASSES_URL_SIGN)){
                 classLoader.addResource(new MainJarResourceLoader(url));

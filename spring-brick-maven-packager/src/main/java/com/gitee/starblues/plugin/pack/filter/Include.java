@@ -18,7 +18,9 @@ package com.gitee.starblues.plugin.pack.filter;
 
 /**
  * 包含的依赖定义
+ *
  * @author starBlues
+ * @since 3.0.0
  * @version 3.0.0
  */
 public class Include extends FilterableDependency{

@@ -22,11 +22,15 @@ import lombok.Data;
  * rsa 加密配置
  *
  * @author starBlues
+ * @since 3.0.1
  * @version 3.0.1
  */
 @Data
 public class RsaConfig {
 
+    /**
+     * rsa 公钥
+     */
     private String publicKey;
 
 }

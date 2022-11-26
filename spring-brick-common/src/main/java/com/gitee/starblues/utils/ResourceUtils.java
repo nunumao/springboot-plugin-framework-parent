@@ -29,6 +29,7 @@ import java.util.function.Consumer;
  * 资源工具类
  *
  * @author starBlues
+ * @since 3.0.0
  * @version 3.0.0
  */
 public class ResourceUtils {

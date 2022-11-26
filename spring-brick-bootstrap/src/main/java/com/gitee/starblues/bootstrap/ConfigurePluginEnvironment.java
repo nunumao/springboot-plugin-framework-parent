@@ -19,7 +19,9 @@ package com.gitee.starblues.bootstrap;
 import com.gitee.starblues.bootstrap.processor.ProcessorContext;
 import com.gitee.starblues.core.descriptor.InsidePluginDescriptor;
 import com.gitee.starblues.integration.AutoIntegrationConfiguration;
+import com.gitee.starblues.integration.IntegrationConfiguration;
 import com.gitee.starblues.loader.launcher.DevelopmentModeSetting;
+import com.gitee.starblues.spring.MainApplicationContext;
 import com.gitee.starblues.utils.Assert;
 import com.gitee.starblues.utils.FilesUtils;
 import com.gitee.starblues.utils.ObjectUtils;
@@ -38,9 +40,10 @@ import java.util.Map;
 
 /**
  * 插件环境配置
+ *
  * @author starBlues
  * @since 3.0.0
- * @version 3.1.0
+ * @version 3.1.1
  */
 public class ConfigurePluginEnvironment {
     private final Logger logger = LoggerFactory.getLogger(ConfigurePluginEnvironment.class);
@@ -51,6 +54,7 @@ public class ConfigurePluginEnvironment {
     private final static String SPRING_CONFIG_LOCATION = "spring.config.location";
 
     private final static String SPRING_JMX_UNIQUE_NAMES = "spring.jmx.unique-names";
+    private final static String SPRING_ADMIM_ENABLED = "spring.application.admin.enabled";
     private final static String SPRING_ADMIN_JMX_NAME = "spring.application.admin.jmx-name";
     private final static String SPRING_ADMIN_JMX_VALUE = "org.springframework.boot:type=Admin,name=";
 
@@ -79,9 +83,12 @@ public class ConfigurePluginEnvironment {
         }
         env.put(AutoIntegrationConfiguration.ENABLE_STARTER_KEY, false);
         env.put(SPRING_JMX_UNIQUE_NAMES, true);
+        // 直接禁用插件的 spring-admin mbean
+        env.put(SPRING_ADMIM_ENABLED, false);
         env.put(SPRING_ADMIN_JMX_NAME, SPRING_ADMIN_JMX_VALUE + pluginId);
         env.put(REGISTER_SHUTDOWN_HOOK_PROPERTY, false);
         env.put(MBEAN_DOMAIN_PROPERTY_NAME, pluginId);
+
 
         try{
             // fix: https://gitee.com/starblues/springboot-plugin-framework-parent/issues/I57965
@@ -95,6 +102,13 @@ public class ConfigurePluginEnvironment {
 
         if(DevelopmentModeSetting.coexist()){
             env.put(AutoIntegrationConfiguration.ENABLE_STARTER_KEY, false);
+        }
+
+        IntegrationConfiguration configuration = processorContext.getConfiguration();
+        if(configuration.pluginFollowProfile()){
+            MainApplicationContext mainApplicationContext = processorContext.getMainApplicationContext();
+            environment.setActiveProfiles(mainApplicationContext.getActiveProfiles());
+            environment.setDefaultProfiles(mainApplicationContext.getDefaultProfiles());
         }
 
         environment.getPropertySources().addFirst(new MapPropertySource(PLUGIN_PROPERTY_NAME, env));

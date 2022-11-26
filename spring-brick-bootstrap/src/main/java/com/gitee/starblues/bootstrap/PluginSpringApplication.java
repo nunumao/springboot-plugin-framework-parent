@@ -32,6 +32,7 @@ import org.springframework.core.io.ResourceLoader;
 
 /**
  * 插件SpringApplication实现
+ *
  * @author starBlues
  * @since 3.0.0
  * @version 3.1.0

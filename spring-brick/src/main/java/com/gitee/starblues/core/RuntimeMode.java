@@ -19,6 +19,7 @@ package com.gitee.starblues.core;
 /**
  * 插件运行环境
  * @author starBlues
+ * @since 3.0.0
  * @version 3.0.0
  */
 public enum RuntimeMode {

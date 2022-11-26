@@ -20,7 +20,9 @@ import com.gitee.starblues.loader.DevelopmentMode;
 
 /**
  * 主程序实现该接口引导启动SpringBoot
+ *
  * @author starBlues
+ * @since 3.0.0
  * @version 3.0.0
  */
 public interface SpringBootstrap {

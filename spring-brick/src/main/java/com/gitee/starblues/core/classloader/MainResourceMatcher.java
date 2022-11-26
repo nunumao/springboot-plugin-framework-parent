@@ -18,7 +18,9 @@ package com.gitee.starblues.core.classloader;
 
 /**
  * 主程序资源匹配者
+ *
  * @author starBlues
+ * @since 3.0.0
  * @version 3.0.3
  */
 public interface MainResourceMatcher {

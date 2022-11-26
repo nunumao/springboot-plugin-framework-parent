@@ -18,6 +18,7 @@ package com.gitee.starblues.loader.classloader.resource.storage;
 
 import com.gitee.starblues.loader.classloader.resource.Resource;
 import com.gitee.starblues.loader.classloader.resource.ResourceByteGetter;
+import com.gitee.starblues.loader.utils.Release;
 
 import java.io.InputStream;
 import java.net.URL;
@@ -27,9 +28,10 @@ import java.util.List;
  * 资源存储者
  *
  * @author starBlues
- * @version 3.0.0
+ * @since 3.0.0
+ * @version 3.1.1
  */
-public interface ResourceStorage extends AutoCloseable{
+public interface ResourceStorage extends AutoCloseable, Release {
 
     /**
      * 添加资源
@@ -68,18 +70,5 @@ public interface ResourceStorage extends AutoCloseable{
      * @return InputStream
      */
     InputStream getInputStream(String name);
-
-    /**
-     * 得到全部资源
-     * @return 全部资源列表
-     */
-    List<Resource> getAll();
-
-    /**
-     * 是否为空
-     * @return boolean
-     */
-    boolean isEmpty();
-
 
 }

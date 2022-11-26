@@ -25,6 +25,7 @@ import java.lang.annotation.*;
  * 被调用类的提供者。配合 @Caller 注解使用, 两者结合实现插件中的方法调用。
  *
  * @author starBlues
+ * @since  2.4.0
  * @version 2.4.0
  */
 @Target(ElementType.TYPE)

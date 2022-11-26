@@ -101,6 +101,13 @@
       "defaultValue": false
     },
     {
+      "name": "plugin.pluginFollowProfile",
+      "type": "java.lang.Boolean",
+      "sourceType": "com.gitee.starblues.integration.AutoIntegrationConfiguration",
+      "description": "插件的配置文件 Profile 是否跟随主程序的 Profile 配置动态切换",
+      "defaultValue": false
+    },
+    {
       "name": "plugin.decrypt",
       "type": "com.gitee.starblues.integration.decrypt.DecryptConfiguration",
       "sourceType": "com.gitee.starblues.integration.AutoIntegrationConfiguration",

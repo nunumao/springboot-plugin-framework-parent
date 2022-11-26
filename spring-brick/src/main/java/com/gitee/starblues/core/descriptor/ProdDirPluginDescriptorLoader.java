@@ -43,7 +43,9 @@ import static com.gitee.starblues.common.PackageStructure.*;
 /**
  * 生产环境目录式插件 PluginDescriptorLoader 加载者
  * 解析生产的dir
+ *
  * @author starBlues
+ * @since 3.0.0
  * @version 3.0.2
  */
 public class ProdDirPluginDescriptorLoader extends AbstractPluginDescriptorLoader{

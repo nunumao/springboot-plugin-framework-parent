@@ -23,7 +23,9 @@ import java.nio.file.Path;
 
 /**
  * 插件基本检查者
+ *
  * @author starBlues
+ * @since 3.0.0
  * @version 3.0.0
  */
 public interface PluginBasicChecker {

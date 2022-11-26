@@ -19,18 +19,29 @@ package com.gitee.starblues.loader.classloader.resource.storage;
 import com.gitee.starblues.loader.classloader.resource.loader.DefaultResource;
 import com.gitee.starblues.loader.classloader.resource.Resource;
 import com.gitee.starblues.loader.classloader.resource.ResourceByteGetter;
-
+import com.gitee.starblues.loader.utils.IOUtils;
+import com.gitee.starblues.loader.utils.ObjectUtils;
+import com.gitee.starblues.loader.utils.ResourceUtils;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * 可缓存的资源存储者
+ * 默认的资源存储者
  *
  * @author starBlues
- * @version 3.0.0
+ * @since 3.0.0
+ * @version 3.1.1
  */
-public class CacheResourceStorage extends DefaultResourceStorage{
+public class CacheResourceStorage extends SameRootResourceStorage{
+
+    protected final Map<String, Resource> resourceStorage = new ConcurrentHashMap<>();
+
+    private final List<InputStream> inputStreams = new ArrayList<>();
 
     public CacheResourceStorage(URL baseUrl) {
         super(baseUrl);
@@ -47,9 +58,79 @@ public class CacheResourceStorage extends DefaultResourceStorage{
         addResource(name, cacheResource);
     }
 
-    private static class CacheResource extends DefaultResource {
+    @Override
+    public void add(String name, URL url) throws Exception{
+        if(ObjectUtils.isEmpty(name) || url == null){
+            return;
+        }
+        this.add(name, url, null);
+    }
 
-        private byte[] bytes;
+    @Override
+    public boolean exist(String name) {
+        if(ObjectUtils.isEmpty(name)){
+            return false;
+        }
+        name = formatResourceName(name);
+        return resourceStorage.containsKey(name);
+    }
+
+    protected void addResource(String name, Resource resource){
+        if(ObjectUtils.isEmpty(name) || resource == null){
+            return;
+        }
+        resourceStorage.put(name, resource);
+    }
+
+    @Override
+    public Resource get(String name) {
+        if(ObjectUtils.isEmpty(name)){
+            return null;
+        }
+        name = formatResourceName(name);
+        return resourceStorage.get(name);
+    }
+
+    @Override
+    public InputStream getInputStream(String name) {
+        if(ObjectUtils.isEmpty(name)){
+            return null;
+        }
+        Resource resource = get(name);
+        if(resource == null){
+            return null;
+        }
+        try {
+            InputStream inputStream = resource.getUrl().openStream();
+            inputStreams.add(inputStream);
+            return inputStream;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    @Override
+    public void close() throws Exception {
+        for (InputStream inputStream : inputStreams) {
+            IOUtils.closeQuietly(inputStream);
+        }
+        for (Resource resource : resourceStorage.values()) {
+            IOUtils.closeQuietly(resource);
+        }
+        resourceStorage.clear();
+    }
+
+    protected final String formatResourceName(String name) {
+        return ResourceUtils.formatStandardName(name);
+    }
+
+    /**
+     * 缓存资源
+     */
+    protected static class CacheResource extends DefaultResource {
+
+        protected byte[] bytes;
 
         public CacheResource(String name, URL baseUrl, URL url) {
             super(name, baseUrl, url);
@@ -60,7 +141,6 @@ public class CacheResourceStorage extends DefaultResourceStorage{
             if(byteGetter == null){
                 return;
             }
-            // 忽略
             bytes = byteGetter.get();
         }
 
@@ -69,6 +149,5 @@ public class CacheResourceStorage extends DefaultResourceStorage{
             return bytes;
         }
     }
-
 
 }

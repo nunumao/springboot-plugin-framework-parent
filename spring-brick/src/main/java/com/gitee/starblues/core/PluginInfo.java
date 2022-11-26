@@ -16,6 +16,9 @@
 
 package com.gitee.starblues.core;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonIgnoreType;
 import com.gitee.starblues.core.descriptor.PluginDescriptor;
 
 import java.util.Date;
@@ -23,8 +26,10 @@ import java.util.Map;
 
 /**
  * 插件信息
+ *
  * @author starBlues
- * @version 3.0.0
+ * @since 3.0.0
+ * @version 3.1.1
  */
 public interface PluginInfo {
 
@@ -75,5 +80,12 @@ public interface PluginInfo {
      * @return 扩展信息Map
      */
     Map<String, Object> getExtensionInfo();
+
+    /**
+     * 获取插件的Classloader
+     * @return ClassLoader
+     */
+    @JsonIgnore
+    ClassLoader getClassLoader();
 
 }

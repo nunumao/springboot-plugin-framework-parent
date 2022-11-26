@@ -26,7 +26,9 @@ import java.nio.file.Path;
 
 /**
  * 生产环境插件描述加载者
+ *
  * @author starBlues
+ * @since 3.0.0
  * @version 3.0.1
  */
 public class ProdPluginDescriptorLoader implements PluginDescriptorLoader{

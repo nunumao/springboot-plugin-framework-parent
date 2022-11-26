@@ -24,6 +24,7 @@ import java.lang.annotation.*;
  *
  * @author starBlues
  * @version 2.4.0
+ * @version 2.4.0
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)

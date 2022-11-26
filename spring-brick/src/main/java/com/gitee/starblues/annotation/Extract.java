@@ -23,7 +23,9 @@ import java.lang.annotation.*;
 
 /**
  * 基于业务的扩展注解
+ *
  * @author starBlues
+ * @since  2.4.4
  * @version 2.4.4
  */
 @Target(ElementType.TYPE)

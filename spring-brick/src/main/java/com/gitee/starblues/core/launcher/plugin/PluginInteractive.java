@@ -26,6 +26,7 @@ import com.gitee.starblues.spring.invoke.InvokeSupperCache;
 /**
  * 插件交互接口
  * @author starBlues
+ * @since 3.0.0
  * @version 3.0.0
  */
 public interface PluginInteractive {

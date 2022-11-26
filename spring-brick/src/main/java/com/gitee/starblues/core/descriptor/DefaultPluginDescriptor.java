@@ -29,6 +29,7 @@ import static com.gitee.starblues.common.PluginDescriptorKey.*;
  * 默认插件描述者
  *
  * @author starBlues
+ * @since 3.0.0
  * @version 3.0.0
  */
 public class DefaultPluginDescriptor implements PluginDescriptor {

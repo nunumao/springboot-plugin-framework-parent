@@ -42,6 +42,18 @@ public interface MainApplicationContext extends ApplicationContext {
      */
     EnvironmentProvider getEnvironmentProvider();
 
+    /**
+     * 返回主程序配置的Profile配置
+     * @return String 数组
+     */
+    String[] getActiveProfiles();
+
+    /**
+     * 返回主程序默认的Profile配置
+     * @return String 数组
+     */
+    String[] getDefaultProfiles();
+
 
     /**
      * 从主程序获取依赖

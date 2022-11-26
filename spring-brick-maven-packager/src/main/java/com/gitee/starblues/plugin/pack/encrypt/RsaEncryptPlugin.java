@@ -29,6 +29,7 @@ import java.util.Map;
  * rsa 算法插件加密
  *
  * @author starBlues
+ * @since 3.0.1
  * @version 3.0.1
  */
 public class RsaEncryptPlugin implements EncryptPlugin{

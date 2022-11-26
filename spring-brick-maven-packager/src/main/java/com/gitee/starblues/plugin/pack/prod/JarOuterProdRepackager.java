@@ -27,7 +27,9 @@ import java.util.jar.Manifest;
 
 /**
  * jar-outer包生成
+ *
  * @author starBlues
+ * @since 3.0.0
  * @version 3.0.0
  */
 public class JarOuterProdRepackager extends ZipOuterProdRepackager {

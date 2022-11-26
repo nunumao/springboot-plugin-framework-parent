@@ -24,6 +24,7 @@ import java.util.Set;
 /**
  * java 内部包匹配定义
  * @author starBlues
+ * @since 3.0.0
  * @version 3.0.0
  */
 public class JavaMainResourcePatternDefiner implements MainResourcePatternDefiner {

@@ -82,6 +82,16 @@ public class MainApplicationContextProxy extends ApplicationContextProxy impleme
     }
 
     @Override
+    public String[] getActiveProfiles() {
+        return applicationContext.getEnvironment().getActiveProfiles();
+    }
+
+    @Override
+    public String[] getDefaultProfiles() {
+        return applicationContext.getEnvironment().getDefaultProfiles();
+    }
+
+    @Override
     public Object resolveDependency(String requestingBeanName, Class<?> dependencyType) {
         try {
             return applicationContext.getBean(dependencyType);

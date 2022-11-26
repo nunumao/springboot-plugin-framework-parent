@@ -21,7 +21,9 @@ import com.gitee.starblues.core.exception.PluginException;
 
 /**
  * 插件启动检查者
+ *
  * @author starBlues
+ * @since 3.0.0
  * @version 3.0.0
  */
 public interface PluginLauncherChecker {

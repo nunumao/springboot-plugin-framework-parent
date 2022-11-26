@@ -26,6 +26,7 @@ import java.util.regex.Matcher;
  * 插件打包结构
  *
  * @author starBlues
+ * @since 3.0.0
  * @version 3.0.0
  */
 public abstract class PackageStructure {

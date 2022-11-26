@@ -28,11 +28,12 @@ import java.util.jar.JarInputStream;
 /**
  * jar 资源加载者
  * @author starBlues
- * @version 3.0.0
+ * @since 3.0.0
+ * @version 3.1.1
  */
 public class JarResourceLoader extends AbstractResourceLoader {
 
-    private final JarInputStream jarInputStream;
+    private JarInputStream jarInputStream;
 
     private ExcludeResource excludeResource = (jarEntry)->false;
     private IncludeResource includeResource = (jarEntry)->true;
@@ -88,6 +89,12 @@ public class JarResourceLoader extends AbstractResourceLoader {
         } finally {
             jarInputStream.close();
         }
+    }
+
+    @Override
+    public void close() throws Exception {
+        super.close();
+        jarInputStream = null;
     }
 
     protected String resolveName(String name){

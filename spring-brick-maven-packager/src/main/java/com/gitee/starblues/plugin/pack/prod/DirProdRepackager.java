@@ -39,7 +39,9 @@ import static com.gitee.starblues.common.PackageStructure.*;
 
 /**
  * 文件夹包生成
+ *
  * @author starBlues
+ * @since 3.0.0
  * @version 3.0.0
  */
 public class DirProdRepackager extends DevRepackager {

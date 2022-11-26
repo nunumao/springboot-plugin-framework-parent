@@ -128,6 +128,12 @@ public class AutoIntegrationConfiguration extends DefaultIntegrationConfiguratio
     private Boolean exactVersion;
 
     /**
+     * 插件的配置文件 Profile 是否跟随主程序的 Profile 配置动态切换
+     */
+    @Value("${pluginFollowProfile:false}")
+    private Boolean pluginFollowProfile;
+
+    /**
      * 对插件启动时进行解密校验配置。默认为不启用
      */
     private DecryptConfiguration decrypt;
@@ -212,6 +218,14 @@ public class AutoIntegrationConfiguration extends DefaultIntegrationConfiguratio
     @Override
     public boolean exactVersion() {
         return exactVersion;
+    }
+
+    @Override
+    public boolean pluginFollowProfile() {
+        if(pluginFollowProfile == null){
+            return super.pluginFollowProfile();
+        }
+        return pluginFollowProfile;
     }
 
     @Override

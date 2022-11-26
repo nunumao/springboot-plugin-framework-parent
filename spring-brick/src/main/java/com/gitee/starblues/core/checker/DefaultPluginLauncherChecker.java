@@ -31,6 +31,7 @@ import com.gitee.starblues.utils.ObjectUtils;
  * 默认插件启动检查者
  *
  * @author starBlues
+ * @since 3.0.0
  * @version 3.0.1
  */
 public class DefaultPluginLauncherChecker implements PluginLauncherChecker {

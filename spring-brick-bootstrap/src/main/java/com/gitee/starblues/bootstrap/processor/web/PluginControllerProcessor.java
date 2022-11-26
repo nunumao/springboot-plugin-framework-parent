@@ -49,7 +49,9 @@ import java.util.function.Predicate;
 
 /**
  * 插件Controller处理者
+ *
  * @author starBlues
+ * @since 3.0.0
  * @version 3.0.3
  */
 public class PluginControllerProcessor implements SpringPluginProcessor {

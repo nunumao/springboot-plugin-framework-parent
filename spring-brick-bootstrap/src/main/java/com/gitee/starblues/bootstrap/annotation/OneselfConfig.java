@@ -20,7 +20,9 @@ import java.lang.annotation.*;
 
 /**
  * 插件自主运行配置
+ *
  * @author starBlues
+ * @since 3.0.0
  * @version 3.0.0
  */
 @Target(ElementType.TYPE)

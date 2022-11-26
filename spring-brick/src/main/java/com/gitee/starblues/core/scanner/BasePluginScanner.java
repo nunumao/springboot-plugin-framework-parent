@@ -27,6 +27,7 @@ import java.util.List;
 /**
  * 基本的插件扫描者
  * @author starBlues
+ * @since 3.0.0
  * @version 3.0.0
  */
 public class BasePluginScanner implements PluginScanner{

@@ -21,6 +21,7 @@ import com.gitee.starblues.common.AbstractDependencyPlugin;
 /**
  * 依赖的插件信息
  * @author starBlues
+ * @since 3.0.0
  * @version 3.0.0
  */
 public class DefaultDependencyPlugin extends AbstractDependencyPlugin {

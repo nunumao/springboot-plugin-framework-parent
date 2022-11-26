@@ -40,8 +40,8 @@ import java.util.Set;
  * 插件资源加载工厂代理
  *
  * @author starBlues
- * @version 3.1.0
- * @since 13.0.4
+ * @since 3.0.4
+ * @version 3.1.1
  */
 @Slf4j
 public class PluginResourceLoaderFactoryProxy implements PluginResourceLoaderFactory {
@@ -178,5 +178,10 @@ public class PluginResourceLoaderFactoryProxy implements PluginResourceLoaderFac
     @Override
     public void close() throws Exception {
         target.close();
+    }
+
+    @Override
+    public void release() throws Exception {
+        target.release();
     }
 }

@@ -21,15 +21,22 @@ import com.gitee.starblues.loader.classloader.resource.loader.ResourceLoaderFact
 import com.gitee.starblues.loader.launcher.AbstractMainLauncher;
 import com.gitee.starblues.loader.launcher.runner.MethodRunner;
 import com.gitee.starblues.loader.utils.ObjectUtils;
+import com.gitee.starblues.loader.utils.ResourceUtils;
 
 
 import java.lang.management.ManagementFactory;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * 主程序启动者
+ *
  * @author starBlues
+ * @since 3.0.0
  * @version 3.0.0
  */
 public class IsolationBaseLauncher extends AbstractMainLauncher {
@@ -47,15 +54,14 @@ public class IsolationBaseLauncher extends AbstractMainLauncher {
 
     @Override
     protected ClassLoader createClassLoader(String... args) throws Exception {
-        GenericClassLoader classLoader = new GenericClassLoader(MAIN_CLASS_LOADER_NAME, getParentClassLoader(),
+        return new GenericClassLoader(MAIN_CLASS_LOADER_NAME, getParentClassLoader(),
                 getResourceLoaderFactory(args));
-        addResource(classLoader);
-        return classLoader;
     }
 
     @Override
     protected ClassLoader launch(ClassLoader classLoader, String... args) throws Exception {
         methodRunner.run(classLoader);
+        ResourceUtils.release(classLoader);
         return classLoader;
     }
 
@@ -67,22 +73,26 @@ public class IsolationBaseLauncher extends AbstractMainLauncher {
         return IsolationBaseLauncher.class.getClassLoader();
     }
 
-    protected void addResource(GenericClassLoader classLoader) throws Exception{
+    protected Set<URL> getBaseResource() {
+        Set<URL> urls = new HashSet<>();
         String classPath = ManagementFactory.getRuntimeMXBean().getClassPath();
         if(!ObjectUtils.isEmpty(classPath)){
             String[] classPathStr = classPath.split(";");
             for (String path : classPathStr) {
-                classLoader.addResource(path);
+                try {
+                    urls.add(new URL(path));
+                } catch (MalformedURLException e) {
+                    // 忽略
+                }
             }
         }
         ClassLoader sourceClassLoader = Thread.currentThread().getContextClassLoader();
         if(sourceClassLoader instanceof URLClassLoader){
             URLClassLoader urlClassLoader = (URLClassLoader) sourceClassLoader;
             final URL[] urLs = urlClassLoader.getURLs();
-            for (URL url : urLs) {
-                classLoader.addResource(url);
-            }
+            urls.addAll(Arrays.asList(urLs));
         }
+        return urls;
     }
 
 }
