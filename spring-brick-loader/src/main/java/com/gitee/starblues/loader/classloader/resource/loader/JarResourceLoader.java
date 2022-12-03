@@ -1,5 +1,5 @@
 /**
- * Copyright [2019-2022] [starBlues]
+ * Copyright [2019-Present] [starBlues]
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -80,9 +80,10 @@ public class JarResourceLoader extends AbstractResourceLoader {
                 if(includeResource.include(jarEntry)){
                     String name = resolveName(jarEntry.getName());
                     URL url = new URL(baseUrl.toString() + name);
-                    resourceStorage.add(name, url, ()->{
+                    CacheResource cacheResource = new CacheResource(name, baseUrl, url, ()->{
                         return getClassBytes(name, jarInputStream, false);
                     });
+                    resourceStorage.add(cacheResource);
                     jarInputStream.closeEntry();
                 }
             }

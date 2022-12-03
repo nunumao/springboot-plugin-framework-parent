@@ -1,5 +1,5 @@
 /**
- * Copyright [2019-2022] [starBlues]
+ * Copyright [2019-Present] [starBlues]
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -76,19 +76,20 @@ public class SwaggerListener implements PluginListener{
     @Override
     public void startSuccess(PluginInfo pluginInfo) {
         PluginDescriptor descriptor = pluginInfo.getPluginDescriptor();
-        Docket docket = this.createDocket(descriptor);
-        String groupName = docket.getGroupName();
-        PluginRegistry<DocumentationPlugin, DocumentationType> pluginRegistry = this.getPluginRegistry();
-        List<DocumentationPlugin> plugins = pluginRegistry.getPlugins();
-        List<DocumentationPlugin> newPlugins = new ArrayList<>();
-        for(DocumentationPlugin plugin : plugins){
-            if(plugin.getGroupName().equals(groupName)){
-                continue;
-            }
-            newPlugins.add(plugin);
-        }
-        newPlugins.add(docket);
         try {
+            Docket docket = this.createDocket(descriptor);
+            String groupName = docket.getGroupName();
+            PluginRegistry<DocumentationPlugin, DocumentationType> pluginRegistry = this.getPluginRegistry();
+            List<DocumentationPlugin> plugins = pluginRegistry.getPlugins();
+            List<DocumentationPlugin> newPlugins = new ArrayList<>();
+            for(DocumentationPlugin plugin : plugins){
+                if(plugin.getGroupName().equals(groupName)){
+                    continue;
+                }
+                newPlugins.add(plugin);
+            }
+            newPlugins.add(docket);
+
             Field field = PluginRegistrySupport.class.getDeclaredField("plugins");
             field.setAccessible(true);
             field.set(pluginRegistry, newPlugins);
@@ -96,9 +97,9 @@ public class SwaggerListener implements PluginListener{
             if(!pluginInfo.isFollowSystem() || pluginInfo.getStopTime() != null){
                 this.refresh();
             }
-            log.debug("插件[{}]注册到 Swagger 成功", pluginInfo.getPluginId());
-        } catch (NoSuchFieldException | IllegalAccessException e) {
-            log.error("插件[{}]注册到 Swagger 失败，错误为:{}", pluginInfo.getPluginId(),e.getMessage());
+            log.debug("插件[{}]注册到 Swagger 成功", MsgUtils.getPluginUnique(descriptor));
+        } catch (Exception e) {
+            log.error("插件[{}]注册到 Swagger 失败，错误为:{}", MsgUtils.getPluginUnique(descriptor) ,e.getMessage());
         }
     }
 
@@ -106,25 +107,24 @@ public class SwaggerListener implements PluginListener{
     public void stopSuccess(PluginInfo pluginInfo) {
         PluginDescriptor descriptor = pluginInfo.getPluginDescriptor();
         String groupName = getGroupName(descriptor);
-
-        PluginRegistry<DocumentationPlugin, DocumentationType> pluginRegistry = this.getPluginRegistry();
-        List<DocumentationPlugin> plugins = pluginRegistry.getPlugins();
-        List<DocumentationPlugin> newPlugins = new ArrayList<>();
-        for(DocumentationPlugin plugin : plugins){
-            if(groupName.equalsIgnoreCase(plugin.getGroupName())){
-                continue;
-            }
-            newPlugins.add(plugin);
-        }
         try{
+            PluginRegistry<DocumentationPlugin, DocumentationType> pluginRegistry = this.getPluginRegistry();
+            List<DocumentationPlugin> plugins = pluginRegistry.getPlugins();
+            List<DocumentationPlugin> newPlugins = new ArrayList<>();
+            for(DocumentationPlugin plugin : plugins){
+                if(groupName.equalsIgnoreCase(plugin.getGroupName())){
+                    continue;
+                }
+                newPlugins.add(plugin);
+            }
+
             Field field = PluginRegistrySupport.class.getDeclaredField("plugins");
             field.setAccessible(true);
             field.set(pluginRegistry, newPlugins);
 
             this.refresh();
             log.debug("插件[{}]从 Swagger 移除成功", MsgUtils.getPluginUnique(descriptor));
-        }
-        catch (NoSuchFieldException | IllegalAccessException e) {
+        } catch (Exception e) {
             log.error("插件[{}]从 Swagger 移除失败，错误为:{}", MsgUtils.getPluginUnique(descriptor), e.getMessage());
         }
     }
@@ -157,7 +157,12 @@ public class SwaggerListener implements PluginListener{
      * @return PluginRegistry
      */
     private PluginRegistry<DocumentationPlugin, DocumentationType> getPluginRegistry(){
-        return SpringBeanUtils.getExistBean(mainApplicationContext,"documentationPluginRegistry");
+        PluginRegistry<DocumentationPlugin, DocumentationType> registry =
+                SpringBeanUtils.getExistBean(mainApplicationContext, "documentationPluginRegistry");
+        if(registry != null){
+            return registry;
+        }
+        throw new IllegalStateException("项目依赖的 Swagger 版本不支持刷新插件接口, 请切换版本");
     }
 
     /**

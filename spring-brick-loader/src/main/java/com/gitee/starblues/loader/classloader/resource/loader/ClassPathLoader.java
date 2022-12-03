@@ -1,5 +1,5 @@
 /**
- * Copyright [2019-2022] [starBlues]
+ * Copyright [2019-Present] [starBlues]
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,6 @@ import com.gitee.starblues.loader.classloader.resource.Resource;
 import com.gitee.starblues.loader.classloader.resource.storage.ResourceStorage;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Files;
@@ -88,13 +87,15 @@ public class ClassPathLoader extends AbstractResourceLoader {
     }
 
     private void addResource(ResourceStorage resourceStorage, File file, String packageName) throws Exception {
-        resourceStorage.add(packageName, new URL(url.toString() + packageName), ()->{
+        CacheResource cacheResource = new CacheResource(packageName, url, new URL(url.toString() + packageName));
+        cacheResource.setBytes(()->{
             if(file.exists() && file.isFile()){
                 return getClassBytes(file.getPath(), Files.newInputStream(file.toPath()), true);
             } else {
                 return null;
             }
         });
+        resourceStorage.add(cacheResource);
     }
 
 

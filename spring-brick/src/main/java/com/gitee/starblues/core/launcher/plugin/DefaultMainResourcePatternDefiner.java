@@ -1,5 +1,5 @@
 /**
- * Copyright [2019-2022] [starBlues]
+ * Copyright [2019-Present] [starBlues]
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -60,6 +60,7 @@ public class DefaultMainResourcePatternDefiner extends JavaMainResourcePatternDe
         addWebIncludeResourcePatterns(includeResourcePatterns);
         addApiDoc(includeResourcePatterns);
         addDbDriver(includeResourcePatterns);
+        addMainDependencyFramework(includeResourcePatterns);
 
         addIdea(includeResourcePatterns);
         addLog(includeResourcePatterns);
@@ -140,16 +141,20 @@ public class DefaultMainResourcePatternDefiner extends JavaMainResourcePatternDe
         patterns.add("jdbc/h2/**");
     }
 
-    private void addIdea(Set<String> includeResourcePatterns) {
-        // idea debug agent
-        includeResourcePatterns.add("com/intellij/rt/debugger/agent/**");
+    protected void addMainDependencyFramework(Set<String> patterns) {
+        patterns.add("com/github/benmanes/caffeine/cache/**");
     }
 
-    private void addLog(Set<String> includeResourcePatterns) {
+    protected void addIdea(Set<String> patterns) {
+        // idea debug agent
+        patterns.add("com/intellij/rt/debugger/agent/**");
+    }
+
+    protected void addLog(Set<String> patterns) {
         if(Boolean.FALSE.equals(configuration.pluginFollowLog())){
             return;
         }
-        includeResourcePatterns.add("org/slf4j/**");
+        patterns.add("org/slf4j/**");
     }
 
 

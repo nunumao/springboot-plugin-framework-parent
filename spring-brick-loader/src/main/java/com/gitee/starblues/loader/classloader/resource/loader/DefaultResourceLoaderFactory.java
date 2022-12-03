@@ -1,5 +1,5 @@
 /**
- * Copyright [2019-2022] [starBlues]
+ * Copyright [2019-Present] [starBlues]
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,9 +18,7 @@ package com.gitee.starblues.loader.classloader.resource.loader;
 
 import com.gitee.starblues.loader.classloader.resource.Resource;
 import com.gitee.starblues.loader.classloader.resource.storage.ResourceStorage;
-import com.gitee.starblues.loader.classloader.resource.storage.SameRootResourceStorage;
 import com.gitee.starblues.loader.launcher.isolation.ResourceLoaderFactoryGetter;
-import com.gitee.starblues.loader.utils.IOUtils;
 import com.gitee.starblues.loader.utils.ResourceUtils;
 
 import java.io.File;
@@ -30,7 +28,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * 默认的资源加载工厂
@@ -41,12 +38,10 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class DefaultResourceLoaderFactory implements ResourceLoaderFactory{
 
-    private final Map<URL, SameRootResourceStorage> resourceLoaderMap = new ConcurrentHashMap<>();
-
-    private final String classLoaderName;
+    private final ResourceStorage resourceStorage;
 
     public DefaultResourceLoaderFactory(String classLoaderName) {
-        this.classLoaderName = classLoaderName;
+        resourceStorage = ResourceLoaderFactoryGetter.getResourceStorage(classLoaderName);
     }
 
     @Override
@@ -97,14 +92,8 @@ public class DefaultResourceLoaderFactory implements ResourceLoaderFactory{
 
     @Override
     public void addResource(Resource resource) throws Exception {
-        SameRootResourceStorage resourceStorage = resourceLoaderMap.get(resource.getBaseUrl());
-        if (resourceStorage == null) {
-            resourceStorage = ResourceLoaderFactoryGetter.getResourceStorage(
-                    classLoaderName,
-                    resource.getBaseUrl());
-            resourceLoaderMap.put(resource.getBaseUrl(), resourceStorage);
-        }
-        resourceStorage.add(resource.getName(), resource.getUrl(), resource::getBytes);
+        resourceStorage.addBaseUrl(resource.getBaseUrl());
+        resourceStorage.add(resource);
     }
 
     @Override
@@ -112,106 +101,37 @@ public class DefaultResourceLoaderFactory implements ResourceLoaderFactory{
         if(resourceLoader == null){
             return;
         }
-        SameRootResourceStorage resourceStorage = resourceLoaderMap.get(resourceLoader.getBaseUrl());
-        if (resourceStorage != null) {
-            return;
-        }
-        resourceStorage = ResourceLoaderFactoryGetter.getResourceStorage(
-                classLoaderName,
-                resourceLoader.getBaseUrl());
+        resourceStorage.addBaseUrl(resourceLoader.getBaseUrl());
         resourceLoader.load(resourceStorage);
-        resourceLoaderMap.put(resourceLoader.getBaseUrl(), resourceStorage);
     }
 
     @Override
     public Resource findFirstResource(String name) {
-        for (Map.Entry<URL, SameRootResourceStorage> entry : resourceLoaderMap.entrySet()) {
-            ResourceStorage resourceStorage = entry.getValue();
-            Resource resource = resourceStorage.get(name);
-            if(resource != null){
-                return resource;
-            }
-        }
-        return null;
+        return resourceStorage.getFirst(name);
     }
 
     @Override
     public Enumeration<Resource> findAllResource(String name) {
-        return new Enumeration<Resource>() {
-            private final List<SameRootResourceStorage> list  = new ArrayList<>(resourceLoaderMap.values());
-            private int index = 0;
-            private Resource resource = null;
-
-            @Override
-            public boolean hasMoreElements() {
-                return next();
-            }
-
-            @Override
-            public Resource nextElement() {
-                if (!next()) {
-                    throw new NoSuchElementException();
-                }
-                Resource r = resource;
-                resource = null;
-                return r;
-            }
-
-            private boolean next() {
-                if (resource != null) {
-                    return true;
-                } else {
-                    SameRootResourceStorage resourceStorage;
-                    while (index < list.size()){
-                        resourceStorage = list.get(index++);
-                        resource = getResource(resourceStorage);
-                        if(resource != null){
-                            return true;
-                        }
-                    }
-                    return false;
-                }
-            }
-
-            private Resource getResource(SameRootResourceStorage resourceStorage){
-                resource = resourceStorage.get(name);
-                if(resource != null){
-                    return resource;
-                }
-                return null;
-            }
-        };
+        return resourceStorage.get(name);
     }
 
     @Override
     public InputStream getInputStream(String name) {
-        for (Map.Entry<URL, SameRootResourceStorage> entry : resourceLoaderMap.entrySet()) {
-            ResourceStorage resourceStorage = entry.getValue();
-            InputStream inputStream = resourceStorage.getInputStream(name);
-            if(inputStream != null){
-                return inputStream;
-            }
-        }
-        return null;
+        return resourceStorage.getFirstInputStream(name);
     }
 
     @Override
     public List<URL> getUrls() {
-        return new ArrayList<>(resourceLoaderMap.keySet());
+        return resourceStorage.getBaseUrl();
     }
 
     @Override
     public void close() throws Exception {
-        for (ResourceStorage resourceStorage : resourceLoaderMap.values()) {
-            IOUtils.closeQuietly(resourceStorage);
-        }
-        resourceLoaderMap.clear();
+        resourceStorage.close();
     }
 
     @Override
-    public void release() {
-        for (SameRootResourceStorage resourceStorage : resourceLoaderMap.values()) {
-            ResourceUtils.release(resourceStorage);
-        }
+    public void release() throws Exception{
+        resourceStorage.release();
     }
 }

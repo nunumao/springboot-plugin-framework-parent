@@ -1,5 +1,5 @@
 /**
- * Copyright [2019-2022] [starBlues]
+ * Copyright [2019-Present] [starBlues]
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@ import java.net.URL;
 /**
  * 资源信息
  * @author starBlues
+ * @since 3.0.0
  * @version 3.0.0
  */
 public interface Resource extends AutoCloseable, Release {
@@ -54,12 +55,9 @@ public interface Resource extends AutoCloseable, Release {
     byte[] getBytes();
 
     /**
-     * 设置字节数
-     * @param byteGetter byteGetter
-     * @throws Exception set byte 异常
+     * 解决byte
+     * @throws Exception 处理资源字节异常
      */
-    void setBytes(ResourceByteGetter byteGetter) throws Exception;
-
-    void release();
+    void resolveByte() throws Exception;
 
 }

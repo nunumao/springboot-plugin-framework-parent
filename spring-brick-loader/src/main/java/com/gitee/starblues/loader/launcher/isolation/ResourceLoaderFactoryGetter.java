@@ -1,5 +1,5 @@
 /**
- * Copyright [2019-2022] [starBlues]
+ * Copyright [2019-Present] [starBlues]
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -20,7 +20,6 @@ import com.gitee.starblues.loader.classloader.resource.loader.DefaultResourceLoa
 import com.gitee.starblues.loader.classloader.resource.loader.ResourceLoaderFactory;
 import com.gitee.starblues.loader.classloader.resource.storage.*;
 
-import java.net.URL;
 import java.util.Objects;
 
 /**
@@ -36,9 +35,19 @@ public class ResourceLoaderFactoryGetter {
 
 
     /**
-     * 资源存储模式--缓存模式
+     * 资源存储模式-永久缓存。速度最快, 但启动前后占用都比较内存高
      */
-    private static final String RESOURCE_MODE_CACHE = "cache";
+    private static final String RESOURCE_MODE_PERPETUAL = "perpetual";
+
+    /**
+     * 资源存储模式-低内存模型。启动占用内存低, 速度可能会慢
+     */
+    private static final String RESOURCE_MODE_LOW_MEMORY = "lowMemory";
+
+    /**
+     * 资源存储模式-快速模式。启动占用内存高, 速度比较高, 启动完成后占用内存会降低
+     */
+    private static final String RESOURCE_MODE_FAST = "fast";
 
 
     /**
@@ -74,11 +83,13 @@ public class ResourceLoaderFactoryGetter {
         return null;
     }
 
-    public static SameRootResourceStorage getResourceStorage(String key, URL baseUrl){
-        if(Objects.equals(resourceMode, RESOURCE_MODE_CACHE)){
-            return new CacheResourceStorage(baseUrl);
+    public static AbstractResourceStorage getResourceStorage(String key){
+        if(Objects.equals(resourceMode, RESOURCE_MODE_PERPETUAL)){
+            return new CachePerpetualResourceStorage();
+        } else if(Objects.equals(resourceMode, RESOURCE_MODE_LOW_MEMORY)){
+            return new CacheLowMemoryResourceStorage(key);
         } else {
-            return new CacheReleasedResourceStorage(baseUrl);
+            return new CacheFastResourceStorage(key);
         }
     }
 

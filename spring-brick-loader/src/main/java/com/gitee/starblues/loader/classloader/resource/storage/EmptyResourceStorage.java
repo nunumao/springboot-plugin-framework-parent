@@ -1,5 +1,5 @@
 /**
- * Copyright [2019-2022] [starBlues]
+ * Copyright [2019-Present] [starBlues]
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,10 +17,10 @@
 package com.gitee.starblues.loader.classloader.resource.storage;
 
 import com.gitee.starblues.loader.classloader.resource.Resource;
-import com.gitee.starblues.loader.classloader.resource.ResourceByteGetter;
 
 import java.io.InputStream;
 import java.net.URL;
+import java.util.Enumeration;
 import java.util.List;
 
 /**
@@ -31,13 +31,19 @@ import java.util.List;
  * @version 3.1.1
  */
 public class EmptyResourceStorage implements ResourceStorage{
+
     @Override
-    public void add(String name, URL url, ResourceByteGetter byteGetter) throws Exception {
+    public void addBaseUrl(URL baseUrl) {
 
     }
 
     @Override
-    public void add(String name, URL url) throws Exception {
+    public List<URL> getBaseUrl() {
+        return null;
+    }
+
+    @Override
+    public void add(Resource resource) throws Exception {
 
     }
 
@@ -47,12 +53,22 @@ public class EmptyResourceStorage implements ResourceStorage{
     }
 
     @Override
-    public Resource get(String name) {
+    public Resource getFirst(String name) {
         return null;
     }
 
     @Override
-    public InputStream getInputStream(String name) {
+    public Enumeration<Resource> get(String name) {
+        return null;
+    }
+
+    @Override
+    public InputStream getFirstInputStream(String name) {
+        return null;
+    }
+
+    @Override
+    public Enumeration<InputStream> getInputStream(String name) {
         return null;
     }
 
