@@ -17,6 +17,8 @@
 package com.gitee.starblues.spring;
 
 import com.gitee.starblues.spring.environment.EnvironmentProvider;
+import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter;
+import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
 import java.util.Map;
 import java.util.Objects;
@@ -35,7 +37,6 @@ public interface MainApplicationContext extends ApplicationContext {
      */
     Map<String, Map<String, Object>> getConfigurableEnvironment();
 
-
     /**
      * 得到主程序配置的 Provider
      * @return EnvironmentProvider
@@ -53,7 +54,6 @@ public interface MainApplicationContext extends ApplicationContext {
      * @return String 数组
      */
     String[] getDefaultProfiles();
-
 
     /**
      * 从主程序获取依赖
@@ -75,5 +75,18 @@ public interface MainApplicationContext extends ApplicationContext {
      * @return Object
      */
     Object getSourceApplicationContext();
+
+    /**
+     * 获取主程序的 RequestMappingHandlerMapping
+     * @return RequestMappingHandlerMapping
+     */
+    RequestMappingHandlerMapping getRequestMappingHandlerMapping();
+
+    /**
+     * 获取主程序的 RequestMappingHandlerAdapter
+     * @return RequestMappingHandlerAdapter
+     */
+    RequestMappingHandlerAdapter getRequestMappingHandlerAdapter();
+
 
 }

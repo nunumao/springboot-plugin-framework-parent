@@ -28,6 +28,7 @@ import java.util.Map;
  * 类工具类
  *
  * @author starBlues
+ * @since 2.4.0
  * @version 2.4.0
  */
 public class ClassUtils {

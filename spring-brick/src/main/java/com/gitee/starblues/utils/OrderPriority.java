@@ -20,7 +20,8 @@ package com.gitee.starblues.utils;
  * 顺序优先级
  *
  * @author starBlues
- * @version 1.0
+ * @since 1.0.0
+ * @version 1.0.0
  */
 public class OrderPriority {
     /**

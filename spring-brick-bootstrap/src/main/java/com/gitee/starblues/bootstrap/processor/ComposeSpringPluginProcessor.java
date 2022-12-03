@@ -26,11 +26,14 @@ import com.gitee.starblues.bootstrap.processor.web.PluginStaticResourceProcessor
 import com.gitee.starblues.bootstrap.processor.web.thymeleaf.PluginThymeleafProcessor;
 import com.gitee.starblues.bootstrap.utils.AnnotationUtils;
 import com.gitee.starblues.bootstrap.utils.ProcessorUtils;
+import com.gitee.starblues.spring.MainApplicationContext;
 import com.gitee.starblues.utils.OrderUtils;
 import com.gitee.starblues.utils.ObjectUtils;
 import com.gitee.starblues.utils.OrderPriority;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter;
+import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -164,7 +167,8 @@ public class ComposeSpringPluginProcessor implements SpringPluginProcessor {
      * @param processors 处理者容器集合
      */
     protected void addDefaultWebEnvProcessors(ProcessorContext context, List<SpringPluginProcessor> processors){
-        if(!context.getMainApplicationContext().isWebEnvironment()){
+        MainApplicationContext mainApplicationContext = context.getMainApplicationContext();
+        if(!mainApplicationContext.isWebEnvironment()){
             // 主程序不是web类型, 则不进行注册
             return;
         }

@@ -22,6 +22,7 @@ import com.gitee.starblues.bootstrap.processor.SpringPluginProcessor;
 import com.gitee.starblues.bootstrap.utils.AnnotationUtils;
 import com.gitee.starblues.bootstrap.utils.DestroyUtils;
 import com.gitee.starblues.integration.IntegrationConfiguration;
+import com.gitee.starblues.spring.MainApplicationContext;
 import com.gitee.starblues.spring.SpringBeanFactory;
 import com.gitee.starblues.utils.*;
 import lombok.AllArgsConstructor;
@@ -69,10 +70,9 @@ public class PluginControllerProcessor implements SpringPluginProcessor {
 
     @Override
     public void initialize(ProcessorContext processorContext) throws ProcessorException {
-        SpringBeanFactory mainBeanFactory = processorContext.getMainBeanFactory();
-        this.requestMappingHandlerMapping = mainBeanFactory.getBean(RequestMappingHandlerMapping.class);
-        this.handlerAdapter = SpringBeanCustomUtils.getExistBean(processorContext.getMainApplicationContext(),
-                RequestMappingHandlerAdapter.class);
+        MainApplicationContext mainApplicationContext = processorContext.getMainApplicationContext();
+        this.requestMappingHandlerMapping = mainApplicationContext.getRequestMappingHandlerMapping();
+        this.handlerAdapter = mainApplicationContext.getRequestMappingHandlerAdapter();
         canRegistered.set(true);
     }
 

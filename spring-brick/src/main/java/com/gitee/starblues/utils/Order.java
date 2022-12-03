@@ -19,7 +19,8 @@ package com.gitee.starblues.utils;
 /**
  * 排序接口
  * @author starBlues
- * @version 1.0
+ * @since 1.0.0
+ * @version 1.0.0
  */
 public interface Order {
 

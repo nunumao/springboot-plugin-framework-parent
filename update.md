@@ -2,3 +2,5 @@
 2. 【新增】插件配置文件`spring.profiles.active`的值可跟随主程序配置切换。
 3. 【新增】插件的日志可配置为跟随主程序日志配置打印。 
 4. 【优化】优化插件隔离模式下，内存占用过大的问题。
+5. 【修复[#I61INH](https://gitee.com/starblues/springboot-plugin-framework-parent/issues/I61INH)】PluginUser通过 Bean名称获取 Bean 对象接口返回的Wrapper中插件的类不对
+6. 

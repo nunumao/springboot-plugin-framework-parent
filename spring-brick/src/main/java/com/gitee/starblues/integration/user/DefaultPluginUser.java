@@ -72,7 +72,7 @@ public class DefaultPluginUser implements PluginUser{
         applicationContexts.forEach((k,v)->{
             Object existBean = SpringBeanCustomUtils.getExistBean(v, name);
             if(existBean != null){
-                pluginBeans.put(k, v);
+                pluginBeans.put(k, existBean);
             }
         });
         return new BeanWrapper<>(mainBean, pluginBeans);

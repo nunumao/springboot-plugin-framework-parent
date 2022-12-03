@@ -22,6 +22,7 @@ import com.gitee.starblues.integration.IntegrationConfiguration;
 /**
  * 插件配置工具类
  * @author starBlues
+ * @since 3.0.0
  * @version 3.0.0
  */
 public class PluginConfigUtils {

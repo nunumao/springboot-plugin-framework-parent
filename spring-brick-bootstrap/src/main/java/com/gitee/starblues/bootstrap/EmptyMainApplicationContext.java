@@ -20,6 +20,8 @@ import com.gitee.starblues.spring.MainApplicationContext;
 import com.gitee.starblues.spring.SpringBeanFactory;
 import com.gitee.starblues.spring.environment.EmptyEnvironmentProvider;
 import com.gitee.starblues.spring.environment.EnvironmentProvider;
+import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter;
+import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
 import java.util.Collections;
 import java.util.Map;
@@ -83,6 +85,16 @@ public class EmptyMainApplicationContext implements MainApplicationContext {
 
     @Override
     public Object getSourceApplicationContext() {
+        return null;
+    }
+
+    @Override
+    public RequestMappingHandlerMapping getRequestMappingHandlerMapping() {
+        return null;
+    }
+
+    @Override
+    public RequestMappingHandlerAdapter getRequestMappingHandlerAdapter() {
         return null;
     }
 

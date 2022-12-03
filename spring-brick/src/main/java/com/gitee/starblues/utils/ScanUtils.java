@@ -39,6 +39,7 @@ import java.util.stream.Stream;
  *
  * @author starBlues
  * @version 2.2.2
+ * @version 2.2.2
  */
 public class ScanUtils {
 

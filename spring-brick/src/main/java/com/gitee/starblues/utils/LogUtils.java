@@ -20,7 +20,10 @@ import com.gitee.starblues.core.descriptor.PluginDescriptor;
 import org.slf4j.Logger;
 
 /**
+ * 日志打印工具
+ *
  * @author starBlues
+ * @since 3.0.0
  * @version 3.0.0
  */
 public class LogUtils {

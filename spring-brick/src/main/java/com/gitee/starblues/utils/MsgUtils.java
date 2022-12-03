@@ -20,7 +20,10 @@ package com.gitee.starblues.utils;
 import com.gitee.starblues.core.descriptor.PluginDescriptor;
 
 /**
+ * msg 工具
+ *
  * @author starBlues
+ * @since 3.0.0
  * @version 3.0.0
  */
 public abstract class MsgUtils {
