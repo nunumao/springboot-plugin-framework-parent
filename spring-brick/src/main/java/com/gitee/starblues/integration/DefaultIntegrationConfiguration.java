@@ -21,6 +21,7 @@ import com.gitee.starblues.integration.decrypt.DecryptConfiguration;
 import com.gitee.starblues.utils.Assert;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -28,16 +29,17 @@ import java.util.Set;
  * 默认的插件集成配置。给非必须配置设置了默认值
  *
  * @author starBlues
+ * @since 3.0.0
  * @version 3.0.1
  */
 public abstract class DefaultIntegrationConfiguration implements IntegrationConfiguration{
 
     public static final String DEFAULT_PLUGIN_REST_PATH_PREFIX = "plugins";
-    public static final boolean DEFAULT_ENABLE_PLUGIN_ID_REST_PATH_PREFIX = true;
+    public static final Boolean DEFAULT_ENABLE_PLUGIN_ID_REST_PATH_PREFIX = Boolean.TRUE;
 
     @Override
-    public boolean enable() {
-        return true;
+    public Boolean enable() {
+        return Boolean.TRUE;
     }
 
     @Override
@@ -63,23 +65,23 @@ public abstract class DefaultIntegrationConfiguration implements IntegrationConf
     }
 
     @Override
-    public boolean enablePluginIdRestPathPrefix() {
+    public Boolean enablePluginIdRestPathPrefix() {
         return DEFAULT_ENABLE_PLUGIN_ID_REST_PATH_PREFIX;
     }
 
     @Override
     public Set<String> enablePluginIds() {
-        return null;
+        return Collections.emptySet();
     }
 
     @Override
     public Set<String> disablePluginIds() {
-        return null;
+        return Collections.emptySet();
     }
 
     @Override
     public List<String> sortInitPluginIds() {
-        return null;
+        return Collections.emptyList();
     }
 
     @Override
@@ -88,13 +90,18 @@ public abstract class DefaultIntegrationConfiguration implements IntegrationConf
     }
 
     @Override
-    public boolean exactVersion() {
-        return false;
+    public Boolean exactVersion() {
+        return Boolean.FALSE;
     }
 
     @Override
-    public boolean pluginFollowProfile() {
-        return false;
+    public Boolean pluginFollowProfile() {
+        return Boolean.FALSE;
+    }
+
+    @Override
+    public Boolean pluginFollowLog() {
+        return Boolean.FALSE;
     }
 
     @Override

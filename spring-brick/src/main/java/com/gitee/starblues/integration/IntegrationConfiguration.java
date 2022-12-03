@@ -37,7 +37,7 @@ public interface IntegrationConfiguration {
      * 是否启用该插件框架
      * @return true 启用, false 禁用
      */
-    boolean enable();
+    Boolean enable();
 
     /**
      * 运行环境。运行项目时的模式。分为开发环境(Dev)、生产环境(Prod)
@@ -82,7 +82,7 @@ public interface IntegrationConfiguration {
      * 即为: /pathPrefix/pluginId/**
      * @return boolean
      */
-    boolean enablePluginIdRestPathPrefix();
+    Boolean enablePluginIdRestPathPrefix();
 
     /**
      * 启用的插件id
@@ -116,13 +116,19 @@ public interface IntegrationConfiguration {
      * 默认为false
      * @return true or false
      */
-    boolean exactVersion();
+    Boolean exactVersion();
 
     /**
      * 插件的配置文件 Profile 是否跟随主程序的 Profile 配置动态切换
      * @return true: 跟随, false: 不跟随
      */
-    boolean pluginFollowProfile();
+    Boolean pluginFollowProfile();
+
+    /**
+     * 插件日志打印是否跟随主程序
+     * @return true: 跟随, false: 不跟随
+     */
+    Boolean pluginFollowLog();
 
     /**
      * 解密配置

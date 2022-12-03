@@ -18,6 +18,7 @@ package com.gitee.starblues.core.launcher.plugin;
 
 import com.gitee.starblues.core.classloader.MainResourcePatternDefiner;
 import com.gitee.starblues.core.launcher.JavaMainResourcePatternDefiner;
+import com.gitee.starblues.integration.IntegrationConfiguration;
 import com.gitee.starblues.utils.ObjectUtils;
 import com.gitee.starblues.utils.SpringBeanUtils;
 import org.springframework.context.ApplicationContext;
@@ -40,10 +41,12 @@ public class DefaultMainResourcePatternDefiner extends JavaMainResourcePatternDe
     public static final String FACTORIES_RESOURCE_LOCATION = "META-INF/spring.factories";
 
     private final String mainPackage;
+    private final IntegrationConfiguration configuration;
     private final ApplicationContext applicationContext;
 
-    public DefaultMainResourcePatternDefiner(String mainPackage, ApplicationContext applicationContext) {
-        this.mainPackage = mainPackage;
+    public DefaultMainResourcePatternDefiner(IntegrationConfiguration configuration, ApplicationContext applicationContext) {
+        this.mainPackage = configuration.mainPackage();
+        this.configuration = configuration;
         this.applicationContext = applicationContext;
     }
 
@@ -59,6 +62,7 @@ public class DefaultMainResourcePatternDefiner extends JavaMainResourcePatternDe
         addDbDriver(includeResourcePatterns);
 
         addIdea(includeResourcePatterns);
+        addLog(includeResourcePatterns);
 
         // add extension
         List<MainResourcePatternDefiner> extensionPatternDefiners = getExtensionPatternDefiners();
@@ -139,6 +143,13 @@ public class DefaultMainResourcePatternDefiner extends JavaMainResourcePatternDe
     private void addIdea(Set<String> includeResourcePatterns) {
         // idea debug agent
         includeResourcePatterns.add("com/intellij/rt/debugger/agent/**");
+    }
+
+    private void addLog(Set<String> includeResourcePatterns) {
+        if(Boolean.FALSE.equals(configuration.pluginFollowLog())){
+            return;
+        }
+        includeResourcePatterns.add("org/slf4j/**");
     }
 
 

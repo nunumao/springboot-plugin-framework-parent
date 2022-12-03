@@ -108,6 +108,13 @@
       "defaultValue": false
     },
     {
+      "name": "plugin.pluginFollowLog",
+      "type": "java.lang.Boolean",
+      "sourceType": "com.gitee.starblues.integration.AutoIntegrationConfiguration",
+      "description": "插件日志打印是否跟随主程序",
+      "defaultValue": false
+    },
+    {
       "name": "plugin.decrypt",
       "type": "com.gitee.starblues.integration.decrypt.DecryptConfiguration",
       "sourceType": "com.gitee.starblues.integration.AutoIntegrationConfiguration",

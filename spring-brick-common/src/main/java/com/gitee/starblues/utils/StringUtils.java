@@ -60,4 +60,20 @@ public class StringUtils {
         return (!ObjectUtils.isEmpty(collection) ? collection.toArray(EMPTY_STRING_ARRAY) : EMPTY_STRING_ARRAY);
     }
 
+    public static String toStrByArray(String[] str){
+        if(str == null || str.length == 0){
+            return "";
+        }
+        int length = str.length;
+        StringBuilder stringBuilder = new StringBuilder();
+        for (int i = 0; i < length; i++) {
+            String s = str[i];
+            stringBuilder.append(s);
+            if (i < length - 1) {
+                stringBuilder.append(",");
+            }
+        }
+        return stringBuilder.toString();
+    }
+
 }

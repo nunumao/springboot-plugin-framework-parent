@@ -86,7 +86,7 @@ public class ExtendPointConfiguration {
     @Bean
     public MainResourceMatcher mainResourceMatcher(){
         return new DefaultMainResourceMatcher(new DefaultMainResourcePatternDefiner(
-                configuration.mainPackage(),
+                configuration,
                 applicationContext
         ));
     }

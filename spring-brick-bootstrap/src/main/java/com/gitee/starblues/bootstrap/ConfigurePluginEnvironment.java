@@ -22,10 +22,7 @@ import com.gitee.starblues.integration.AutoIntegrationConfiguration;
 import com.gitee.starblues.integration.IntegrationConfiguration;
 import com.gitee.starblues.loader.launcher.DevelopmentModeSetting;
 import com.gitee.starblues.spring.MainApplicationContext;
-import com.gitee.starblues.utils.Assert;
-import com.gitee.starblues.utils.FilesUtils;
-import com.gitee.starblues.utils.ObjectUtils;
-import com.gitee.starblues.utils.PluginFileUtils;
+import com.gitee.starblues.utils.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -99,18 +96,10 @@ public class ConfigurePluginEnvironment {
         } catch (Exception ex){
             logger.error("LiveBeansView.registerApplicationContext失败. {}", ex.getMessage(), ex);
         }
-
         if(DevelopmentModeSetting.coexist()){
             env.put(AutoIntegrationConfiguration.ENABLE_STARTER_KEY, false);
         }
-
-        IntegrationConfiguration configuration = processorContext.getConfiguration();
-        if(configuration.pluginFollowProfile()){
-            MainApplicationContext mainApplicationContext = processorContext.getMainApplicationContext();
-            environment.setActiveProfiles(mainApplicationContext.getActiveProfiles());
-            environment.setDefaultProfiles(mainApplicationContext.getDefaultProfiles());
-        }
-
+        configProfiles(environment);
         environment.getPropertySources().addFirst(new MapPropertySource(PLUGIN_PROPERTY_NAME, env));
     }
 
@@ -121,6 +110,30 @@ public class ConfigurePluginEnvironment {
             return path;
         } else {
             return path + File.separator;
+        }
+    }
+
+    private void configProfiles(ConfigurableEnvironment environment){
+        IntegrationConfiguration configuration = processorContext.getConfiguration();
+        if(!configuration.pluginFollowProfile()){
+            return;
+        }
+        MainApplicationContext mainApplicationContext = processorContext.getMainApplicationContext();
+        String[] activeProfiles = environment.getActiveProfiles();
+        if(activeProfiles.length > 0){
+            logger.info("Plugin[{}] following profiles are active: {}",
+                    MsgUtils.getPluginUnique(pluginDescriptor), StringUtils.toStrByArray(activeProfiles));
+        } else {
+            String[] mainActiveProfiles = mainApplicationContext.getActiveProfiles();
+            if(mainActiveProfiles.length > 0){
+                logger.info("Plugin[{}] following profiles are active from main: {}",
+                        MsgUtils.getPluginUnique(pluginDescriptor), StringUtils.toStrByArray(mainActiveProfiles));
+                environment.setActiveProfiles(mainActiveProfiles);
+            } else {
+                logger.info("Plugin[{}]  No active profile set, falling back to default profiles: {}",
+                        MsgUtils.getPluginUnique(pluginDescriptor),
+                        StringUtils.toStrByArray(environment.getDefaultProfiles()));
+            }
         }
     }
 
