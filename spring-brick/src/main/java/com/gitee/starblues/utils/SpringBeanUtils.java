@@ -1,5 +1,5 @@
 /**
- * Copyright [2019-2022] [starBlues]
+ * Copyright [2019-Present] [starBlues]
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -24,7 +24,8 @@ import java.util.*;
 /**
  * 插件bean工具类
  * @author starBlues
- * @version 3.0.0
+ * @since 3.0.0
+ * @version 3.1.1
  */
 public class SpringBeanUtils {
 
@@ -86,6 +87,30 @@ public class SpringBeanUtils {
         } else {
             return null;
         }
+    }
+
+    /**
+     * 获取存在的Bean。名称和类型任意批量即可返回
+     * @param applicationContext applicationContext
+     * @param beanName bean名称
+     * @param beanClass bean class
+     * @return T
+     * @param <T> bean 类型
+     */
+    public static <T> T getExistBean(ApplicationContext applicationContext, String beanName, Class<T> beanClass){
+        Map<String, T> beansOfTypeMap = applicationContext.getBeansOfType(beanClass);
+        if(ObjectUtils.isEmpty(beansOfTypeMap)){
+            return null;
+        }
+        Set<Map.Entry<String, T>> entries = beansOfTypeMap.entrySet();
+        for (Map.Entry<String, T> entry : entries) {
+            String key = entry.getKey();
+            T value = entry.getValue();
+            if(beanName.equals(key) || Objects.equals(value.getClass().getName(), beanClass.getName())){
+                return value;
+            }
+        }
+        return null;
     }
 
     /**

@@ -1,5 +1,5 @@
 /**
- * Copyright [2019-2022] [starBlues]
+ * Copyright [2019-Present] [starBlues]
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@ import com.gitee.starblues.bootstrap.processor.SpringPluginProcessor;
 import com.gitee.starblues.bootstrap.utils.AnnotationUtils;
 import com.gitee.starblues.bootstrap.utils.DestroyUtils;
 import com.gitee.starblues.integration.IntegrationConfiguration;
+import com.gitee.starblues.spring.MainApplicationContext;
 import com.gitee.starblues.spring.SpringBeanFactory;
 import com.gitee.starblues.utils.*;
 import lombok.AllArgsConstructor;
@@ -49,8 +50,10 @@ import java.util.function.Predicate;
 
 /**
  * 插件Controller处理者
+ *
  * @author starBlues
- * @version 3.0.3
+ * @since 3.0.0
+ * @version 3.1.1
  */
 public class PluginControllerProcessor implements SpringPluginProcessor {
 
@@ -67,10 +70,9 @@ public class PluginControllerProcessor implements SpringPluginProcessor {
 
     @Override
     public void initialize(ProcessorContext processorContext) throws ProcessorException {
-        SpringBeanFactory mainBeanFactory = processorContext.getMainBeanFactory();
-        this.requestMappingHandlerMapping = mainBeanFactory.getBean(RequestMappingHandlerMapping.class);
-        this.handlerAdapter = SpringBeanCustomUtils.getExistBean(processorContext.getMainApplicationContext(),
-                RequestMappingHandlerAdapter.class);
+        MainApplicationContext mainApplicationContext = processorContext.getMainApplicationContext();
+        this.requestMappingHandlerMapping = mainApplicationContext.getRequestMappingHandlerMapping();
+        this.handlerAdapter = mainApplicationContext.getRequestMappingHandlerAdapter();
         canRegistered.set(true);
     }
 

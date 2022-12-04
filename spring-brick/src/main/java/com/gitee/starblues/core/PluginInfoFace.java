@@ -1,5 +1,5 @@
 /**
- * Copyright [2019-2022] [starBlues]
+ * Copyright [2019-Present] [starBlues]
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -25,8 +25,10 @@ import java.util.function.Supplier;
 
 /**
  * 外部 PluginWrapperFace
+ *
  * @author starBlues
- * @version 3.0.0
+ * @since 3.0.0
+ * @version 3.1.1
  */
 public class PluginInfoFace implements PluginInfo {
 
@@ -34,6 +36,7 @@ public class PluginInfoFace implements PluginInfo {
     private final PluginState pluginState;
     private final boolean followSystem;
     private final Supplier<Map<String, Object>> extensionInfoSupplier;
+    private final ClassLoader classLoader;
 
     private final Date startTime;
     private final Date stopTime;
@@ -46,6 +49,7 @@ public class PluginInfoFace implements PluginInfo {
         this.extensionInfoSupplier = pluginInsideInfo.getExtensionInfoSupplier();
         this.startTime = pluginInsideInfo.getStartTime();
         this.stopTime = pluginInsideInfo.getStopTime();
+        this.classLoader = pluginInsideInfo.getClassLoader();
     }
 
     @Override
@@ -86,5 +90,10 @@ public class PluginInfoFace implements PluginInfo {
     @Override
     public Map<String, Object> getExtensionInfo() {
         return extensionInfoSupplier.get();
+    }
+
+    @Override
+    public ClassLoader getClassLoader() {
+        return classLoader;
     }
 }

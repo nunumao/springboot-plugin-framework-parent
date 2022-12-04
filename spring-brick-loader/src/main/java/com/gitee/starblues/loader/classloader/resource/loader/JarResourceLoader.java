@@ -1,5 +1,5 @@
 /**
- * Copyright [2019-2022] [starBlues]
+ * Copyright [2019-Present] [starBlues]
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,11 +28,12 @@ import java.util.jar.JarInputStream;
 /**
  * jar 资源加载者
  * @author starBlues
- * @version 3.0.0
+ * @since 3.0.0
+ * @version 3.1.1
  */
 public class JarResourceLoader extends AbstractResourceLoader {
 
-    private final JarInputStream jarInputStream;
+    private JarInputStream jarInputStream;
 
     private ExcludeResource excludeResource = (jarEntry)->false;
     private IncludeResource includeResource = (jarEntry)->true;
@@ -79,15 +80,22 @@ public class JarResourceLoader extends AbstractResourceLoader {
                 if(includeResource.include(jarEntry)){
                     String name = resolveName(jarEntry.getName());
                     URL url = new URL(baseUrl.toString() + name);
-                    resourceStorage.add(name, url, ()->{
+                    CacheResource cacheResource = new CacheResource(name, baseUrl, url, ()->{
                         return getClassBytes(name, jarInputStream, false);
                     });
+                    resourceStorage.add(cacheResource);
                     jarInputStream.closeEntry();
                 }
             }
         } finally {
             jarInputStream.close();
         }
+    }
+
+    @Override
+    public void close() throws Exception {
+        super.close();
+        jarInputStream = null;
     }
 
     protected String resolveName(String name){

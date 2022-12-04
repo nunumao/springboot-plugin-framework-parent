@@ -1,5 +1,5 @@
 /**
- * Copyright [2019-2022] [starBlues]
+ * Copyright [2019-Present] [starBlues]
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,9 @@ import java.lang.annotation.*;
 
 /**
  * 基于业务的扩展注解
+ *
  * @author starBlues
+ * @since  2.4.4
  * @version 2.4.4
  */
 @Target(ElementType.TYPE)

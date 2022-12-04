@@ -1,5 +1,5 @@
 /**
- * Copyright [2019-2022] [starBlues]
+ * Copyright [2019-Present] [starBlues]
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,9 @@ import java.nio.file.Path;
 
 /**
  * 生产环境插件描述加载者
+ *
  * @author starBlues
+ * @since 3.0.0
  * @version 3.0.1
  */
 public class ProdPluginDescriptorLoader implements PluginDescriptorLoader{

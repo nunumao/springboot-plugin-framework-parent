@@ -1,5 +1,5 @@
 /**
- * Copyright [2019-2022] [starBlues]
+ * Copyright [2019-Present] [starBlues]
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ package com.gitee.starblues.core.launcher.plugin;
 
 import com.gitee.starblues.core.classloader.MainResourcePatternDefiner;
 import com.gitee.starblues.core.launcher.JavaMainResourcePatternDefiner;
+import com.gitee.starblues.integration.IntegrationConfiguration;
 import com.gitee.starblues.utils.ObjectUtils;
 import com.gitee.starblues.utils.SpringBeanUtils;
 import org.springframework.context.ApplicationContext;
@@ -30,6 +31,7 @@ import java.util.Set;
  * 主程序资源匹配定义
  *
  * @author starBlues
+ * @since 3.0.0
  * @version 3.0.3
  */
 public class DefaultMainResourcePatternDefiner extends JavaMainResourcePatternDefiner {
@@ -39,10 +41,12 @@ public class DefaultMainResourcePatternDefiner extends JavaMainResourcePatternDe
     public static final String FACTORIES_RESOURCE_LOCATION = "META-INF/spring.factories";
 
     private final String mainPackage;
+    private final IntegrationConfiguration configuration;
     private final ApplicationContext applicationContext;
 
-    public DefaultMainResourcePatternDefiner(String mainPackage, ApplicationContext applicationContext) {
-        this.mainPackage = mainPackage;
+    public DefaultMainResourcePatternDefiner(IntegrationConfiguration configuration, ApplicationContext applicationContext) {
+        this.mainPackage = configuration.mainPackage();
+        this.configuration = configuration;
         this.applicationContext = applicationContext;
     }
 
@@ -56,8 +60,10 @@ public class DefaultMainResourcePatternDefiner extends JavaMainResourcePatternDe
         addWebIncludeResourcePatterns(includeResourcePatterns);
         addApiDoc(includeResourcePatterns);
         addDbDriver(includeResourcePatterns);
+        addMainDependencyFramework(includeResourcePatterns);
 
         addIdea(includeResourcePatterns);
+        addLog(includeResourcePatterns);
 
         // add extension
         List<MainResourcePatternDefiner> extensionPatternDefiners = getExtensionPatternDefiners();
@@ -135,9 +141,20 @@ public class DefaultMainResourcePatternDefiner extends JavaMainResourcePatternDe
         patterns.add("jdbc/h2/**");
     }
 
-    private void addIdea(Set<String> includeResourcePatterns) {
+    protected void addMainDependencyFramework(Set<String> patterns) {
+        patterns.add("com/github/benmanes/caffeine/cache/**");
+    }
+
+    protected void addIdea(Set<String> patterns) {
         // idea debug agent
-        includeResourcePatterns.add("com/intellij/rt/debugger/agent/**");
+        patterns.add("com/intellij/rt/debugger/agent/**");
+    }
+
+    protected void addLog(Set<String> patterns) {
+        if(Boolean.FALSE.equals(configuration.pluginFollowLog())){
+            return;
+        }
+        patterns.add("org/slf4j/**");
     }
 
 

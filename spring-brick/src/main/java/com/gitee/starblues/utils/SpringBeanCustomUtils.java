@@ -1,5 +1,5 @@
 /**
- * Copyright [2019-2022] [starBlues]
+ * Copyright [2019-Present] [starBlues]
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@ package com.gitee.starblues.utils;
 import com.gitee.starblues.spring.ApplicationContext;
 import com.gitee.starblues.spring.SpringBeanFactory;
 import org.springframework.util.ClassUtils;
+import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
 import java.lang.annotation.Annotation;
 import java.util.*;
@@ -26,7 +27,8 @@ import java.util.*;
 /**
  * 自定义插件bean工具类
  * @author starBlues
- * @version 3.0.0
+ * @since 3.0.0
+ * @version 3.1.1
  */
 public class SpringBeanCustomUtils {
 
@@ -92,6 +94,31 @@ public class SpringBeanCustomUtils {
         } else {
             return null;
         }
+    }
+
+    /**
+     * 获取存在的Bean。名称和类型任意批量即可返回
+     * @param applicationContext applicationContext
+     * @param beanName bean名称
+     * @param beanClass bean class
+     * @return T
+     * @param <T> bean 类型
+     */
+    public static <T> T getExistBean(ApplicationContext applicationContext, String beanName, Class<T> beanClass){
+        SpringBeanFactory springBeanFactory = applicationContext.getSpringBeanFactory();
+        Map<String, T> beansOfTypeMap = springBeanFactory.getBeansOfType(beanClass);
+        if(ObjectUtils.isEmpty(beansOfTypeMap)){
+            return null;
+        }
+        Set<Map.Entry<String, T>> entries = beansOfTypeMap.entrySet();
+        for (Map.Entry<String, T> entry : entries) {
+            String key = entry.getKey();
+            T value = entry.getValue();
+            if(Objects.equals(beanName, key) || Objects.equals(value.getClass().getName(), beanClass.getName())){
+                return value;
+            }
+        }
+        return null;
     }
 
     /**

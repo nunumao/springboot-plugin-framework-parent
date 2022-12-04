@@ -1,5 +1,5 @@
 /**
- * Copyright [2019-2022] [starBlues]
+ * Copyright [2019-Present] [starBlues]
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -72,7 +72,7 @@ public class DefaultPluginUser implements PluginUser{
         applicationContexts.forEach((k,v)->{
             Object existBean = SpringBeanCustomUtils.getExistBean(v, name);
             if(existBean != null){
-                pluginBeans.put(k, v);
+                pluginBeans.put(k, existBean);
             }
         });
         return new BeanWrapper<>(mainBean, pluginBeans);

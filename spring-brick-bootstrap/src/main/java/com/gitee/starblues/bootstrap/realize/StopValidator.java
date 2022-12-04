@@ -1,5 +1,5 @@
 /**
- * Copyright [2019-2022] [starBlues]
+ * Copyright [2019-Present] [starBlues]
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ package com.gitee.starblues.bootstrap.realize;
 
 /**
  * 插件停止校验器. 自主实现判断是否可卸载
+ *
  * @author starBlues
  * @since 3.0.0
  * @version 3.0.3

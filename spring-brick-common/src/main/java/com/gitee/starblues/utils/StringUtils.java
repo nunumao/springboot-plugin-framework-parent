@@ -1,5 +1,5 @@
 /**
- * Copyright [2019-2022] [starBlues]
+ * Copyright [2019-Present] [starBlues]
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@ import java.util.StringTokenizer;
  * String 工具类
  *
  * @author starBlues
+ * @since 3.0.0
  * @version 3.0.0
  */
 public class StringUtils {
@@ -57,6 +58,22 @@ public class StringUtils {
 
     public static String[] toStringArray(Collection<String> collection) {
         return (!ObjectUtils.isEmpty(collection) ? collection.toArray(EMPTY_STRING_ARRAY) : EMPTY_STRING_ARRAY);
+    }
+
+    public static String toStrByArray(String[] str){
+        if(str == null || str.length == 0){
+            return "";
+        }
+        int length = str.length;
+        StringBuilder stringBuilder = new StringBuilder();
+        for (int i = 0; i < length; i++) {
+            String s = str[i];
+            stringBuilder.append(s);
+            if (i < length - 1) {
+                stringBuilder.append(",");
+            }
+        }
+        return stringBuilder.toString();
     }
 
 }
