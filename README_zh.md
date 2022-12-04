@@ -42,7 +42,7 @@
 ### 运行环境 | Runtime Environment
 1. jdk1.8+
 2. apache maven 3.6+
-3. spring-boot 2.3.1 ~ 2.6.14
+3. spring-boot 2.3.1 ~ 2.7.6
 
 ### 文档地址 | Document
 - [https://www.yuque.com/starblues/spring-brick-3.0.0](https://www.yuque.com/starblues/spring-brick-3.0.0)
