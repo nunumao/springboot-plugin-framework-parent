@@ -1,5 +1,5 @@
 /**
- * Copyright [2019-2022] [starBlues]
+ * Copyright [2019-Present] [starBlues]
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -37,7 +37,7 @@ public interface IntegrationConfiguration {
      * 是否启用该插件框架
      * @return true 启用, false 禁用
      */
-    boolean enable();
+    Boolean enable();
 
     /**
      * 运行环境。运行项目时的模式。分为开发环境(Dev)、生产环境(Prod)
@@ -82,7 +82,7 @@ public interface IntegrationConfiguration {
      * 即为: /pathPrefix/pluginId/**
      * @return boolean
      */
-    boolean enablePluginIdRestPathPrefix();
+    Boolean enablePluginIdRestPathPrefix();
 
     /**
      * 启用的插件id
@@ -116,7 +116,25 @@ public interface IntegrationConfiguration {
      * 默认为false
      * @return true or false
      */
-    boolean exactVersion();
+    Boolean exactVersion();
+
+    /**
+     * 是否扫描插件 swagger 接口
+     * @return true 启动, false 禁用。默认启用
+     */
+    Boolean pluginSwaggerScan();
+
+    /**
+     * 插件的配置文件 Profile 是否跟随主程序的 Profile 配置动态切换
+     * @return true: 跟随, false: 不跟随
+     */
+    Boolean pluginFollowProfile();
+
+    /**
+     * 插件日志打印是否跟随主程序
+     * @return true: 跟随, false: 不跟随
+     */
+    Boolean pluginFollowLog();
 
     /**
      * 解密配置

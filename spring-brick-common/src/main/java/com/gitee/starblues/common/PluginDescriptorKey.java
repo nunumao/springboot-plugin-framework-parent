@@ -1,5 +1,5 @@
 /**
- * Copyright [2019-2022] [starBlues]
+ * Copyright [2019-Present] [starBlues]
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@ package com.gitee.starblues.common;
  * 插件描述文件配置key
  *
  * @author starBlues
+ * @since 3.0.0
  * @version 3.0.0
  */
 public class PluginDescriptorKey {

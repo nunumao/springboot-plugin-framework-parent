@@ -1,5 +1,5 @@
 /**
- * Copyright [2019-2022] [starBlues]
+ * Copyright [2019-Present] [starBlues]
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,9 @@ import org.apache.maven.plugins.annotations.Parameter;
 
 /**
  * 生产环境打包配置
+ *
  * @author starBlues
+ * @since 3.0.0
  * @version 3.0.2
  */
 @Data
@@ -30,7 +32,6 @@ public class ProdConfig {
 
     /**
      * 打包类型。默认jar包
-     *
      * {@link com.gitee.starblues.common.PackageType#PLUGIN_PACKAGE_TYPE_JAR}
      * {@link com.gitee.starblues.common.PackageType#PLUGIN_PACKAGE_TYPE_JAR_OUTER}
      * {@link com.gitee.starblues.common.PackageType#PLUGIN_PACKAGE_TYPE_ZIP}

@@ -1,5 +1,5 @@
 /**
- * Copyright [2019-2022] [starBlues]
+ * Copyright [2019-Present] [starBlues]
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,8 +29,10 @@ import java.util.Set;
 
 /**
  * 抽象的重新打包 mojo
+ *
  * @author starBlues
- * @version 3.0.0
+ * @since 3.0.0
+ * @version 3.1.1
  */
 @EqualsAndHashCode(callSuper = true)
 @Data
@@ -81,7 +83,8 @@ public abstract class AbstractPackagerMojo extends AbstractDependencyFilterMojo{
     protected abstract void pack() throws MojoExecutionException, MojoFailureException;
 
     public final Set<Artifact> getFilterDependencies() throws MojoExecutionException {
-        return filterDependencies(project.getArtifacts(), getFilters());
+        Set<Artifact> artifacts = project.getArtifacts();
+        return filterDependencies(artifacts, getFilters());
     }
 
     public final Set<Artifact> getSourceDependencies() throws MojoExecutionException {

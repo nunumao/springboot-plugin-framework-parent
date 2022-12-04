@@ -1,5 +1,5 @@
 /**
- * Copyright [2019-2022] [starBlues]
+ * Copyright [2019-Present] [starBlues]
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -17,6 +17,8 @@
 package com.gitee.starblues.loader.launcher.isolation;
 
 import com.gitee.starblues.loader.classloader.GenericClassLoader;
+import com.gitee.starblues.loader.classloader.resource.loader.JarResourceLoader;
+import com.gitee.starblues.loader.classloader.resource.loader.MainJarResourceLoader;
 import com.gitee.starblues.loader.launcher.classpath.ClasspathResource;
 import com.gitee.starblues.loader.launcher.classpath.JarOutClasspathResource;
 import com.gitee.starblues.loader.launcher.runner.MethodRunner;
@@ -25,12 +27,16 @@ import java.io.File;
 import java.net.URL;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
+
+import static com.gitee.starblues.loader.LoaderConstant.PROD_CLASSES_URL_SIGN;
 
 
 /**
  * 主程序jar-outer 模式启动者
  *
  * @author starBlues
+ * @since 3.0.2
  * @version 3.0.2
  */
 public class IsolationJarOuterLauncher extends IsolationBaseLauncher {
@@ -44,15 +50,24 @@ public class IsolationJarOuterLauncher extends IsolationBaseLauncher {
     }
 
     @Override
+    protected ClassLoader createClassLoader(String... args) throws Exception {
+        GenericClassLoader classLoader = (GenericClassLoader) super.createClassLoader(args);
+        addResource(classLoader);
+        return classLoader;
+    }
+
+    @Override
     protected boolean resolveThreadClassLoader() {
         return true;
     }
 
-    @Override
-    protected void addResource(GenericClassLoader classLoader) throws Exception {
-        super.addResource(classLoader);
+    private void addResource(GenericClassLoader classLoader) throws Exception {
+        Set<URL> baseResource = getBaseResource();
         List<URL> classpath = classpathResource.getClasspath();
-        for (URL url : classpath) {
+        if(classpath != null){
+            baseResource.addAll(classpath);
+        }
+        for (URL url : baseResource) {
             classLoader.addResource(url);
         }
     }

@@ -9,6 +9,7 @@ import java.util.Map;
  * 抽象的插件解密
  *
  * @author starBlues
+ * @since 3.0.1
  * @version 3.0.1
  */
 public abstract class AbstractPluginCipher implements PluginCipher{

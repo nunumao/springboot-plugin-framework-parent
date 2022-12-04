@@ -1,5 +1,5 @@
 /**
- * Copyright [2019-2022] [starBlues]
+ * Copyright [2019-Present] [starBlues]
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -38,6 +38,7 @@ import java.util.stream.Stream;
  * 扫描工具类
  *
  * @author starBlues
+ * @version 2.2.2
  * @version 2.2.2
  */
 public class ScanUtils {

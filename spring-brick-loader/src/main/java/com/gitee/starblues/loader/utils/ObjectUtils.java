@@ -1,5 +1,5 @@
 /**
- * Copyright [2019-2022] [starBlues]
+ * Copyright [2019-Present] [starBlues]
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,14 +17,13 @@
 package com.gitee.starblues.loader.utils;
 
 import java.lang.reflect.Array;
-import java.util.Collection;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * object utils
  *
  * @author starBlues
+ * @since 3.0.0
  * @version 3.0.0
  */
 public class ObjectUtils {
@@ -56,6 +55,27 @@ public class ObjectUtils {
             return ((Map<?, ?>) obj).isEmpty();
         }
         return false;
+    }
+
+    public static <T> List<T> toList(T... array){
+        if(array.length == 0){
+            return new ArrayList<>(0);
+        }
+        List<T> list = new ArrayList<>(array.length);
+        for (T t : array) {
+            list.add(t);
+        }
+        return list;
+    }
+
+    public static <T> T getFirst(Collection<T> collection){
+        if(ObjectUtils.isEmpty(collection)){
+            return null;
+        }
+        for (T t : collection) {
+            return t;
+        }
+        return null;
     }
 
 }

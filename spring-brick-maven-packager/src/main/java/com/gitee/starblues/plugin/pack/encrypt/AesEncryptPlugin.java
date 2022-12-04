@@ -13,6 +13,7 @@ import java.util.Map;
  * rsa 加密者
  *
  * @author starBlues
+ * @since 3.0.1
  * @version 3.0.1
  */
 public class AesEncryptPlugin implements EncryptPlugin{

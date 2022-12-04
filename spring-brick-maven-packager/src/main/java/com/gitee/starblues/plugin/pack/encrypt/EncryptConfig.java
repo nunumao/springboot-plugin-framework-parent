@@ -1,5 +1,5 @@
 /**
- * Copyright [2019-2022] [starBlues]
+ * Copyright [2019-Present] [starBlues]
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,12 +22,20 @@ import lombok.Data;
  * 加密配置
  *
  * @author starBlues
+ * @since 3.0.1
  * @version 3.0.1
  */
 @Data
 public class EncryptConfig {
 
+    /**
+     * rsa 配置
+     */
     private RsaConfig rsa;
+
+    /**
+     * aes 配置
+     */
     private AesConfig aes;
 
 }

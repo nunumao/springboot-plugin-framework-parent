@@ -30,7 +30,7 @@ The framework can be developed in the `spring-boot` project plugin, plugin can b
 ### Environment
 1. jdk1.8+d
 2. apache maven 3.6+
-3. spring-boot 2.0.0+
+3. spring-boot 2.3.1 ~ 2.7.6
 
 ### Doc
 

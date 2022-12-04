@@ -19,6 +19,7 @@ import java.util.*;
  * 默认的 PluginDescriptorDecrypt
  *
  * @author starBlues
+ * @since 3.0.0
  * @version 3.0.1
  */
 public class DefaultPluginDescriptorDecrypt implements PluginDescriptorDecrypt{
