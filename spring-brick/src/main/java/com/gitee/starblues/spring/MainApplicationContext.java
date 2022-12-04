@@ -1,5 +1,5 @@
 /**
- * Copyright [2019-2022] [starBlues]
+ * Copyright [2019-Present] [starBlues]
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -17,6 +17,8 @@
 package com.gitee.starblues.spring;
 
 import com.gitee.starblues.spring.environment.EnvironmentProvider;
+import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter;
+import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
 import java.util.Map;
 import java.util.Objects;
@@ -35,13 +37,23 @@ public interface MainApplicationContext extends ApplicationContext {
      */
     Map<String, Map<String, Object>> getConfigurableEnvironment();
 
-
     /**
      * 得到主程序配置的 Provider
      * @return EnvironmentProvider
      */
     EnvironmentProvider getEnvironmentProvider();
 
+    /**
+     * 返回主程序配置的Profile配置
+     * @return String 数组
+     */
+    String[] getActiveProfiles();
+
+    /**
+     * 返回主程序默认的Profile配置
+     * @return String 数组
+     */
+    String[] getDefaultProfiles();
 
     /**
      * 从主程序获取依赖
@@ -63,5 +75,24 @@ public interface MainApplicationContext extends ApplicationContext {
      * @return Object
      */
     Object getSourceApplicationContext();
+
+    /**
+     * 是否能注册Controller
+     * @return boolean
+     */
+    boolean isRegisterController();
+
+    /**
+     * 获取主程序的 RequestMappingHandlerMapping
+     * @return RequestMappingHandlerMapping
+     */
+    RequestMappingHandlerMapping getRequestMappingHandlerMapping();
+
+    /**
+     * 获取主程序的 RequestMappingHandlerAdapter
+     * @return RequestMappingHandlerAdapter
+     */
+    RequestMappingHandlerAdapter getRequestMappingHandlerAdapter();
+
 
 }

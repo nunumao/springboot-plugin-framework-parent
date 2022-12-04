@@ -1,5 +1,5 @@
 /**
- * Copyright [2019-2022] [starBlues]
+ * Copyright [2019-Present] [starBlues]
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,11 +17,19 @@
 package com.gitee.starblues.loader.utils;
 
 import java.io.File;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLConnection;
+import java.util.Objects;
+import java.util.function.Consumer;
 
 /**
  * 资源工具
+ *
  * @author starBlues
+ * @since 3.0.0
  * @version 3.0.0
  */
 public class ResourceUtils {
@@ -35,6 +43,8 @@ public class ResourceUtils {
     public static final String URL_PROTOCOL_VFS = "vfs";
 
     public static final String PACKAGE_SPLIT = "/";
+
+    public static final String CLASS_FILE_EXTENSION = ".class";
 
     private ResourceUtils(){}
 
@@ -117,6 +127,83 @@ public class ResourceUtils {
             return PACKAGE_SPLIT;
         }
         return newPath.toString();
+    }
+
+    /**
+     * 释放资源
+     * @param object 释放资源的对象
+     */
+    public static void release(final Object object) {
+        release(object, null);
+    }
+
+    /**
+     * 释放资源
+     * @param object 释放资源的对象
+     * @param consumer 释放异常消费
+     */
+    public static void release(final Object object, final Consumer<Exception> consumer) {
+        if (object instanceof Release) {
+            try {
+                ((Release)object).release();
+            } catch (final Exception e) {
+                if (consumer != null) {
+                    consumer.accept(e);
+                }
+            }
+        }
+    }
+
+    /**
+     * 获取存在的url
+     * @param url url
+     * @return 存在的URL, 不存在返回nulll
+     */
+    public static URL getExistUrl(URL url){
+        return getExistUrl(url, null);
+    }
+
+    /**
+     * 获取存在的url
+     * @param baseUrl 根url
+     * @param name 资源名称
+     * @return 存在的URL, 不存在返回nulll
+     */
+    public static URL getExistUrl(URL baseUrl, String name){
+        URL url;
+        try {
+            if(ObjectUtils.isEmpty(name)){
+                url = baseUrl;
+            } else {
+                url = new URL(baseUrl, name);
+            }
+        } catch (MalformedURLException e) {
+            throw new IllegalArgumentException("非法：" + name);
+        }
+        try {
+            URLConnection uc = url.openConnection();
+            if (uc instanceof HttpURLConnection) {
+                HttpURLConnection hconn = (HttpURLConnection)uc;
+                hconn.setRequestMethod("HEAD");
+                if (hconn.getResponseCode() >= HttpURLConnection.HTTP_BAD_REQUEST) {
+                    return null;
+                }
+            } else {
+                uc.setUseCaches(false);
+                InputStream is = uc.getInputStream();
+                is.close();
+            }
+            return url;
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    public static boolean isClass(String path){
+        if(ObjectUtils.isEmpty(path)){
+            return false;
+        }
+        return path.toLowerCase().endsWith(CLASS_FILE_EXTENSION);
     }
 
 }

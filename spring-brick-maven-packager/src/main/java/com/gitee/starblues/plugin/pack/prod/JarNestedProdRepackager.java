@@ -1,5 +1,5 @@
 /**
- * Copyright [2019-2022] [starBlues]
+ * Copyright [2019-Present] [starBlues]
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,8 +38,10 @@ import static com.gitee.starblues.common.PackageStructure.PROD_RESOURCES_DEFINE_
 
 /**
  * jar包生成
+ *
  * @author starBlues
- * @version 3.0.0
+ * @since 3.0.0
+ * @version 3.1.1
  */
 public class JarNestedProdRepackager extends ZipProdRepackager {
 
@@ -51,6 +53,11 @@ public class JarNestedProdRepackager extends ZipProdRepackager {
     @Override
     public void repackage() throws MojoExecutionException, MojoFailureException {
         super.repackage();
+    }
+
+    protected void logSuccess(){
+        repackageMojo.getLog().info("Success package prod jar file : "
+                + packageZip.getFile().getPath());
     }
 
     @Override

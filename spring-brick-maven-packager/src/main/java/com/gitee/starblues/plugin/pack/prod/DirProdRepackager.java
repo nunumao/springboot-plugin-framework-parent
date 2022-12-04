@@ -1,5 +1,5 @@
 /**
- * Copyright [2019-2022] [starBlues]
+ * Copyright [2019-Present] [starBlues]
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,8 +39,10 @@ import static com.gitee.starblues.common.PackageStructure.*;
 
 /**
  * 文件夹包生成
+ *
  * @author starBlues
- * @version 3.0.0
+ * @since 3.0.0
+ * @version 3.1.1
  */
 public class DirProdRepackager extends DevRepackager {
 
@@ -57,10 +59,15 @@ public class DirProdRepackager extends DevRepackager {
         super.repackage();
         try {
             resolveClasses();
+            logSuccess();
         } catch (Exception e) {
             repackageMojo.getLog().error(e.getMessage(), e);
             throw new MojoFailureException(e);
         }
+    }
+
+    protected void logSuccess(){
+        repackageMojo.getLog().info("Success package prod dir file : " + getRootDir());
     }
 
     @Override

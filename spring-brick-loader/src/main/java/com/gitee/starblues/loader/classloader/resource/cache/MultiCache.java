@@ -1,5 +1,5 @@
 /**
- * Copyright [2019-2022] [starBlues]
+ * Copyright [2019-Present] [starBlues]
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,31 +14,36 @@
  * limitations under the License.
  */
 
-package com.gitee.starblues.loader.classloader.resource.storage;
+package com.gitee.starblues.loader.classloader.resource.cache;
 
-import java.net.URL;
+
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 /**
- * 抽象的资源存储
+ * 缓存接口
  *
  * @author starBlues
- * @version 3.0.0
+ * @since 3.1.1
+ * @version 3.1.1
  */
-public abstract class SameRootResourceStorage implements ResourceStorage {
-
-    protected final URL baseUrl;
-
-    public SameRootResourceStorage(URL baseUrl) {
-        this.baseUrl = baseUrl;
-    }
+public interface MultiCache<K, V> extends Cache<K, Collection<V>>{
 
     /**
-     * 获取 base url
-     * @return URL
+     * put 一个值
+     * @param key 缓存的key
+     * @param value 缓存的值
      */
-    public URL getBaseUrl() {
-        return baseUrl;
-    }
+    void putSingle(K key, V value);
 
+    /**
+     * 得到第一个value
+     * @param key 缓存的key
+     * @return 第一个value
+     */
+    V getFirst(K key);
 
 }

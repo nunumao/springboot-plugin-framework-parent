@@ -1,5 +1,5 @@
 /**
- * Copyright [2019-2022] [starBlues]
+ * Copyright [2019-Present] [starBlues]
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,14 +19,14 @@ package com.gitee.starblues.loader.classloader.resource.loader;
 import com.gitee.starblues.loader.classloader.resource.storage.ResourceStorage;
 import com.gitee.starblues.loader.utils.IOUtils;
 
-import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.net.URL;
 
 /**
  * 抽象的资源加载者
  * @author starBlues
- * @version 3.0.0
+ * @since 3.0.0
+ * @version 3.1.1
  */
 public abstract class AbstractResourceLoader implements ResourceLoader{
 
@@ -55,8 +55,8 @@ public abstract class AbstractResourceLoader implements ResourceLoader{
             throw new Exception(this.getClass().getName()+": 已经初始化了, 不能再初始化!");
         }
         try {
-            // 添加root 路径
-            resourceStorage.add("/", baseUrl);
+            // 添加root 资源
+            resourceStorage.add(new DefaultResource("/", baseUrl, baseUrl));
             loadOfChild(resourceStorage);
         } finally {
             loaded = true;
@@ -74,15 +74,12 @@ public abstract class AbstractResourceLoader implements ResourceLoader{
         if(!isClass(path)){
             return null;
         }
-        final ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         try {
-            IOUtils.copy(inputStream, byteArrayOutputStream);
-            return byteArrayOutputStream.toByteArray();
+            return IOUtils.read(inputStream);
         } finally {
             if(isClose){
                 IOUtils.closeQuietly(inputStream);
             }
-            IOUtils.closeQuietly(byteArrayOutputStream);
         }
     }
 

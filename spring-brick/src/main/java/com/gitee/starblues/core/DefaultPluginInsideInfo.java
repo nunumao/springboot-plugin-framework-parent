@@ -1,5 +1,5 @@
 /**
- * Copyright [2019-2022] [starBlues]
+ * Copyright [2019-Present] [starBlues]
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -28,7 +28,9 @@ import java.util.function.Supplier;
 /**
  * 默认的内部PluginWrapperInside实现
  * @author starBlues
- * @version 3.0.0
+ *
+ * @since 3.0.0
+ * @version 3.1.1
  */
 public class DefaultPluginInsideInfo implements PluginInsideInfo {
 
@@ -41,6 +43,8 @@ public class DefaultPluginInsideInfo implements PluginInsideInfo {
     private Date stopTime;
 
     private Supplier<Map<String, Object>> extensionInfoSupplier = Collections::emptyMap;
+
+    private ClassLoader classLoader = null;
 
     public DefaultPluginInsideInfo(InsidePluginDescriptor pluginDescriptor) {
         this.pluginId = pluginDescriptor.getPluginId();
@@ -61,6 +65,11 @@ public class DefaultPluginInsideInfo implements PluginInsideInfo {
     @Override
     public void setExtensionInfoSupplier(Supplier<Map<String, Object>> supplier) {
         this.extensionInfoSupplier = supplier;
+    }
+
+    @Override
+    public void setClassLoader(ClassLoader classLoader) {
+        this.classLoader = classLoader;
     }
 
     @Override
@@ -111,6 +120,11 @@ public class DefaultPluginInsideInfo implements PluginInsideInfo {
     @Override
     public Map<String, Object> getExtensionInfo() {
         return extensionInfoSupplier.get();
+    }
+
+    @Override
+    public ClassLoader getClassLoader() {
+        return classLoader;
     }
 
     private void resolveTime(PluginState pluginState){

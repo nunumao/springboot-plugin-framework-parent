@@ -1,5 +1,5 @@
 /**
- * Copyright [2019-2022] [starBlues]
+ * Copyright [2019-Present] [starBlues]
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@ import java.util.function.Consumer;
  * io utils
  *
  * @author starBlues
+ * @since 3.0.0
  * @version 3.0.0
  */
 public class IOUtils {
@@ -47,13 +48,18 @@ public class IOUtils {
         if(inputStream == null){
             throw new IllegalArgumentException("参数inputStream不能为空");
         }
-        ByteArrayOutputStream output = new ByteArrayOutputStream();
-        byte[] buffer = new byte[4096];
-        int n = 0;
-        while (-1 != (n = inputStream.read(buffer))) {
-            output.write(buffer, 0, n);
+        if(!(inputStream instanceof BufferedInputStream)){
+            inputStream = new BufferedInputStream(inputStream);
         }
-        return output.toByteArray();
+        try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()){
+            int len = 0;
+            byte[] buffer = new byte[1024];
+            while (-1 != (len = inputStream.read(buffer))) {
+                outputStream.write(buffer, 0, len);
+            }
+            outputStream.flush();
+            return outputStream.toByteArray();
+        }
     }
 
     public static void closeQuietly(final AutoCloseable closeable) {

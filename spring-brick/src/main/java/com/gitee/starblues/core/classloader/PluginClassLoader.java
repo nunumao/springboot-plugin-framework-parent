@@ -1,5 +1,5 @@
 /**
- * Copyright [2019-2022] [starBlues]
+ * Copyright [2019-Present] [starBlues]
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,6 +39,7 @@ import java.util.Set;
 
 /**
  * 插件 classLoader
+ *
  * @author starBlues
  * @version 3.0.3
  * @since 3.0.0
@@ -51,9 +52,10 @@ public class PluginClassLoader extends GenericClassLoader implements PluginResou
     private final PluginResourceLoaderFactory proxy;
 
     public PluginClassLoader(String name, GenericClassLoader parentClassLoader,
+                             ClassLoader classLoader,
                              ResourceLoaderFactory resourceLoaderFactory,
                              MainResourceMatcher mainResourceMatcher) {
-        super(name, parentClassLoader, resourceLoaderFactory);
+        super(name, classLoader, resourceLoaderFactory);
         this.mainResourceMatcher = mainResourceMatcher;
         this.proxy = new PluginResourceLoaderFactoryProxy(resourceLoaderFactory, parentClassLoader);
     }
@@ -114,6 +116,4 @@ public class PluginClassLoader extends GenericClassLoader implements PluginResou
             }
         }
     }
-
-
 }

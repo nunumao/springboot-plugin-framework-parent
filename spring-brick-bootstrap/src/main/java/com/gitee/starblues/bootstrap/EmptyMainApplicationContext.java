@@ -1,5 +1,5 @@
 /**
- * Copyright [2019-2022] [starBlues]
+ * Copyright [2019-Present] [starBlues]
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,8 @@ import com.gitee.starblues.spring.MainApplicationContext;
 import com.gitee.starblues.spring.SpringBeanFactory;
 import com.gitee.starblues.spring.environment.EmptyEnvironmentProvider;
 import com.gitee.starblues.spring.environment.EnvironmentProvider;
+import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter;
+import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
 import java.util.Collections;
 import java.util.Map;
@@ -27,8 +29,10 @@ import java.util.Set;
 
 /**
  * 空的MainApplicationContext实现
+ *
  * @author starBlues
- * @version 3.0.3
+ * @since 3.0.0
+ * @version 3.1.1
  */
 public class EmptyMainApplicationContext implements MainApplicationContext {
 
@@ -60,6 +64,16 @@ public class EmptyMainApplicationContext implements MainApplicationContext {
     }
 
     @Override
+    public String[] getActiveProfiles() {
+        return new String[0];
+    }
+
+    @Override
+    public String[] getDefaultProfiles() {
+        return new String[0];
+    }
+
+    @Override
     public Object resolveDependency(String requestingBeanName, Class<?> dependencyType) {
         return null;
     }
@@ -71,6 +85,21 @@ public class EmptyMainApplicationContext implements MainApplicationContext {
 
     @Override
     public Object getSourceApplicationContext() {
+        return null;
+    }
+
+    @Override
+    public boolean isRegisterController() {
+        return false;
+    }
+
+    @Override
+    public RequestMappingHandlerMapping getRequestMappingHandlerMapping() {
+        return null;
+    }
+
+    @Override
+    public RequestMappingHandlerAdapter getRequestMappingHandlerAdapter() {
         return null;
     }
 

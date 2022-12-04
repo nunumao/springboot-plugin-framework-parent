@@ -1,5 +1,5 @@
 /**
- * Copyright [2019-2022] [starBlues]
+ * Copyright [2019-Present] [starBlues]
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,9 @@ import java.lang.annotation.*;
 /**
  * 禁用web环境. 如果该注解加入到入口类上, 表示当前插件禁用web的功能。
  * 包括：controller注册、拦截器注册、web静态资源访问、thymeleaf模板引擎
+ *
  * @author starBlues
+ * @since 3.0.0
  * @version 3.0.0
  */
 @Target(ElementType.TYPE)

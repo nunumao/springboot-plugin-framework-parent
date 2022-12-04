@@ -1,5 +1,5 @@
 /**
- * Copyright [2019-2022] [starBlues]
+ * Copyright [2019-Present] [starBlues]
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -19,6 +19,8 @@ package com.gitee.starblues.spring;
 import com.gitee.starblues.spring.environment.EnvironmentProvider;
 import com.gitee.starblues.spring.environment.MainSpringBootEnvironmentProvider;
 import com.gitee.starblues.utils.ObjectUtils;
+import com.gitee.starblues.utils.SpringBeanUtils;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.web.reactive.context.AnnotationConfigReactiveWebServerApplicationContext;
 import org.springframework.boot.web.servlet.context.AnnotationConfigServletWebServerApplicationContext;
 import org.springframework.context.support.GenericApplicationContext;
@@ -26,25 +28,31 @@ import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.EnumerablePropertySource;
 import org.springframework.core.env.MutablePropertySources;
 import org.springframework.core.env.PropertySource;
+import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter;
+import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 主程序 ApplicationContext 的实现
  * @author starBlues
  * @version 3.0.1
  */
+@Slf4j
 public class MainApplicationContextProxy extends ApplicationContextProxy implements MainApplicationContext{
+
+    private final static String REQUEST_MAPPING_BANE_NAME = "requestMappingHandlerMapping";
+    private final static String REQUEST_MAPPING_ADAPTER_BANE_NAME = "requestMappingHandlerAdapter";
 
     private final GenericApplicationContext applicationContext;
     private final boolean isWebEnvironment;
 
+    private final boolean isRegisterController;
+    private final RequestMappingHandlerMapping requestMappingHandlerMapping;
+    private final RequestMappingHandlerAdapter requestMappingHandlerAdapter;
+
     public MainApplicationContextProxy(GenericApplicationContext applicationContext) {
-        super(applicationContext.getBeanFactory());
-        this.applicationContext = applicationContext;
-        this.isWebEnvironment = getIsWebEnvironment(applicationContext);
+        this(applicationContext, null);
     }
 
     public MainApplicationContextProxy(GenericApplicationContext applicationContext,
@@ -52,6 +60,22 @@ public class MainApplicationContextProxy extends ApplicationContextProxy impleme
         super(applicationContext.getBeanFactory(), autoCloseable);
         this.applicationContext = applicationContext;
         this.isWebEnvironment = getIsWebEnvironment(applicationContext);
+        if(isWebEnvironment){
+            this.requestMappingHandlerMapping = SpringBeanUtils.getExistBean(
+                    applicationContext, REQUEST_MAPPING_BANE_NAME, RequestMappingHandlerMapping.class);
+            this.requestMappingHandlerAdapter = SpringBeanUtils.getExistBean(
+                    applicationContext, REQUEST_MAPPING_ADAPTER_BANE_NAME, RequestMappingHandlerAdapter.class);
+            if(this.requestMappingHandlerMapping == null || this.requestMappingHandlerAdapter == null){
+                log.error("主程序环境异常, 插件不能注册 Controller 接口！");
+                isRegisterController = false;
+            } else {
+                isRegisterController = true;
+            }
+        } else {
+            this.isRegisterController = false;
+            this.requestMappingHandlerMapping = null;
+            this.requestMappingHandlerAdapter = null;
+        }
     }
 
     @Override
@@ -82,6 +106,16 @@ public class MainApplicationContextProxy extends ApplicationContextProxy impleme
     }
 
     @Override
+    public String[] getActiveProfiles() {
+        return applicationContext.getEnvironment().getActiveProfiles();
+    }
+
+    @Override
+    public String[] getDefaultProfiles() {
+        return applicationContext.getEnvironment().getDefaultProfiles();
+    }
+
+    @Override
     public Object resolveDependency(String requestingBeanName, Class<?> dependencyType) {
         try {
             return applicationContext.getBean(dependencyType);
@@ -98,6 +132,21 @@ public class MainApplicationContextProxy extends ApplicationContextProxy impleme
     @Override
     public Object getSourceApplicationContext() {
         return applicationContext;
+    }
+
+    @Override
+    public boolean isRegisterController() {
+        return isRegisterController;
+    }
+
+    @Override
+    public RequestMappingHandlerMapping getRequestMappingHandlerMapping() {
+        return requestMappingHandlerMapping;
+    }
+
+    @Override
+    public RequestMappingHandlerAdapter getRequestMappingHandlerAdapter() {
+        return requestMappingHandlerAdapter;
     }
 
     @Override

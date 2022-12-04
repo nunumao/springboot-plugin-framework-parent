@@ -1,5 +1,5 @@
 /**
- * Copyright [2019-2022] [starBlues]
+ * Copyright [2019-Present] [starBlues]
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -20,7 +20,8 @@ package com.gitee.starblues.utils;
  * 顺序优先级
  *
  * @author starBlues
- * @version 1.0
+ * @since 1.0.0
+ * @version 1.0.0
  */
 public class OrderPriority {
     /**
