@@ -42,7 +42,7 @@ import static com.gitee.starblues.common.PackageStructure.*;
  *
  * @author starBlues
  * @since 3.0.0
- * @version 3.0.0
+ * @version 3.1.1
  */
 public class DirProdRepackager extends DevRepackager {
 
@@ -59,10 +59,15 @@ public class DirProdRepackager extends DevRepackager {
         super.repackage();
         try {
             resolveClasses();
+            logSuccess();
         } catch (Exception e) {
             repackageMojo.getLog().error(e.getMessage(), e);
             throw new MojoFailureException(e);
         }
+    }
+
+    protected void logSuccess(){
+        repackageMojo.getLog().info("Success package prod dir file : " + getRootDir());
     }
 
     @Override

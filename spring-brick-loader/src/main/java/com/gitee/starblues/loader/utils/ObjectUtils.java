@@ -17,9 +17,7 @@
 package com.gitee.starblues.loader.utils;
 
 import java.lang.reflect.Array;
-import java.util.Collection;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * object utils
@@ -57,6 +55,27 @@ public class ObjectUtils {
             return ((Map<?, ?>) obj).isEmpty();
         }
         return false;
+    }
+
+    public static <T> List<T> toList(T... array){
+        if(array.length == 0){
+            return new ArrayList<>(0);
+        }
+        List<T> list = new ArrayList<>(array.length);
+        for (T t : array) {
+            list.add(t);
+        }
+        return list;
+    }
+
+    public static <T> T getFirst(Collection<T> collection){
+        if(ObjectUtils.isEmpty(collection)){
+            return null;
+        }
+        for (T t : collection) {
+            return t;
+        }
+        return null;
     }
 
 }

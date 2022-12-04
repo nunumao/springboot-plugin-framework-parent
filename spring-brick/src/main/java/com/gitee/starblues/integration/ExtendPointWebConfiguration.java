@@ -76,6 +76,7 @@ public class ExtendPointWebConfiguration {
     }
 
     @ConditionalOnClass({ DocumentationPluginsBootstrapper.class })
+    @ConditionalOnProperty(name = "plugin.pluginSwaggerScan", havingValue = "true", matchIfMissing = true)
     public static class SwaggerListenerConfiguration {
 
         private final GenericApplicationContext applicationContext;

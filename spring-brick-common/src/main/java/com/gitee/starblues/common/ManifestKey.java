@@ -23,7 +23,7 @@ import java.util.jar.Attributes;
  *
  * @author starBlues
  * @since 3.0.0
- * @version 3.0.0
+ * @version 3.1.1
  */
 public class ManifestKey {
 
@@ -31,6 +31,11 @@ public class ManifestKey {
      * Manifest version
      */
     public static final String MANIFEST_VERSION = "Manifest-Version";
+
+    /**
+     * Manifest Build Time
+     */
+    public static final String BUILD_TIME = "Build-Time";
 
     /**
      * Manifest-version: 1.0

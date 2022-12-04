@@ -95,6 +95,11 @@ public abstract class DefaultIntegrationConfiguration implements IntegrationConf
     }
 
     @Override
+    public Boolean pluginSwaggerScan() {
+        return Boolean.TRUE;
+    }
+
+    @Override
     public Boolean pluginFollowProfile() {
         return Boolean.FALSE;
     }

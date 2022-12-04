@@ -89,6 +89,11 @@ public class EmptyMainApplicationContext implements MainApplicationContext {
     }
 
     @Override
+    public boolean isRegisterController() {
+        return false;
+    }
+
+    @Override
     public RequestMappingHandlerMapping getRequestMappingHandlerMapping() {
         return null;
     }

@@ -45,8 +45,9 @@ public class MainApplicationContextProxy extends ApplicationContextProxy impleme
     private final static String REQUEST_MAPPING_ADAPTER_BANE_NAME = "requestMappingHandlerAdapter";
 
     private final GenericApplicationContext applicationContext;
-    private boolean isWebEnvironment;
+    private final boolean isWebEnvironment;
 
+    private final boolean isRegisterController;
     private final RequestMappingHandlerMapping requestMappingHandlerMapping;
     private final RequestMappingHandlerAdapter requestMappingHandlerAdapter;
 
@@ -65,10 +66,13 @@ public class MainApplicationContextProxy extends ApplicationContextProxy impleme
             this.requestMappingHandlerAdapter = SpringBeanUtils.getExistBean(
                     applicationContext, REQUEST_MAPPING_ADAPTER_BANE_NAME, RequestMappingHandlerAdapter.class);
             if(this.requestMappingHandlerMapping == null || this.requestMappingHandlerAdapter == null){
-                log.error("主程序环境异常, 插件不能注接口！");
-                isWebEnvironment = false;
+                log.error("主程序环境异常, 插件不能注册 Controller 接口！");
+                isRegisterController = false;
+            } else {
+                isRegisterController = true;
             }
         } else {
+            this.isRegisterController = false;
             this.requestMappingHandlerMapping = null;
             this.requestMappingHandlerAdapter = null;
         }
@@ -128,6 +132,11 @@ public class MainApplicationContextProxy extends ApplicationContextProxy impleme
     @Override
     public Object getSourceApplicationContext() {
         return applicationContext;
+    }
+
+    @Override
+    public boolean isRegisterController() {
+        return isRegisterController;
     }
 
     @Override

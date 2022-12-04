@@ -17,18 +17,13 @@
 package com.gitee.starblues.loader.classloader.resource.storage;
 
 import com.gitee.starblues.loader.classloader.resource.Resource;
-import com.gitee.starblues.loader.classloader.resource.cache.Cache;
-import com.gitee.starblues.loader.classloader.resource.cache.DefaultCacheExpirationTrigger;
-import com.gitee.starblues.loader.classloader.resource.cache.LRUMapCache;
+import com.gitee.starblues.loader.classloader.resource.cache.*;
 import com.gitee.starblues.loader.utils.IOUtils;
 import com.gitee.starblues.loader.utils.ObjectUtils;
 import com.gitee.starblues.loader.utils.ResourceUtils;
 
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Enumeration;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -42,18 +37,21 @@ import java.util.concurrent.TimeUnit;
  */
 public class CacheFastResourceStorage extends AbstractResourceStorage {
 
-    protected final Cache<String, List<Resource>> resourceStorage;
+    protected final MultiCache<String, Resource> resourceStorage;
     private final ResourceStorage cacheResourceStorage;
 
     private final List<InputStream> inputStreams = new ArrayList<>();
 
     private volatile boolean release = false;
 
+    @SuppressWarnings("all")
     public CacheFastResourceStorage(String key) {
         this.cacheResourceStorage = new CachePerpetualResourceStorage();
         // 最大 1000 个, 最长 3 分钟
-        resourceStorage = DefaultCacheExpirationTrigger.getCacheExpirationTrigger(3, TimeUnit.MINUTES)
-                .getCache(key, () -> new LRUMapCache<String, List<Resource>>(1000, 180000));
+        CacheExpirationTrigger trigger = DefaultCacheExpirationTrigger
+                .getCacheExpirationTrigger(3, TimeUnit.MINUTES);
+        resourceStorage = (MultiCache<String, Resource>) trigger.getCache(key,
+                () -> new LRUMultiMapUnifiedListCache<String, Resource>(1000, 180000));
     }
 
     @Override
@@ -64,9 +62,7 @@ public class CacheFastResourceStorage extends AbstractResourceStorage {
         }
         resource.resolveByte();
         String name = formatResourceName(resource.getName());
-        // TODO 多缓存处理
-        List<Resource> resources = resourceStorage.getOrDefault(name, ArrayList::new, true);
-        resources.add(resource);
+        resourceStorage.putSingle(name, resource);
     }
 
     @Override
@@ -86,9 +82,9 @@ public class CacheFastResourceStorage extends AbstractResourceStorage {
             return null;
         }
         name = formatResourceName(name);
-        List<Resource> resources = resourceStorage.get(name);
-        if(!ObjectUtils.isEmpty(resources)){
-            return resources.get(0);
+        Resource firstResource = resourceStorage.getFirst(name);
+        if(firstResource != null){
+            return firstResource;
         }
         return searchResource(name);
     }
@@ -102,7 +98,7 @@ public class CacheFastResourceStorage extends AbstractResourceStorage {
             return Collections.emptyEnumeration();
         }
         name = formatResourceName(name);
-        List<Resource> resources = resourceStorage.get(name);
+        Collection<Resource> resources = resourceStorage.get(name);
         if(!ObjectUtils.isEmpty(resources)){
             return Collections.enumeration(resources);
         }

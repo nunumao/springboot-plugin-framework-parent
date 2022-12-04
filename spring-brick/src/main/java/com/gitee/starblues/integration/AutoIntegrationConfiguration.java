@@ -130,6 +130,13 @@ public class AutoIntegrationConfiguration extends DefaultIntegrationConfiguratio
     private Boolean exactVersion;
 
     /**
+     * 插是否扫描 swagger 接口
+     */
+    @Value("${pluginSwaggerScan:true}")
+    private Boolean pluginSwaggerScan;
+
+
+    /**
      * 插件的配置文件 Profile 是否跟随主程序的 Profile 配置动态切换
      */
     @Value("${pluginFollowProfile:false}")
@@ -226,6 +233,14 @@ public class AutoIntegrationConfiguration extends DefaultIntegrationConfiguratio
     @Override
     public Boolean exactVersion() {
         return exactVersion;
+    }
+
+    @Override
+    public Boolean pluginSwaggerScan() {
+        if(pluginSwaggerScan == null){
+            return super.pluginSwaggerScan();
+        }
+        return pluginSwaggerScan;
     }
 
     @Override

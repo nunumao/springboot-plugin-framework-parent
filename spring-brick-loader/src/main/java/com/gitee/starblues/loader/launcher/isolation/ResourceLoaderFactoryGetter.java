@@ -40,14 +40,9 @@ public class ResourceLoaderFactoryGetter {
     private static final String RESOURCE_MODE_PERPETUAL = "perpetual";
 
     /**
-     * 资源存储模式-低内存模型。启动占用内存低, 速度可能会慢
+     * 资源存储模式-快速模式且内存相对较低。启动占用内存稍高, 速度比较高, 启动完成后占用内存会降低
      */
-    private static final String RESOURCE_MODE_LOW_MEMORY = "lowMemory";
-
-    /**
-     * 资源存储模式-快速模式。启动占用内存高, 速度比较高, 启动完成后占用内存会降低
-     */
-    private static final String RESOURCE_MODE_FAST = "fast";
+    private static final String RESOURCE_MODE_FAST_LOW = "fast-low";
 
 
     /**
@@ -86,8 +81,6 @@ public class ResourceLoaderFactoryGetter {
     public static AbstractResourceStorage getResourceStorage(String key){
         if(Objects.equals(resourceMode, RESOURCE_MODE_PERPETUAL)){
             return new CachePerpetualResourceStorage();
-        } else if(Objects.equals(resourceMode, RESOURCE_MODE_LOW_MEMORY)){
-            return new CacheLowMemoryResourceStorage(key);
         } else {
             return new CacheFastResourceStorage(key);
         }

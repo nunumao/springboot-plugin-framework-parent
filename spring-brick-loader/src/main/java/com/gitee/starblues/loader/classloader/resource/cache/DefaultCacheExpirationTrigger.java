@@ -102,8 +102,7 @@ public class DefaultCacheExpirationTrigger implements CacheExpirationTrigger{
         }
         cacheMap.forEach((k,v)->{
             try {
-                int i = v.cleanExpired();
-                System.out.println(k + "清除缓存: " + i);
+                v.cleanExpired();
             } catch (Exception e){
                 // log.warn("Checking clean cache:{} Exceptions. {}", k, e.getMessage());
             }

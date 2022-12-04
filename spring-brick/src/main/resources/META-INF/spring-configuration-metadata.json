@@ -95,10 +95,17 @@
     },
     {
       "name": "plugin.exactVersion",
-      "type": "java.lang.String",
+      "type": "java.lang.Boolean",
       "sourceType": "com.gitee.starblues.integration.AutoIntegrationConfiguration",
       "description": "是否完全匹配版本。设置为true表示插件设置的requires的版本号完全匹配version版本号才可允许插件安装, 即: requires=x.y.z; 设置为false表示插件设置的requires的版本号小于等于version值, 插件就可安装, 即requires<=x.y.z",
       "defaultValue": false
+    },
+    {
+      "name": "plugin.pluginSwaggerScan",
+      "type": "java.lang.Boolean",
+      "sourceType": "com.gitee.starblues.integration.AutoIntegrationConfiguration",
+      "description": "是否扫描插件 swagger 接口",
+      "defaultValue": true
     },
     {
       "name": "plugin.pluginFollowProfile",

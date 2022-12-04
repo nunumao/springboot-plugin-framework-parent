@@ -18,6 +18,8 @@ package com.gitee.starblues.integration.listener;
 
 import com.gitee.starblues.core.PluginInfo;
 import com.gitee.starblues.core.descriptor.PluginDescriptor;
+import com.gitee.starblues.integration.AutoIntegrationConfiguration;
+import com.gitee.starblues.integration.IntegrationConfiguration;
 import com.gitee.starblues.loader.utils.ObjectUtils;
 import com.gitee.starblues.utils.MsgUtils;
 import com.gitee.starblues.utils.SpringBeanUtils;
@@ -51,7 +53,6 @@ public class SwaggerListener implements PluginListener{
 
     private final Logger log = LoggerFactory.getLogger(this.getClass());
     private final ApplicationContext mainApplicationContext;
-
     private static List<Parameter> parameterList = new ArrayList<>();
 
     /**

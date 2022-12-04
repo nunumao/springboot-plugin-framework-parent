@@ -18,8 +18,8 @@ package com.gitee.starblues.loader.classloader.resource.cache;
 
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.StampedLock;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -62,7 +62,17 @@ public class LRUMapCache<K, V> implements Cache<K, V>{
 
     @Override
     public int size() {
-        return cacheMap.size();
+        long stamp = lock.tryOptimisticRead();
+        int size = cacheMap.size();
+        if(!lock.validate(stamp)){
+            stamp = lock.readLock();
+            try {
+                size = cacheMap.size();
+            } finally {
+                lock.unlockRead(stamp);
+            }
+        }
+        return size;
     }
 
     @Override
@@ -190,69 +200,28 @@ public class LRUMapCache<K, V> implements Cache<K, V>{
 
     public int cleanExpired(boolean isLock) {
         if(!isLock){
-            cacheMap.values().removeIf(Entity::isExpired);
-            return 0;
+            return actualCleanExpired();
         }
         long stamp = lock.writeLock();
         try {
-            AtomicInteger count = new AtomicInteger(0);
-            cacheMap.values().removeIf(v->{
-                if(v.isExpired()){
-                    count.addAndGet(1);
-                    return true;
-                } else {
-                    return false;
-                }
-            });
-            return count.get();
+            return actualCleanExpired();
         } finally {
             lock.unlockWrite(stamp);
         }
     }
 
-    private static class CacheLinkedHashMap<K, V> extends LinkedHashMap<K, V>{
-
-        private final int size;
-
-        private CacheLinkedHashMap(int size) {
-            super(size + 1, 1.0f, true);
-            this.size = size;
-        }
-
-        @Override
-        protected boolean removeEldestEntry(Map.Entry<K, V> eldest) {
-            if (size == 0) {
-                return false;
+    private int actualCleanExpired(){
+        Iterator<Map.Entry<K, Entity<V>>> cacheMapIterator = cacheMap.entrySet().iterator();
+        int removeCount = 0;
+        while (cacheMapIterator.hasNext()){
+            Map.Entry<K, Entity<V>> entityMap = cacheMapIterator.next();
+            Entity<V> value = entityMap.getValue();
+            if(value == null || value.isExpired()){
+                cacheMapIterator.remove();
+                removeCount++;
             }
-            return size() > size;
         }
-    }
-
-    private static class Entity<V> {
-
-        private final V value;
-        private final long ttl;
-        private long lastAccessTimestamp;
-
-        public Entity(V value, long ttl) {
-            this.value = value;
-            this.ttl = ttl;
-
-            this.lastAccessTimestamp = System.currentTimeMillis();
-        }
-
-        public boolean isExpired() {
-            if (ttl == 0) {
-                return false;
-            }
-            return lastAccessTimestamp + ttl < System.currentTimeMillis();
-        }
-
-        public V getValue() {
-            lastAccessTimestamp = System.currentTimeMillis();
-            return value;
-        }
-
+        return removeCount;
     }
 
 }

@@ -20,6 +20,7 @@ import com.gitee.starblues.common.PackageType;
 import com.gitee.starblues.plugin.pack.Constant;
 import com.gitee.starblues.plugin.pack.RepackageMojo;
 import com.gitee.starblues.plugin.pack.Repackager;
+import com.gitee.starblues.plugin.pack.utils.CommonUtils;
 import com.gitee.starblues.utils.ObjectUtils;
 import com.gitee.starblues.utils.ReflectionUtils;
 import lombok.Getter;
@@ -40,7 +41,7 @@ import java.util.Set;
  *
  * @author starBlues
  * @since 3.0.0
- * @version 3.0.0
+ * @version 3.1.1
  */
 @Getter
 public class MainRepackager implements Repackager {
@@ -58,13 +59,15 @@ public class MainRepackager implements Repackager {
         checkConfig();
         setDevelopmentMode();
         String packageType = mainConfig.getPackageType();
+        Repackager repackager = null;
         if(PackageType.MAIN_PACKAGE_TYPE_JAR.equalsIgnoreCase(packageType)){
-            new JarNestPackager(this).repackage();
+            repackager = new JarNestPackager(this);
         } else if(PackageType.MAIN_PACKAGE_TYPE_JAR_OUTER.equalsIgnoreCase(packageType)){
-            new JarOuterPackager(this).repackage();
+            repackager = new JarOuterPackager(this);
         } else {
             throw new MojoFailureException("Not found packageType : " + packageType);
         }
+        repackager.repackage();
     }
 
     private void checkConfig() throws MojoFailureException {

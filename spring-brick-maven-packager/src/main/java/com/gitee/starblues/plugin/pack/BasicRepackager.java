@@ -22,6 +22,7 @@ import com.gitee.starblues.utils.FilesUtils;
 import com.gitee.starblues.utils.ObjectUtils;
 import lombok.Getter;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -36,6 +37,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.*;
 import java.util.jar.Attributes;
+import java.util.jar.JarFile;
 import java.util.jar.Manifest;
 
 import static com.gitee.starblues.common.PackageStructure.*;
@@ -46,7 +48,7 @@ import static com.gitee.starblues.common.PluginDescriptorKey.*;
  *
  * @author starBlues
  * @since 3.0.0
- * @version 3.0.0
+ * @version 3.1.1
  */
 public class BasicRepackager implements Repackager{
 
@@ -59,6 +61,7 @@ public class BasicRepackager implements Repackager{
     protected File resourcesDefineFile;
 
     protected final RepackageMojo repackageMojo;
+    protected JarFile sourceJarFile;
 
     public BasicRepackager(RepackageMojo repackageMojo) {
         this.repackageMojo = repackageMojo;
@@ -66,6 +69,7 @@ public class BasicRepackager implements Repackager{
 
     @Override
     public void repackage() throws MojoExecutionException, MojoFailureException {
+        sourceJarFile = CommonUtils.getSourceJarFile(repackageMojo.getProject());
         checkPluginInfo();
         rootDir = createRootDir();
         relativeManifestPath = getRelativeManifestPath();
@@ -77,6 +81,8 @@ public class BasicRepackager implements Repackager{
         } catch (Exception e) {
             repackageMojo.getLog().error(e.getMessage(), e);
             throw new MojoFailureException(e);
+        } finally {
+            IOUtils.closeQuietly(sourceJarFile);
         }
     }
 
@@ -157,15 +163,21 @@ public class BasicRepackager implements Repackager{
     }
 
     protected Manifest getManifest() throws Exception{
-        Manifest manifest = new Manifest();
+        Manifest manifest = null;
+        if(sourceJarFile != null){
+            manifest = sourceJarFile.getManifest();
+        } else {
+            manifest = new Manifest();
+        }
         Attributes attributes = manifest.getMainAttributes();
         attributes.putValue(ManifestKey.MANIFEST_VERSION, ManifestKey.MANIFEST_VERSION_1_0);
+        attributes.putValue(ManifestKey.BUILD_TIME, CommonUtils.getDateTime());
         attributes.putValue(ManifestKey.PLUGIN_META_PATH, getPluginMetaInfoPath());
         attributes.putValue(ManifestKey.PLUGIN_PACKAGE_TYPE, PackageType.PLUGIN_PACKAGE_TYPE_DEV);
         // 增加jar包title和version属性
         MavenProject mavenProject = this.repackageMojo.getProject();
-        attributes.putValue(ManifestKey.IMPLEMENTATION_TITLE,mavenProject.getArtifactId());
-        attributes.putValue(ManifestKey.IMPLEMENTATION_VERSION,mavenProject.getVersion());
+        attributes.putValue(ManifestKey.IMPLEMENTATION_TITLE, mavenProject.getArtifactId());
+        attributes.putValue(ManifestKey.IMPLEMENTATION_VERSION, mavenProject.getVersion());
         return manifest;
     }
 

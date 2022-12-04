@@ -37,6 +37,7 @@ import java.util.concurrent.TimeUnit;
  * @author starBlues
  * @since 3.1.1
  * @version 3.1.1
+ * @deprecated 暂时遗弃
  */
 @Deprecated
 public class CacheLowMemoryResourceStorage extends AbstractResourceStorage {

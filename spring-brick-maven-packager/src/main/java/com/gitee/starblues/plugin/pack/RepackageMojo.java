@@ -24,6 +24,7 @@ import com.gitee.starblues.plugin.pack.main.MainConfig;
 import com.gitee.starblues.plugin.pack.main.MainRepackager;
 import com.gitee.starblues.plugin.pack.prod.ProdConfig;
 import com.gitee.starblues.plugin.pack.prod.ProdRepackager;
+import com.gitee.starblues.plugin.pack.utils.CommonUtils;
 import com.gitee.starblues.utils.ObjectUtils;
 import lombok.Getter;
 import org.apache.maven.artifact.Artifact;
@@ -43,7 +44,7 @@ import java.util.Set;
  *
  * @author starBlues
  * @since 3.0.0
- * @version 3.0.1
+ * @version 3.1.1
  */
 @Mojo(name = "repackage", defaultPhase = LifecyclePhase.PACKAGE, requiresProject = true, threadSafe = true,
         requiresDependencyResolution = ResolutionScope.COMPILE_PLUS_RUNTIME,

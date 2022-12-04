@@ -44,7 +44,7 @@ import java.util.stream.Collectors;
  *
  * @author starBlues
  * @since 3.0.0
- * @version 3.0.3
+ * @version 3.1.1
  */
 public class ComposeSpringPluginProcessor implements SpringPluginProcessor {
 
@@ -179,7 +179,9 @@ public class ComposeSpringPluginProcessor implements SpringPluginProcessor {
             return;
         }
         context.getWebConfig().setEnable(true);
-        processors.add(new PluginControllerProcessor());
+        if(mainApplicationContext.isRegisterController()){
+            processors.add(new PluginControllerProcessor());
+        }
         processors.add(new PluginInterceptorsProcessor());
         processors.add(new PluginStaticResourceProcessor());
         processors.add(new PluginThymeleafProcessor());

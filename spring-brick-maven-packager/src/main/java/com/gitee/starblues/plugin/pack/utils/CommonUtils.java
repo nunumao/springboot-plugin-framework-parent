@@ -20,9 +20,17 @@ import com.gitee.starblues.plugin.pack.filter.Exclude;
 import org.apache.commons.io.FileUtils;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.project.MavenProject;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Objects;
+import java.util.jar.JarFile;
 
 /**
  * Object 工具类
@@ -38,6 +46,9 @@ public class CommonUtils {
 
     public final static String PLUGIN_FRAMEWORK_LOADER_ARTIFACT_ID = "spring-brick-loader";
 
+    public static final String PATTERN = "yyyy-MM-dd HH:mm:ss";
+    public static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern(PATTERN);
+
     private CommonUtils(){}
 
     public static Exclude getPluginFrameworkExclude(){
@@ -52,6 +63,19 @@ public class CommonUtils {
     public static boolean isPluginFrameworkLoader(Artifact artifact){
         return Objects.equals(artifact.getGroupId(), PLUGIN_FRAMEWORK_GROUP_ID)
                 && Objects.equals(artifact.getArtifactId(), PLUGIN_FRAMEWORK_LOADER_ARTIFACT_ID);
+    }
+
+    public static JarFile getSourceJarFile(MavenProject mavenProject) {
+        File file = mavenProject.getArtifact().getFile();
+        try {
+            return new JarFile(file);
+        } catch (Exception e){
+            return null;
+        }
+    }
+
+    public static String getDateTime() {
+        return DATE_TIME_FORMATTER.format(LocalDateTime.now());
     }
 
     public static void deleteFile(File rootFile) throws MojoFailureException {
@@ -72,4 +96,5 @@ public class CommonUtils {
             throw new MojoFailureException("Delete file '" + rootFile.getPath() + "' failure. " + e.getMessage());
         }
     }
+
 }

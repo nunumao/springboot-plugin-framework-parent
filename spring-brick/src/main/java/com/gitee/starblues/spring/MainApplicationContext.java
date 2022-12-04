@@ -77,6 +77,12 @@ public interface MainApplicationContext extends ApplicationContext {
     Object getSourceApplicationContext();
 
     /**
+     * 是否能注册Controller
+     * @return boolean
+     */
+    boolean isRegisterController();
+
+    /**
      * 获取主程序的 RequestMappingHandlerMapping
      * @return RequestMappingHandlerMapping
      */

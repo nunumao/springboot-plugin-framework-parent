@@ -16,48 +16,34 @@
 
 package com.gitee.starblues.loader.classloader.resource.cache;
 
+
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 /**
- * 缓存过期调度接口
+ * 缓存接口
  *
  * @author starBlues
  * @since 3.1.1
  * @version 3.1.1
  */
-public interface CacheExpirationTrigger {
+public interface MultiCache<K, V> extends Cache<K, Collection<V>>{
 
     /**
-     * 添加缓存过期调度
+     * put 一个值
      * @param key 缓存的key
-     * @param cache 缓存对象
+     * @param value 缓存的值
      */
-    void addCache(String key, Cache<?, ?> cache);
+    void putSingle(K key, V value);
 
-    /***
-     * 获取缓存
+    /**
+     * 得到第一个value
      * @param key 缓存的key
-     * @param cacheSupplier 不存在时提供, 并add到缓存中
-     * @return 缓存
-     * @param <K> K
-     * @param <V> V
+     * @return 第一个value
      */
-    <K, V> Cache<K, V> getCache(String key, Supplier<Cache<K, V>> cacheSupplier);
-
-    /**
-     * 移除缓存过期调度
-     * @param key 缓存的key
-     */
-    void removeCache(String key);
-
-    /**
-     * 启动调度
-     */
-    void start();
-
-    /**
-     * 停止调度
-     */
-    void stop();
+    V getFirst(K key);
 
 }

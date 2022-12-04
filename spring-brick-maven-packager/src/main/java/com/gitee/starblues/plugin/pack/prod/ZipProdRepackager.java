@@ -77,8 +77,7 @@ public class ZipProdRepackager extends DevRepackager {
             } catch (IOException e) {
                 // 忽略
             }
-            repackageMojo.getLog().info("Success package prod zip file : "
-                    + packageZip.getFile().getPath());
+            logSuccess();
         } catch (Exception e){
             repackageMojo.getLog().error(e.getMessage(), e);
             throw new MojoFailureException(e);
@@ -87,6 +86,11 @@ public class ZipProdRepackager extends DevRepackager {
                 IOUtils.closeQuietly(packageZip);
             }
         }
+    }
+
+    protected void logSuccess(){
+        repackageMojo.getLog().info("Success package prod zip file : "
+                + packageZip.getFile().getPath());
     }
 
     protected PackageZip getPackageZip() throws Exception {
