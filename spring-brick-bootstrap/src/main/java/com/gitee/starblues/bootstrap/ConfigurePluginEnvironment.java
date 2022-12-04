@@ -103,13 +103,20 @@ public class ConfigurePluginEnvironment {
         environment.getPropertySources().addFirst(new MapPropertySource(PLUGIN_PROPERTY_NAME, env));
     }
 
-    private String getConfigFileLocation(String configFileLocation){
-        String path = FilesUtils.resolveRelativePath(new File("").getAbsolutePath(), configFileLocation);
-        // 拼接最后字符斜杠
-        if(path.endsWith(FilesUtils.SLASH) || path.endsWith(File.separator)){
-            return path;
+    public void logProfiles(ConfigurableEnvironment environment){
+        IntegrationConfiguration configuration = processorContext.getConfiguration();
+        String fromMainMsg = configuration.pluginFollowProfile() ? " from main" : " ";
+        String[] activeProfiles = environment.getActiveProfiles();
+        if(activeProfiles.length > 0){
+            logger.info("Plugin[{}] following profiles are active{}: {}",
+                    MsgUtils.getPluginUnique(pluginDescriptor),
+                    fromMainMsg,
+                    StringUtils.toStrByArray(activeProfiles));
         } else {
-            return path + File.separator;
+            logger.info("Plugin[{}]  No active profile set, falling back to default profiles{}: {}",
+                    MsgUtils.getPluginUnique(pluginDescriptor),
+                    fromMainMsg,
+                    StringUtils.toStrByArray(environment.getDefaultProfiles()));
         }
     }
 
@@ -119,21 +126,24 @@ public class ConfigurePluginEnvironment {
             return;
         }
         MainApplicationContext mainApplicationContext = processorContext.getMainApplicationContext();
-        String[] activeProfiles = environment.getActiveProfiles();
-        if(activeProfiles.length > 0){
-            logger.info("Plugin[{}] following profiles are active: {}",
-                    MsgUtils.getPluginUnique(pluginDescriptor), StringUtils.toStrByArray(activeProfiles));
+        String[] mainActiveProfiles = mainApplicationContext.getActiveProfiles();
+        if(mainActiveProfiles.length > 0){
+            environment.setActiveProfiles(mainActiveProfiles);
         } else {
-            String[] mainActiveProfiles = mainApplicationContext.getActiveProfiles();
-            if(mainActiveProfiles.length > 0){
-                logger.info("Plugin[{}] following profiles are active from main: {}",
-                        MsgUtils.getPluginUnique(pluginDescriptor), StringUtils.toStrByArray(mainActiveProfiles));
-                environment.setActiveProfiles(mainActiveProfiles);
-            } else {
-                logger.info("Plugin[{}]  No active profile set, falling back to default profiles: {}",
-                        MsgUtils.getPluginUnique(pluginDescriptor),
-                        StringUtils.toStrByArray(environment.getDefaultProfiles()));
-            }
+            logger.info("Plugin[{}]  No active profile set, falling back to default profiles: {}",
+                    MsgUtils.getPluginUnique(pluginDescriptor),
+                    StringUtils.toStrByArray(environment.getDefaultProfiles()));
+        }
+    }
+
+
+    private String getConfigFileLocation(String configFileLocation){
+        String path = FilesUtils.resolveRelativePath(new File("").getAbsolutePath(), configFileLocation);
+        // 拼接最后字符斜杠
+        if(path.endsWith(FilesUtils.SLASH) || path.endsWith(File.separator)){
+            return path;
+        } else {
+            return path + File.separator;
         }
     }
 

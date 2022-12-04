@@ -90,6 +90,12 @@ public class PluginSpringApplication extends SpringApplication {
     }
 
     @Override
+    protected void bindToSpringApplication(ConfigurableEnvironment environment) {
+        super.bindToSpringApplication(environment);
+        configurePluginEnvironment.logProfiles(environment);
+    }
+
+    @Override
     protected ConfigurableApplicationContext createApplicationContext() {
         return this.applicationContext;
     }
