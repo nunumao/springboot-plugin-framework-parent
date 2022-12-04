@@ -7,6 +7,7 @@ import java.lang.annotation.*;
  * 注入类型
  *
  * @author starBlues
+ * @since 3.0.0
  * @version 3.0.3
  */
 @Target({ElementType.FIELD, ElementType.PARAMETER})

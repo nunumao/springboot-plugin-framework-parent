@@ -1,5 +1,5 @@
 /**
- * Copyright [2019-2022] [starBlues]
+ * Copyright [2019-Present] [starBlues]
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -31,7 +31,9 @@ import java.util.Set;
 
 /**
  * 自动集成的配置
+ *
  * @author starBlues
+ * @since 3.0.0
  * @version 3.0.3
  */
 @EqualsAndHashCode(callSuper = true)
@@ -128,12 +130,31 @@ public class AutoIntegrationConfiguration extends DefaultIntegrationConfiguratio
     private Boolean exactVersion;
 
     /**
+     * 插是否扫描 swagger 接口
+     */
+    @Value("${pluginSwaggerScan:true}")
+    private Boolean pluginSwaggerScan;
+
+
+    /**
+     * 插件的配置文件 Profile 是否跟随主程序的 Profile 配置动态切换
+     */
+    @Value("${pluginFollowProfile:false}")
+    private Boolean pluginFollowProfile;
+
+    /**
+     * 插件日志打印是否跟随主程序
+     */
+    @Value("${pluginFollowLog:false}")
+    private Boolean pluginFollowLog;
+
+    /**
      * 对插件启动时进行解密校验配置。默认为不启用
      */
     private DecryptConfiguration decrypt;
 
     @Override
-    public boolean enable() {
+    public Boolean enable() {
         if(enable == null){
             return true;
         }
@@ -181,7 +202,7 @@ public class AutoIntegrationConfiguration extends DefaultIntegrationConfiguratio
     }
 
     @Override
-    public boolean enablePluginIdRestPathPrefix() {
+    public Boolean enablePluginIdRestPathPrefix() {
         if(enablePluginIdRestPathPrefix == null){
             return super.enablePluginIdRestPathPrefix();
         } else {
@@ -210,8 +231,32 @@ public class AutoIntegrationConfiguration extends DefaultIntegrationConfiguratio
     }
 
     @Override
-    public boolean exactVersion() {
+    public Boolean exactVersion() {
         return exactVersion;
+    }
+
+    @Override
+    public Boolean pluginSwaggerScan() {
+        if(pluginSwaggerScan == null){
+            return super.pluginSwaggerScan();
+        }
+        return pluginSwaggerScan;
+    }
+
+    @Override
+    public Boolean pluginFollowProfile() {
+        if(pluginFollowProfile == null){
+            return super.pluginFollowProfile();
+        }
+        return pluginFollowProfile;
+    }
+
+    @Override
+    public Boolean pluginFollowLog() {
+        if(pluginFollowLog == null){
+            return super.pluginFollowLog();
+        }
+        return pluginFollowLog;
     }
 
     @Override

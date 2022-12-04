@@ -1,5 +1,5 @@
 /**
- * Copyright [2019-2022] [starBlues]
+ * Copyright [2019-Present] [starBlues]
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,9 @@ package com.gitee.starblues.core.classloader;
 
 /**
  * 主程序资源匹配者
+ *
  * @author starBlues
+ * @since 3.0.0
  * @version 3.0.3
  */
 public interface MainResourceMatcher {

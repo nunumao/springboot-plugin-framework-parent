@@ -1,5 +1,5 @@
 /**
- * Copyright [2019-2022] [starBlues]
+ * Copyright [2019-Present] [starBlues]
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@
 package com.gitee.starblues.loader.classloader.resource.loader;
 
 import com.gitee.starblues.loader.classloader.resource.Resource;
-import com.gitee.starblues.loader.classloader.resource.storage.ResourceStorage;
+import com.gitee.starblues.loader.utils.Release;
 
 import java.io.File;
 import java.io.InputStream;
@@ -30,9 +30,10 @@ import java.util.List;
  * 资源加载工厂
  *
  * @author starBlues
- * @version 3.0.0
+ * @since 3.0.0
+ * @version 3.1.1
  */
-public interface ResourceLoaderFactory extends AutoCloseable {
+public interface ResourceLoaderFactory extends AutoCloseable, Release {
 
     /**
      * 根据路径字符串添加资源

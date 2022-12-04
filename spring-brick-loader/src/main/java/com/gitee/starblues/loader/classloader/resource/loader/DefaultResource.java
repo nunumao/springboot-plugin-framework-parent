@@ -1,5 +1,5 @@
 /**
- * Copyright [2019-2022] [starBlues]
+ * Copyright [2019-Present] [starBlues]
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,14 +17,14 @@
 package com.gitee.starblues.loader.classloader.resource.loader;
 
 import com.gitee.starblues.loader.classloader.resource.Resource;
-import com.gitee.starblues.loader.classloader.resource.ResourceByteGetter;
 
 import java.net.URL;
 
 /**
  * 默认的资源信息
  * @author starBlues
- * @version 3.0.0
+ * @since 3.0.0
+ * @version 3.1.1
  */
 public class DefaultResource implements Resource {
 
@@ -59,12 +59,17 @@ public class DefaultResource implements Resource {
     }
 
     @Override
-    public void setBytes(ResourceByteGetter byteGetter) throws Exception{
-        // 忽略
+    public void resolveByte() throws Exception{
+
     }
 
     @Override
     public void close() throws Exception {
+
+    }
+
+    @Override
+    public void release() {
 
     }
 }

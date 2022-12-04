@@ -1,5 +1,5 @@
 /**
- * Copyright [2019-2022] [starBlues]
+ * Copyright [2019-Present] [starBlues]
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,7 +47,9 @@ import static com.gitee.starblues.common.PackageStructure.*;
 
 /**
  * zip 打包
+ *
  * @author starBlues
+ * @since 3.0.0
  * @version 3.0.0
  */
 public class ZipProdRepackager extends DevRepackager {
@@ -75,8 +77,7 @@ public class ZipProdRepackager extends DevRepackager {
             } catch (IOException e) {
                 // 忽略
             }
-            repackageMojo.getLog().info("Success package prod zip file : "
-                    + packageZip.getFile().getPath());
+            logSuccess();
         } catch (Exception e){
             repackageMojo.getLog().error(e.getMessage(), e);
             throw new MojoFailureException(e);
@@ -85,6 +86,11 @@ public class ZipProdRepackager extends DevRepackager {
                 IOUtils.closeQuietly(packageZip);
             }
         }
+    }
+
+    protected void logSuccess(){
+        repackageMojo.getLog().info("Success package prod zip file : "
+                + packageZip.getFile().getPath());
     }
 
     protected PackageZip getPackageZip() throws Exception {

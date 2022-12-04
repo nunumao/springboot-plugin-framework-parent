@@ -7,7 +7,7 @@
     <parent>
         <artifactId>spring-brick-parent</artifactId>
         <groupId>com.gitee.starblues</groupId>
-        <version>3.1.0</version>
+        <version>3.1.1</version>
     </parent>
 
     <artifactId>spring-brick</artifactId>
@@ -16,7 +16,6 @@
     <description>核心集成包, 用于框架集成</description>
 
     <properties>
-        <jackson.version>2.10.1</jackson.version>
         <slf4j.version>1.7.7</slf4j.version>
         <commons-io.version>2.11.0</commons-io.version>
 

@@ -1,5 +1,5 @@
 /**
- * Copyright [2019-2022] [starBlues]
+ * Copyright [2019-Present] [starBlues]
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,36 +17,40 @@
 package com.gitee.starblues.loader.classloader.resource.storage;
 
 import com.gitee.starblues.loader.classloader.resource.Resource;
-import com.gitee.starblues.loader.classloader.resource.ResourceByteGetter;
+import com.gitee.starblues.loader.utils.Release;
 
 import java.io.InputStream;
 import java.net.URL;
+import java.util.Enumeration;
 import java.util.List;
 
 /**
  * 资源存储者
  *
  * @author starBlues
- * @version 3.0.0
+ * @since 3.0.0
+ * @version 3.1.1
  */
-public interface ResourceStorage extends AutoCloseable{
+public interface ResourceStorage extends AutoCloseable, Release {
+
+    /**
+     * 添加根url
+     * @param baseUrl url
+     */
+    void addBaseUrl(URL baseUrl);
+
+    /**
+     * 获取根url
+     * @return url list
+     */
+    List<URL> getBaseUrl();
 
     /**
      * 添加资源
-     * @param name 资源名称
-     * @param url 资源url
-     * @param byteGetter 资源字节获取者
+     * @param resource 资源名称
      * @throws Exception 添加资源异常
      */
-    void add(String name, URL url, ResourceByteGetter byteGetter) throws Exception;
-
-    /**
-     * 添加资源
-     * @param name 资源名称
-     * @param url 资源url
-     * @throws Exception 添加资源异常
-     */
-    void add(String name, URL url) throws Exception;
+    void add(Resource resource) throws Exception;
 
     /**
      * 存在资源
@@ -56,30 +60,31 @@ public interface ResourceStorage extends AutoCloseable{
     boolean exist(String name);
 
     /**
-     * 获取资源
+     * 获取第一个资源
      * @param name 资源名称
      * @return Resource
      */
-    Resource get(String name);
+    Resource getFirst(String name);
 
     /**
-     * 获取资源的 InputStream
+     * 获取所有资源
+     * @param name 资源名称
+     * @return Resource
+     */
+    Enumeration<Resource> get(String name);
+
+    /**
+     * 获取第一个资源的 InputStream
+     * @param name 资源名称
+     * @return Resource
+     */
+    InputStream getFirstInputStream(String name);
+
+    /**
+     * 获取所有资源的 InputStream
      * @param name 资源名称
      * @return InputStream
      */
-    InputStream getInputStream(String name);
-
-    /**
-     * 得到全部资源
-     * @return 全部资源列表
-     */
-    List<Resource> getAll();
-
-    /**
-     * 是否为空
-     * @return boolean
-     */
-    boolean isEmpty();
-
+    Enumeration<InputStream> getInputStream(String name);
 
 }

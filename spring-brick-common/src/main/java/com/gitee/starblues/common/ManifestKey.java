@@ -1,5 +1,5 @@
 /**
- * Copyright [2019-2022] [starBlues]
+ * Copyright [2019-Present] [starBlues]
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -22,7 +22,8 @@ import java.util.jar.Attributes;
  * Manifest-Key
  *
  * @author starBlues
- * @version 3.0.0
+ * @since 3.0.0
+ * @version 3.1.1
  */
 public class ManifestKey {
 
@@ -30,6 +31,11 @@ public class ManifestKey {
      * Manifest version
      */
     public static final String MANIFEST_VERSION = "Manifest-Version";
+
+    /**
+     * Manifest Build Time
+     */
+    public static final String BUILD_TIME = "Build-Time";
 
     /**
      * Manifest-version: 1.0

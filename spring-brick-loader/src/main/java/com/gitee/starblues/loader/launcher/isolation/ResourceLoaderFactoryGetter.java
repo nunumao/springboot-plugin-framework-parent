@@ -1,5 +1,5 @@
 /**
- * Copyright [2019-2022] [starBlues]
+ * Copyright [2019-Present] [starBlues]
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -20,14 +20,14 @@ import com.gitee.starblues.loader.classloader.resource.loader.DefaultResourceLoa
 import com.gitee.starblues.loader.classloader.resource.loader.ResourceLoaderFactory;
 import com.gitee.starblues.loader.classloader.resource.storage.*;
 
-import java.net.URL;
 import java.util.Objects;
 
 /**
  * 获取ResourceLoaderFactory
  *
  * @author starBlues
- * @version 3.0.0
+ * @since 3.0.0
+ * @version 3.1.1
  */
 public class ResourceLoaderFactoryGetter {
 
@@ -35,15 +35,20 @@ public class ResourceLoaderFactoryGetter {
 
 
     /**
-     * 资源模式--缓存隔离模式
+     * 资源存储模式-永久缓存。速度最快, 但启动前后占用都比较内存高
      */
-    private static final String RESOURCE_MODE_CACHE_ISOLATION = "cache-isolation";
+    private static final String RESOURCE_MODE_PERPETUAL = "perpetual";
+
+    /**
+     * 资源存储模式-快速模式且内存相对较低。启动占用内存稍高, 速度比较高, 启动完成后占用内存会降低
+     */
+    private static final String RESOURCE_MODE_FAST_LOW = "fast-low";
 
 
     /**
-     * 资源模式--缓存共享模式
+     * 资源存储模式--缓存可释放模式
      */
-    private static final String RESOURCE_MODE_CACHE_SHARE = "cache-share";
+    private static final String RESOURCE_MODE_CACHE_RELEASED = "cache-released";
 
 
     private static volatile String resourceMode;
@@ -73,16 +78,12 @@ public class ResourceLoaderFactoryGetter {
         return null;
     }
 
-    public static SameRootResourceStorage getResourceStorage(String key, URL baseUrl){
-        SameRootResourceStorage resourceStorage = null;
-        if(Objects.equals(resourceMode, RESOURCE_MODE_CACHE_ISOLATION)){
-            // 资源可缓存, 且隔离
-            resourceStorage = new CacheResourceStorage(baseUrl);
+    public static AbstractResourceStorage getResourceStorage(String key){
+        if(Objects.equals(resourceMode, RESOURCE_MODE_PERPETUAL)){
+            return new CachePerpetualResourceStorage();
         } else {
-            // 资源可缓存, 共享式
-            resourceStorage = new ShareResourceStorage(key, baseUrl);
+            return new CacheFastResourceStorage(key);
         }
-        return resourceStorage;
     }
 
 }

@@ -1,14 +1,8 @@
-1. 【新增】增加主包`MANIFEST.MF`中`title`和`version`定义, 标准jar包中包含`Implementation-Title`和`Implementation-Version`属性
-2. 【新增】新增根据个人需求选择开发模式，支持隔离式开发模式(目前已有的)、共享式开发模式
-3. 【新增】新增可自主实现扩展插件信息
-4. 【新增】新增插件停止类型
-3. 【修复】修复插件中`LiveBeansView`注册异常问题
-4. 【修复[#I5IFR4](https://gitee.com/starblues/springboot-plugin-framework-parent/issues/I5IFR3)】 `ExtractFactory#getExtractByCoordinate` 类型转换`Bug`
-5. 【修复[#I5GJO9](https://gitee.com/starblues/springboot-plugin-framework-parent/issues/I5GJO9)】`DefaultPluginManager#install` 异常无法抛出
-6. 【修复】修复插件无法加载其他包依赖中的`mybatis-xml`问题
-7. 【修复】修复插件子启动问题
-8. 【修复】修复插件`load`解压异常
-9. 【修复】修复`jar`、`zip`加载依赖时未使用`libDir`配置前缀
-10.【优化】优化插件`parse`后为`parsed`状态
-11.【优化】优化依赖资源默认不缓存, 以减少内存
-
+1. 【新增】主程序可通过`pluginInfo`对象获取插件的`ClassLoader`。
+2. 【新增】新增配置`plugin.pluginSwaggerScan`可禁用扫描插件的 `swagger` 接口。
+3. 【新增】插件配置文件`spring.profiles.active`的值可跟随主程序配置切换。
+4. 【新增】插件的日志可配置为跟随主程序日志配置打印。 
+5. 【新增】补充常见打包的 `META-INF\MANIFEST.MF` 文件内容。
+6. 【优化】优化插件隔离模式下，内存占用过大的问题。
+7. 【修复[#I61INH](https://gitee.com/starblues/springboot-plugin-framework-parent/issues/I61INH)】修复`PluginUser#getBean(String name, boolean includeMainBeans)`返回的`Bean`错误
+ 

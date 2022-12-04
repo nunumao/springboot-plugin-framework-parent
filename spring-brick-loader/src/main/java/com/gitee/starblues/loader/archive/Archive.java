@@ -25,8 +25,7 @@ import java.util.function.Consumer;
 import java.util.jar.Manifest;
 
 /**
- * copy from spring-boot-loader
- * An archive that can be launched by the {@link Launcher}.
+ * An archive that can be launched
  *
  * @author Phillip Webb
  * @since 1.0.0
