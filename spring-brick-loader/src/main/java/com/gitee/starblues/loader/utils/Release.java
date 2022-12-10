@@ -11,6 +11,7 @@ public interface Release {
 
     /**
      * 释放资源
+     * @throws Exception 释放异常
      */
     default void release() throws Exception{}
 
