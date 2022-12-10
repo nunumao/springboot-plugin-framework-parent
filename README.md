@@ -28,8 +28,7 @@ The framework can be developed in the `spring-boot` project plugin, plugin can b
 6. Various frameworks and their various `spring-boot-xxx-starter` can be integrated in plugins, such as integration: `mybatis`、`mybatis-plus`、`spring-jpa` etc.
 
 ### Architecture
-![architecture.png](img%2Farchitecture.png)
-
+![architecture.png](img/architecture.png)
 ### Environment
 1. jdk1.8+d
 2. apache maven 3.6+
