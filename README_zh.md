@@ -23,6 +23,9 @@
 - 插件也可以不依赖主程序独立集成微服务模块。
 - 您可以丰富想象该框架给您带来哪些迫切的需求和扩展。
 
+### 架构 | Architecture
+![architecture.png](img%2Farchitecture.png)
+
 ### 特性 | Features
 1. 简化了框架的集成步骤，更容易上手。
 2. 插件开发更加贴近`spring-boot`原生开发。

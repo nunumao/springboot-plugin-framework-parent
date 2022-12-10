@@ -5,4 +5,3 @@
 5. 【新增】补充常见打包的 `META-INF\MANIFEST.MF` 文件内容。
 6. 【优化】优化插件隔离模式下，内存占用过大的问题。
 7. 【修复[#I61INH](https://gitee.com/starblues/springboot-plugin-framework-parent/issues/I61INH)】修复`PluginUser#getBean(String name, boolean includeMainBeans)`返回的`Bean`错误
- 
