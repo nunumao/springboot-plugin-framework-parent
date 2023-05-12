@@ -103,7 +103,7 @@ public class CoexistBootstrapLauncher implements BootstrapLauncher{
             if(autowiredType != null){
                 return autowiredType.value();
             } else {
-                return AutowiredType.Type.PLUGIN;
+                return AutowiredType.Type.PLUGIN_MAIN;
             }
         }
     }
