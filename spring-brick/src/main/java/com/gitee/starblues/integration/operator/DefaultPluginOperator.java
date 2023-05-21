@@ -285,6 +285,8 @@ public class DefaultPluginOperator implements PluginOperator {
         // 将上传的插件拷贝到临时目录
         try (FileOutputStream outputStream = new FileOutputStream(tempFile)){
             IOUtils.copy(inputStream, outputStream);
+        } finally {
+            IOUtils.closeQuietly(inputStream);
         }
         try {
             // 解析该插件包
@@ -317,7 +319,6 @@ public class DefaultPluginOperator implements PluginOperator {
             verifyFailureDelete(tempFilePath, e);
             throw e;
         } finally {
-            IOUtils.closeQuietly(inputStream);
             // 删除临时文件
             tempFile.deleteOnExit();
         }
