@@ -17,6 +17,7 @@
 package com.gitee.starblues.loader.launcher.coexist;
 
 import com.gitee.starblues.loader.classloader.GeneralUrlClassLoader;
+import com.gitee.starblues.loader.classloader.resource.loader.MainJarResourceLoader;
 import com.gitee.starblues.loader.launcher.classpath.ClasspathResource;
 import com.gitee.starblues.loader.launcher.classpath.JarOutClasspathResource;
 import com.gitee.starblues.loader.launcher.runner.MethodRunner;
@@ -26,12 +27,14 @@ import java.net.URL;
 import java.util.List;
 import java.util.Objects;
 
+import static com.gitee.starblues.loader.LoaderConstant.PROD_CLASSES_URL_SIGN;
+
 
 /**
  * 主程序jar-outer 模式启动者
  *
  * @author starBlues
- * @since 3.0.2
+ * @since 3.1.2
  * @version 3.0.2
  */
 public class CoexistJarOuterLauncher extends CoexistBaseLauncher {
@@ -54,7 +57,12 @@ public class CoexistJarOuterLauncher extends CoexistBaseLauncher {
         super.addResource(classLoader);
         List<URL> classpath = classpathResource.getClasspath();
         for (URL url : classpath) {
-            classLoader.addResource(url);
+            String path = url.getPath();
+            if(path.contains(PROD_CLASSES_URL_SIGN)){
+                classLoader.addResource(new MainJarResourceLoader(url));
+            } else {
+                classLoader.addResource(url);
+            }
         }
     }
 

@@ -13,7 +13,7 @@
     <groupId>com.gitee.starblues</groupId>
     <artifactId>spring-brick-parent</artifactId>
     <packaging>pom</packaging>
-    <version>3.1.1</version>
+    <version>3.1.2</version>
 
     <modules>
         <module>spring-brick-common</module>

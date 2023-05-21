@@ -78,11 +78,6 @@ public class ManifestKey {
      */
     public static final String MAIN_LIB_DIR = "Lib-Dir";
 
-    /**
-     * jar main lib indexes
-     */
-    public static final String MAIN_LIB_INDEXES = "Lib-Indexes";
-
 
     /**
      * main package type
