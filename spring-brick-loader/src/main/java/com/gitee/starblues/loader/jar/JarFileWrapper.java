@@ -40,7 +40,7 @@ import com.gitee.starblues.loader.utils.ObjectUtils;
  *
  * @author Phillip Webb
  */
-public class JarFileWrapper extends AbstractJarFile {
+public class JarFileWrapper extends JarFile {
 
     private final String parentName;
 
@@ -58,7 +58,7 @@ public class JarFileWrapper extends AbstractJarFile {
     }
 
     @Override
-    URL getUrl() throws MalformedURLException {
+    public URL getUrl() throws MalformedURLException {
         return this.parent.getUrl();
     }
 
@@ -88,7 +88,7 @@ public class JarFileWrapper extends AbstractJarFile {
     }
 
     @Override
-    public JarEntry getJarEntry(String name) {
+    public com.gitee.starblues.loader.jar.JarEntry getJarEntry(String name) {
         return this.parent.getJarEntry(name);
     }
 

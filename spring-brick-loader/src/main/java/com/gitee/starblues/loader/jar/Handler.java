@@ -64,12 +64,6 @@ public class Handler extends URLStreamHandler {
 
     private static URL jarContextUrl;
 
-    private static SoftReference<Map<File, JarFile>> rootFileCache;
-
-    static {
-        rootFileCache = new SoftReference<>(null);
-    }
-
     private final JarFile jarFile;
 
     private URLStreamHandler fallbackHandler;
@@ -372,29 +366,15 @@ public class Handler extends URLStreamHandler {
                 throw new IllegalStateException("Not a file URL");
             }
             File file = new File(URI.create(name));
-            JarFile jarFile = PluginResourceStorage.getRootJarFile(file);
+            JarFileWrapper jarFile = PluginResourceStorage.getRootJarFile(file);
             if (jarFile == null) {
-                jarFile = new JarFile(file);
+                jarFile = new JarFileWrapper(new JarFile(file));
                 PluginResourceStorage.addRootJarFile(file, jarFile);
             }
             return jarFile;
         } catch (Exception ex) {
             throw new IOException("Unable to open root Jar file '" + name + "'", ex);
         }
-    }
-
-    /**
-     * Add the given {@link JarFile} to the root file cache.
-     * @param sourceFile the source file to add
-     * @param jarFile the jar file.
-     */
-    static void addToRootFileCache(File sourceFile, JarFile jarFile) {
-        Map<File, JarFile> cache = rootFileCache.get();
-        if (cache == null) {
-            cache = new ConcurrentHashMap<>();
-            rootFileCache = new SoftReference<>(cache);
-        }
-        cache.put(sourceFile, jarFile);
     }
 
     /**
