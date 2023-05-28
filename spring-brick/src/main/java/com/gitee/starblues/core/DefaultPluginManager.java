@@ -50,7 +50,7 @@ import java.util.stream.Collectors;
  * 抽象的插件管理者
  * @author starBlues
  * @since 3.0.0
- * @version 3.1.0
+ * @version 3.1.2
  */
 public class DefaultPluginManager implements PluginManager{
 
@@ -190,6 +190,7 @@ public class DefaultPluginManager implements PluginManager{
         String sourcePluginPath = pluginPath.toString();
         try {
             // 解析插件
+
             PluginInfo pluginInfo = parse(pluginPath);
             // 检查是否存在当前插件
             PluginInsideInfo plugin = getPlugin(pluginInfo.getPluginId());
@@ -352,7 +353,7 @@ public class DefaultPluginManager implements PluginManager{
     }
 
     @Override
-    public synchronized PluginInfo getPluginInfo(String pluginId) {
+    public synchronized PluginInsideInfo getPluginInfo(String pluginId) {
         if(ObjectUtils.isEmpty(pluginId)){
             return null;
         }
@@ -360,23 +361,15 @@ public class DefaultPluginManager implements PluginManager{
         if(wrapperInside == null){
             wrapperInside = resolvedPlugins.get(pluginId);
         }
-        if(wrapperInside != null){
-            return wrapperInside.toPluginInfo();
-        } else {
-            return null;
-        }
+        return wrapperInside;
     }
 
     @Override
-    public synchronized List<PluginInfo> getPluginInfos() {
-        List<PluginInfo> pluginDescriptors = new ArrayList<>(
+    public synchronized List<PluginInsideInfo> getPluginInfos() {
+        List<PluginInsideInfo> pluginDescriptors = new ArrayList<>(
                 resolvedPlugins.size() + startedPlugins.size());
-        for (PluginInsideInfo wrapperInside : startedPlugins.values()) {
-            pluginDescriptors.add(wrapperInside.toPluginInfo());
-        }
-        for (PluginInsideInfo wrapperInside : resolvedPlugins.values()) {
-            pluginDescriptors.add(wrapperInside.toPluginInfo());
-        }
+        pluginDescriptors.addAll(startedPlugins.values());
+        pluginDescriptors.addAll(resolvedPlugins.values());
         return pluginDescriptors;
     }
 
@@ -499,6 +492,7 @@ public class DefaultPluginManager implements PluginManager{
                 resultPath = targetFile.toPath();
             }
         } else {
+            // 不在插件目录
             File pluginFile = pluginPath.toFile();
             pluginRootDir = new File(getDefaultPluginRoot());
             File pluginRootDirFile = new File(getDefaultPluginRoot());
@@ -522,7 +516,6 @@ public class DefaultPluginManager implements PluginManager{
         }
         return resultPath;
     }
-
 
     /**
      * 统一启动插件操作

@@ -33,14 +33,12 @@ import java.util.concurrent.TimeUnit;
  *
  * @author starBlues
  * @since 3.1.1
- * @version 3.1.1
+ * @version 3.1.2
  */
 public class CacheFastResourceStorage extends AbstractResourceStorage {
 
     protected final MultiCache<String, Resource> resourceStorage;
     private final ResourceStorage cacheResourceStorage;
-
-    private final List<InputStream> inputStreams = new ArrayList<>();
 
     private volatile boolean release = false;
 
@@ -136,10 +134,8 @@ public class CacheFastResourceStorage extends AbstractResourceStorage {
     @Override
     public void close() throws Exception {
         resourceStorage.clear(ResourceUtils::release);
-        for (InputStream inputStream : inputStreams) {
-            IOUtils.closeQuietly(inputStream);
-        }
-        inputStreams.clear();
+        IOUtils.closeQuietly(cacheResourceStorage);
+        super.close();
     }
 
 

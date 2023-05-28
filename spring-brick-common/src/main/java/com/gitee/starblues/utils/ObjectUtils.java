@@ -25,7 +25,7 @@ import java.util.*;
  *
  * @author starBlues
  * @since 3.0.0
- * @version 3.0.0
+ * @version 3.1.2
  */
 public class ObjectUtils {
 
@@ -264,6 +264,18 @@ public class ObjectUtils {
         }
         for (Object arrayEle : array) {
             if (nullSafeEquals(arrayEle, element)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static boolean equalsElement(Object element, Object... objects) {
+        if (element == null || objects == null) {
+            return false;
+        }
+        for (Object obj : objects) {
+            if (Objects.equals(element, obj)) {
                 return true;
             }
         }
