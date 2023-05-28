@@ -25,7 +25,7 @@ import java.util.List;
  * 插件管理者
  * @author starBlues
  * @since 3.0.0
- * @version 3.0.0
+ * @version 3.1.2
  */
 public interface PluginManager {
 
@@ -125,12 +125,12 @@ public interface PluginManager {
      * @param pluginId 插件id
      * @return PluginDescriptor
      */
-    PluginInfo getPluginInfo(String pluginId);
+    PluginInsideInfo getPluginInfo(String pluginId);
 
     /**
      * 得到全部的插件信息
      * @return List PluginWrapper
      */
-    List<PluginInfo> getPluginInfos();
+    List<PluginInsideInfo> getPluginInfos();
 
 }

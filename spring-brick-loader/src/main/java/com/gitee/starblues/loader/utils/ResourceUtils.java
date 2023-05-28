@@ -16,13 +16,11 @@
 
 package com.gitee.starblues.loader.utils;
 
+
 import java.io.File;
 import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLConnection;
-import java.util.Objects;
+import java.net.*;
+import java.util.Collection;
 import java.util.function.Consumer;
 
 /**
@@ -30,7 +28,7 @@ import java.util.function.Consumer;
  *
  * @author starBlues
  * @since 3.0.0
- * @version 3.0.0
+ * @version 3.1.2
  */
 public class ResourceUtils {
 
@@ -144,12 +142,32 @@ public class ResourceUtils {
      */
     public static void release(final Object object, final Consumer<Exception> consumer) {
         if (object instanceof Release) {
-            try {
-                ((Release)object).release();
-            } catch (final Exception e) {
-                if (consumer != null) {
-                    consumer.accept(e);
+            release((Release) object, consumer);
+        }
+        if(object instanceof Collection){
+            Collection<?> collection = (Collection<?>) object;
+            for (Object o : collection) {
+                if(o instanceof Release){
+                    release((Release) o, consumer);
                 }
+            }
+        }
+    }
+
+    /**
+     * 释放资源
+     * @param release release
+     * @param consumer consumer
+     */
+    public static void release(final Release release, final Consumer<Exception> consumer) {
+        if(release == null){
+            return;
+        }
+        try {
+            release.release();
+        } catch (final Exception e) {
+            if (consumer != null) {
+                consumer.accept(e);
             }
         }
     }
@@ -180,8 +198,9 @@ public class ResourceUtils {
         } catch (MalformedURLException e) {
             throw new IllegalArgumentException("非法：" + name);
         }
+        URLConnection uc = null;
         try {
-            URLConnection uc = url.openConnection();
+            uc = url.openConnection();
             if (uc instanceof HttpURLConnection) {
                 HttpURLConnection hconn = (HttpURLConnection)uc;
                 hconn.setRequestMethod("HEAD");

@@ -29,7 +29,7 @@ import java.util.jar.JarInputStream;
  * jar 资源加载者
  * @author starBlues
  * @since 3.0.0
- * @version 3.1.1
+ * @version 3.1.2
  */
 public class JarResourceLoader extends AbstractResourceLoader {
 
@@ -75,6 +75,7 @@ public class JarResourceLoader extends AbstractResourceLoader {
             JarEntry jarEntry = null;
             while ((jarEntry = jarInputStream.getNextJarEntry()) != null) {
                 if(excludeResource.exclude(jarEntry)){
+                    jarInputStream.closeEntry();
                     continue;
                 }
                 if(includeResource.include(jarEntry)){
@@ -84,8 +85,8 @@ public class JarResourceLoader extends AbstractResourceLoader {
                         return getClassBytes(name, jarInputStream, false);
                     });
                     resourceStorage.add(cacheResource);
-                    jarInputStream.closeEntry();
                 }
+                jarInputStream.closeEntry();
             }
         } finally {
             jarInputStream.close();

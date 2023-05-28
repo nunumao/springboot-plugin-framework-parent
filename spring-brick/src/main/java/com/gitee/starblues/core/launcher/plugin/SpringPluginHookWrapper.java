@@ -20,6 +20,7 @@ import com.gitee.starblues.core.PluginCloseType;
 import com.gitee.starblues.core.PluginInsideInfo;
 import com.gitee.starblues.core.exception.PluginProhibitStopException;
 import com.gitee.starblues.core.launcher.plugin.involved.PluginLaunchInvolved;
+import com.gitee.starblues.loader.PluginResourceStorage;
 import com.gitee.starblues.spring.ApplicationContext;
 import com.gitee.starblues.spring.SpringPluginHook;
 import com.gitee.starblues.spring.WebConfig;
@@ -31,7 +32,7 @@ import lombok.extern.slf4j.Slf4j;
  * SpringPluginHook-Wrapper
  * @author starBlues
  * @since 3.0.0
- * @version 3.1.0
+ * @version 3.1.2
  */
 @Slf4j
 public class SpringPluginHookWrapper implements SpringPluginHook {
@@ -72,15 +73,21 @@ public class SpringPluginHookWrapper implements SpringPluginHook {
 
     @Override
     public void close(PluginCloseType closeType) throws Exception {
+        // 1. 关闭 application 等信息
+        try {
+            target.close(closeType);
+        } catch (Exception e){
+            log.error("关闭插件异常: {}", e.getMessage(), e);
+        }
+        // 2. 关闭 pluginLaunchInvolved
         try {
             pluginLaunchInvolved.close(pluginInsideInfo, classLoader);
         } catch (Exception e){
             log.error("关闭插件异常: {}", e.getMessage(), e);
         }
-        try {
-            target.close(closeType);
-        } finally {
-            ResourceUtils.closeQuietly(classLoader);
-        }
+        // 3. 关闭classloader
+        ResourceUtils.closeQuietly(classLoader);
+        // 4. 移除插件jar等信息
+        PluginResourceStorage.removePlugin(pluginInsideInfo.getPluginId());
     }
 }

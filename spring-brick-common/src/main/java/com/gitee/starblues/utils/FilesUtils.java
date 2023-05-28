@@ -21,13 +21,15 @@ import com.gitee.starblues.common.PackageStructure;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
+import java.util.List;
 
 /**
  * 文件工具类
  *
  * @author starBlues
  * @since 3.0.0
- * @version 3.1.0
+ * @version 3.1.2
  */
 public class FilesUtils {
 
@@ -232,5 +234,62 @@ public class FilesUtils {
         return path.startsWith(Constants.RELATIVE_SIGN);
     }
 
+    /**
+     * 判断两文件是否在同一个目录下
+     * @param file1 文件1
+     * @param file2 文件2
+     * @return 所属目录
+     */
+    public static File sameParent(File file1, File file2){
+        if(file1 == null || file2 == null){
+            return null;
+        }
+        File parentFile = file1.getParentFile();
+        if(parentFile.equals(file2.getParentFile())){
+            return parentFile;
+        }
+        return null;
+    }
+
+    /**
+     * 判断某个目录是否存在于根目录下
+     * @param rootPath 根目录
+     * @param comparePath 比较的目录
+     * @return boolean
+     */
+    public static boolean includePath(Path rootPath, Path comparePath){
+        if(rootPath == null || comparePath == null){
+            return false;
+        }
+        return comparePath.toString().startsWith(rootPath.toString());
+    }
+
+    /**
+     * 是否为子文件
+     * @param rootFile rootFile
+     * @param childFile 子文件
+     * @return boolean
+     */
+    public static boolean isChildFile(List<String> rootFile, File childFile){
+        if(ObjectUtils.isEmpty(rootFile) || childFile == null || !childFile.exists()){
+            return false;
+        }
+        for (String fileStr : rootFile) {
+            File file = new File(fileStr);
+            if(!file.exists()){
+                continue;
+            }
+            File[] files = file.listFiles();
+            if(files == null){
+                continue;
+            }
+            for (File f : files) {
+                if(f.equals(childFile)){
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
 
 }

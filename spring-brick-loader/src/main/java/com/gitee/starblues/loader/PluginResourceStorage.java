@@ -25,6 +25,7 @@ import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -34,7 +35,7 @@ import java.util.concurrent.ConcurrentHashMap;
  *
  * @author starBlues
  * @since 3.0.0
- * @version 3.0.0
+ * @version 3.1.2
  */
 public class PluginResourceStorage {
 
@@ -45,11 +46,11 @@ public class PluginResourceStorage {
      * @param pluginId 插件id
      * @param pluginFileName 插件文件名称
      */
-    public static void addPlugin(String pluginId, String pluginFileName){
+    public static void addPlugin(String pluginId, String pluginFileName, List<String> libPath){
         if(STORAGE_MAP.containsKey(pluginId)){
             return;
         }
-        STORAGE_MAP.put(pluginId, new Storage(pluginFileName));
+        STORAGE_MAP.put(pluginId, new Storage(pluginFileName, libPath));
     }
 
     /**
@@ -80,7 +81,7 @@ public class PluginResourceStorage {
      * @param file 插件文件
      * @param jarFile 插件jar文件
      */
-    public static void addRootJarFile(File file, JarFile jarFile){
+    public static void addRootJarFile(File file, JarFileWrapper jarFile){
         STORAGE_MAP.forEach((k,v)->{
             v.addRootJarFile(file, jarFile);
         });
@@ -91,9 +92,9 @@ public class PluginResourceStorage {
      * @param file 插件文件
      * @return 插件jar文件
      */
-    public static JarFile getRootJarFile(File file){
+    public static JarFileWrapper getRootJarFile(File file){
         for (Storage value : STORAGE_MAP.values()) {
-            JarFile jarFile = value.getRootJarFile(file);
+            JarFileWrapper jarFile = value.getRootJarFile(file);
             if(jarFile != null){
                 return jarFile;
             }
@@ -104,31 +105,37 @@ public class PluginResourceStorage {
 
     private static class Storage implements Closeable {
         private final String pluginFileName;
-        private final Map<File, JarFile> rootJarFileMap = new ConcurrentHashMap<>();
+        private final List<String> libPath;
+        private final Map<File, JarFileWrapper> rootJarFileMap = new ConcurrentHashMap<>();
         private final Map<String, List<AbstractJarFile>> jarFileMap = new ConcurrentHashMap<>();
 
-        public Storage(String pluginFileName) {
+        public Storage(String pluginFileName, List<String> libPath) {
             this.pluginFileName = pluginFileName;
+            if(libPath == null){
+                this.libPath = Collections.emptyList();
+            } else {
+                this.libPath = libPath;
+            }
         }
 
         public void addJarFile(String name, AbstractJarFile jarFile){
             if(name == null || jarFile == null){
                 return;
             }
-            if(name.contains(pluginFileName)){
+            if(isAddFile(name)){
                 List<AbstractJarFile> jarFiles = jarFileMap.computeIfAbsent(name, k -> new ArrayList<>());
                 jarFiles.add(jarFile);
             }
         }
 
-        public void addRootJarFile(File file, JarFile jarFile){
+        public void addRootJarFile(File file, JarFileWrapper jarFile){
             String absolutePath = file.getAbsolutePath();
-            if(absolutePath.contains(pluginFileName)){
+            if(isAddFile(absolutePath)){
                 rootJarFileMap.put(file, jarFile);
             }
         }
 
-        public JarFile getRootJarFile(File file){
+        public JarFileWrapper getRootJarFile(File file){
             return rootJarFileMap.get(file);
         }
 
@@ -145,15 +152,29 @@ public class PluginResourceStorage {
                     IOUtils.closeQuietly(jarFile);
                 }
             }
-            for (JarFile jarFile : rootJarFileMap.values()) {
+            for (JarFileWrapper jarFile : rootJarFileMap.values()) {
                 if(jarFile == null){
                     continue;
                 }
+                jarFile.canClosed();
                 IOUtils.closeQuietly(jarFile);
             }
             jarFileMap.clear();
             rootJarFileMap.clear();
         }
+
+        private boolean isAddFile(String path){
+            if(path.contains(pluginFileName)){
+                return true;
+            }
+            for (String libPath : libPath) {
+                if(path.contains(libPath)){
+                    return true;
+                }
+            }
+            return false;
+        }
+
     }
 
 
