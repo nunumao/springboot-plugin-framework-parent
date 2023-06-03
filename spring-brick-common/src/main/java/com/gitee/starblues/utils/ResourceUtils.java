@@ -30,7 +30,7 @@ import java.util.function.Consumer;
  *
  * @author starBlues
  * @since 3.0.0
- * @version 3.0.0
+ * @version 3.1.2
  */
 public class ResourceUtils {
 
@@ -166,7 +166,7 @@ public class ResourceUtils {
             return false;
         }
         final File[] listFiles = rootFile.listFiles();
-        if(listFiles == null || listFiles.length == 0){
+        if(listFiles == null){
             return false;
         }
         for (File listFile : listFiles) {
