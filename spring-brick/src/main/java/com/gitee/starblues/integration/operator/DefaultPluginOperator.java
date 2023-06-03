@@ -54,8 +54,8 @@ import java.util.stream.Collectors;
 /**
  * 默认的插件操作者
  * @author starBlues
- * @version 3.0.0
- * @since 3.1.2
+ * @since 3.0.0
+ * @version 3.1.2
  */
 public class DefaultPluginOperator implements PluginOperator {
     protected final Logger log = LoggerFactory.getLogger(this.getClass());
@@ -153,7 +153,7 @@ public class DefaultPluginOperator implements PluginOperator {
 
     @Override
     public PluginInfo parse(Path pluginPath) throws PluginException {
-        return pluginManager.parse(pluginPath);
+        return toPluginInfo(pluginManager.parse(pluginPath));
     }
 
     @Override
@@ -168,7 +168,7 @@ public class DefaultPluginOperator implements PluginOperator {
 
     @Override
     public PluginInfo load(Path pluginPath, boolean unpackPlugin) throws PluginException {
-        return pluginManager.load(pluginPath, unpackPlugin);
+        return toPluginInfo(pluginManager.load(pluginPath, unpackPlugin));
     }
 
     @Override
@@ -288,9 +288,13 @@ public class DefaultPluginOperator implements PluginOperator {
         } finally {
             IOUtils.closeQuietly(inputStream);
         }
+        File unpackPluginFile = tempFile;
         try {
             // 解析该插件包
-            PluginInfo uploadPluginInfo = parse(tempFilePath);
+            if(isUnpackPluginFile){
+                unpackPluginFile = PluginFileUtils.decompressZip(tempFile.toString(), configuration.uploadTempPath());
+            }
+            PluginInfo uploadPluginInfo = pluginManager.scanParse(unpackPluginFile.toPath());
             if(uploadPluginInfo == null){
                 Exception exception = new Exception(pluginFileName + " 文件校验失败");
                 verifyFailureDelete(tempFilePath, exception);
@@ -306,12 +310,12 @@ public class DefaultPluginOperator implements PluginOperator {
                     backupPlugin(oldPluginPath, "upload");
                 }
                 // 然后进入更新模式
-                pluginInfo = pluginManager.upgrade(tempFilePath, isUnpackPluginFile);
+                pluginInfo = pluginManager.upgrade(unpackPluginFile.toPath(), false);
                 // 删除旧插件包
                 FileUtils.delete(oldPluginPath.toFile());
             } else {
                 // 不存在则进入安装插件模式
-                pluginInfo = pluginManager.install(tempFilePath, isUnpackPluginFile);
+                pluginInfo = pluginManager.install(unpackPluginFile.toPath(), false);
             }
             return pluginInfo;
         } catch (Exception e){
@@ -319,8 +323,8 @@ public class DefaultPluginOperator implements PluginOperator {
             verifyFailureDelete(tempFilePath, e);
             throw e;
         } finally {
-            // 删除临时文件
-            tempFile.deleteOnExit();
+            // 删除解压文件
+            FileUtils.deleteQuietly(unpackPluginFile);
         }
     }
 
@@ -448,6 +452,13 @@ public class DefaultPluginOperator implements PluginOperator {
             return;
         }
         FileUtils.forceMkdir(file);
+    }
+
+    private PluginInfo toPluginInfo(PluginInsideInfo pluginInsideInfo){
+        if(pluginInsideInfo == null){
+            return null;
+        }
+        return pluginInsideInfo.toPluginInfo();
     }
 
 

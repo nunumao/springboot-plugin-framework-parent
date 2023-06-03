@@ -175,49 +175,77 @@ public class DefaultPluginManager implements PluginManager{
     }
 
     @Override
-    public PluginInfo parse(Path pluginPath) throws PluginException {
+    public PluginInsideInfo parse(Path pluginPath) throws PluginException {
+        if(pluginPath == null){
+            throw new PluginException("解析文件不能为 null");
+        }
         PluginInsideInfo pluginInsideInfo = loadFromPath(pluginPath);
         if(pluginInsideInfo == null){
             throw new PluginException("非法插件包: " + pluginPath);
         }
         pluginInsideInfo.setPluginState(PluginState.PARSED);
-        return pluginInsideInfo.toPluginInfo();
+        return pluginInsideInfo;
     }
 
     @Override
-    public synchronized PluginInfo load(Path pluginPath, boolean unpackPlugin) throws PluginException {
-        Assert.isNotNull(pluginPath, "参数pluginPath不能为空");
-        String sourcePluginPath = pluginPath.toString();
-        try {
+    public PluginInsideInfo scanParse(Path pluginPath) throws PluginException {
+        if(pluginPath == null){
+            throw new PluginException("解析文件不能为 null");
+        }
+        List<String> scanList = new ArrayList<>(1);
+        scanList.add(pluginPath.toString());
+        List<Path> scanPluginPaths = provider.getPluginScanner().scan(scanList);
+        for (Path scanPluginPath : scanPluginPaths) {
             // 解析插件
+            try {
+                PluginInsideInfo pluginInsideInfo = loadFromPath(scanPluginPath);
+                if(pluginInsideInfo != null){
+                    return pluginInsideInfo;
+                }
+            } catch (Exception e){
+                // 忽略
+            }
+        }
+        return null;
+    }
 
-            PluginInfo pluginInfo = parse(pluginPath);
+    @Override
+    public synchronized PluginInsideInfo load(Path pluginPath, boolean unpackPlugin) throws PluginException {
+        Assert.isNotNull(pluginPath, "参数pluginPath不能为空");
+        Path sourcePluginPath = pluginPath;
+        File unpackPluginFile = null;
+        try {
+            if(unpackPlugin){
+                unpackPluginFile = PluginFileUtils.decompressZip(pluginPath.toString(), configuration.uploadTempPath());
+                pluginPath = unpackPluginFile.toPath();
+            }
+            // 拷贝插件到root目录
+            pluginPath = copyPluginToPluginRootDir(pluginPath);
+            PluginInsideInfo pluginInsideInfo = scanParse(pluginPath);
+            if(pluginInsideInfo == null){
+                pluginListenerFactory.loadFailure(sourcePluginPath, new PluginException("Not found PluginInsideInfo"));
+                throw new PluginException("非法插件包: " + sourcePluginPath);
+            }
             // 检查是否存在当前插件
-            PluginInsideInfo plugin = getPlugin(pluginInfo.getPluginId());
+            PluginInsideInfo plugin = getPlugin(pluginInsideInfo.getPluginId());
             if(plugin != null){
                 // 已经存在该插件
                 throw new PluginException("加载插件包[" + pluginPath + "]失败. 已经存在该插件: " +
                         MsgUtils.getPluginUnique(plugin.getPluginDescriptor()));
             }
-            if(configuration.isProd()){
-                // 如果为生产环境, 则拷贝插件
-                pluginPath = copyPlugin(pluginPath, unpackPlugin);
-            }
-            // 加载插件
-            PluginInsideInfo pluginInsideInfo = loadPlugin(pluginPath, true);
-            if(pluginInsideInfo != null){
-                PluginInfo pluginInfoFace = pluginInsideInfo.toPluginInfo();
-                pluginListenerFactory.loadSuccess(pluginInfoFace);
-                return pluginInfoFace;
-            } else {
-                pluginListenerFactory.loadFailure(pluginPath, new PluginException("Not found PluginInsideInfo"));
-                return null;
-            }
+            pluginInsideInfo = loadPlugin(Paths.get(pluginInsideInfo.getPluginPath()), false);
+            PluginInfo pluginInfoFace = pluginInsideInfo.toPluginInfo();
+            pluginListenerFactory.loadSuccess(pluginInfoFace);
+            return pluginInsideInfo;
         } catch (Throwable e) {
             PluginException pluginException = PluginException.getPluginException(e, () -> {
                 throw new PluginException("插件包加载失败: " + sourcePluginPath, e);
             });
-            pluginListenerFactory.loadFailure(pluginPath, pluginException);
+            pluginListenerFactory.loadFailure(sourcePluginPath, pluginException);
+            if(unpackPluginFile != null){
+                FileUtils.deleteQuietly(unpackPluginFile);
+            }
+            FileUtils.deleteQuietly(pluginPath.toFile());
             throw pluginException;
         }
     }
@@ -402,6 +430,12 @@ public class DefaultPluginManager implements PluginManager{
         LogUtils.info(log, wrapperInside.getPluginDescriptor(), "卸载成功");
     }
 
+    /**
+     * 加载插件信息
+     * @param pluginPath 插件路径
+     * @param resolvePath 是否直接解析路径
+     * @return 插件内部细腻些
+     */
     protected PluginInsideInfo loadPlugin(Path pluginPath, boolean resolvePath) {
         if(resolvePath){
             Path sourcePluginPath = pluginPath;
@@ -455,19 +489,18 @@ public class DefaultPluginManager implements PluginManager{
     /**
      * 拷贝插件文件到插件根目录
      * @param pluginPath 源插件文件路径
-     * @param unpackPlugin 是否解压插件包. 只有为压缩类型包才可解压
      * @return 拷贝后的插件路径
      * @throws IOException IO 异常
      */
-    protected Path copyPlugin(Path pluginPath, boolean unpackPlugin) throws IOException {
+    protected Path copyPluginToPluginRootDir(Path pluginPath) throws IOException {
         if(configuration.isDev()){
+            // 开发环境不拷贝
             return pluginPath;
         }
         File targetFile = pluginPath.toFile();
         if(!targetFile.exists()) {
             throw new PluginException("不存在插件文件: " + pluginPath);
         }
-        String targetFileName = targetFile.getName();
         // 先判断当前插件文件是否在插件目录中
         File pluginRootDir = null;
         for (String dir : pluginRootDirs) {
@@ -477,38 +510,22 @@ public class DefaultPluginManager implements PluginManager{
                 break;
             }
         }
-        String resolvePluginFileName = unpackPlugin ? PluginFileUtils.getFileName(targetFile) : targetFileName;
+        String fileName = targetFile.getName();
         Path resultPath = null;
         if(pluginRootDir != null){
-            // 在根目录中存在
-            if(targetFile.isFile() && unpackPlugin){
-                // 需要解压, 检查解压后的文件名称是否存在同名文件
-                checkExistFile(pluginRootDir, resolvePluginFileName);
-                String unpackPluginPath = FilesUtils.joiningFilePath(pluginRootDir.getPath(), resolvePluginFileName);
-                PluginFileUtils.decompressZip(targetFile.getPath(), unpackPluginPath);
-                resultPath = Paths.get(unpackPluginPath);
-                PluginFileUtils.deleteFile(targetFile);
-            } else {
-                resultPath = targetFile.toPath();
-            }
+            // 在根目录中存在, 检查是否存在同名文件
+            checkExistFile(pluginRootDir, fileName);
         } else {
             // 不在插件目录
             File pluginFile = pluginPath.toFile();
             pluginRootDir = new File(getDefaultPluginRoot());
             File pluginRootDirFile = new File(getDefaultPluginRoot());
             // 检查是否存在同名文件
-            checkExistFile(pluginRootDirFile, resolvePluginFileName);
-            targetFile = Paths.get(FilesUtils.joiningFilePath(pluginRootDir.getPath(), resolvePluginFileName)).toFile();
+            checkExistFile(pluginRootDirFile, fileName);
+            targetFile = Paths.get(FilesUtils.joiningFilePath(pluginRootDir.getPath(), fileName)).toFile();
             if(pluginFile.isFile()){
-                if(unpackPlugin){
-                    // 需要解压
-                    String unpackPluginPath = FilesUtils.joiningFilePath(pluginRootDir.getPath(), resolvePluginFileName);
-                    PluginFileUtils.decompressZip(pluginFile.getPath(), unpackPluginPath);
-                    resultPath = Paths.get(unpackPluginPath);
-                } else {
-                    FileUtils.copyFile(pluginFile, targetFile);
-                    resultPath = targetFile.toPath();
-                }
+                FileUtils.copyFile(pluginFile, targetFile);
+                resultPath = targetFile.toPath();
             } else {
                 FileUtils.copyDirectory(pluginFile, targetFile);
                 resultPath = targetFile.toPath();
@@ -659,6 +676,5 @@ public class DefaultPluginManager implements PluginManager{
         }
         log.warn(warn.toString());
     }
-
 
 }
