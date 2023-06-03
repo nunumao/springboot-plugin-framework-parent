@@ -96,11 +96,11 @@ public class FilesUtils {
             }
             if (i < length - 1) {
                 if (path.endsWith(SLASH)) {
-                    path = path.replace(SLASH, "");
+                    path = path.substring(0, path.lastIndexOf(SLASH));
                 } else if (path.endsWith(BACKSLASH)) {
-                    path = path.replace(BACKSLASH, "");
+                    path = path.substring(0, path.lastIndexOf(BACKSLASH));
                 } else if (path.endsWith(DOUBLE_SLASH)) {
-                    path = path.replace(DOUBLE_SLASH, "");
+                    path = path.substring(0, path.lastIndexOf(DOUBLE_SLASH));
                 }
             }
             if (i > 0) {
