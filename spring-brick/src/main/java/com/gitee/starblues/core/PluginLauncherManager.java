@@ -48,7 +48,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * 可引导启动的插件管理者
  * @author starBlues
  * @since 3.0.0
- * @version 3.1.0
+ * @version 3.1.2
  */
 public class PluginLauncherManager extends DefaultPluginManager{
 
@@ -129,9 +129,13 @@ public class PluginLauncherManager extends DefaultPluginManager{
         }
         try {
             SpringPluginHook springPluginHook = registryPluginInfo.getSpringPluginHook();
+            // 校验是否可停止
             springPluginHook.stopVerify();
+            // 关闭插件
             springPluginHook.close(closeType);
+            // 移除插件相互调用缓存的信息
             invokeSupperCache.remove(pluginId);
+            // 移除插件注册信息
             registryInfo.remove(pluginId);
             super.stop(pluginInsideInfo, closeType);
         } catch (Exception e){

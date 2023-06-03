@@ -39,7 +39,6 @@ public class LoaderConstant {
      * ================= Manifest Key =====================
      */
     public static final String MAIN_LIB_DIR = "Lib-Dir";
-    public static final String MAIN_LIB_INDEXES = "Lib-Indexes";
     public static final String MAIN_LIB_INDEXES_SPLIT = " ";
 
     public static final String START_CLASS = "Start-Class";

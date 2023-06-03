@@ -76,6 +76,8 @@ public class NestedPluginJarResourceLoader extends AbstractResourceLoader {
     private void addClassPath(ResourceStorage resourceStorage, JarFile jarFile) throws Exception{
         String classesPath = pluginDescriptor.getPluginClassPath();
         Enumeration<JarEntry> entries = jarFile.entries();
+        resourceLoaderFactory.addResource(new BaseURLResourceLoader(baseUrl));
+        resourceLoaderFactory.addResource(new BaseURLResourceLoader(new URL(baseUrl, "classes/")));
         while (entries.hasMoreElements()){
             JarEntry jarEntry = entries.nextElement();
             if(!jarEntry.getName().startsWith(classesPath)){

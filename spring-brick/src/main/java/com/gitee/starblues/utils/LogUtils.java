@@ -24,7 +24,7 @@ import org.slf4j.Logger;
  *
  * @author starBlues
  * @since 3.0.0
- * @version 3.0.0
+ * @version 3.1.2
  */
 public class LogUtils {
 
@@ -32,6 +32,10 @@ public class LogUtils {
 
     public static void info(Logger logger, PluginDescriptor pluginDescriptor, String msg){
         logger.info("插件[{}]{}", MsgUtils.getPluginUnique(pluginDescriptor), msg);
+    }
+
+    public static String getMsg(PluginDescriptor pluginDescriptor, String msg, Object... args){
+        return "插件[ " + MsgUtils.getPluginUnique(pluginDescriptor) + " ]" + String.format(msg, args);
     }
 
 }

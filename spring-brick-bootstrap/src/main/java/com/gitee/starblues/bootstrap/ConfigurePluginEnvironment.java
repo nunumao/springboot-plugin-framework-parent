@@ -40,7 +40,7 @@ import java.util.Map;
  *
  * @author starBlues
  * @since 3.0.0
- * @version 3.1.1
+ * @version 3.1.2
  */
 public class ConfigurePluginEnvironment {
     private final Logger logger = LoggerFactory.getLogger(ConfigurePluginEnvironment.class);

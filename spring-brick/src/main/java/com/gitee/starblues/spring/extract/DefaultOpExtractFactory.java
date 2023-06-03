@@ -19,6 +19,7 @@ package com.gitee.starblues.spring.extract;
 import com.gitee.starblues.annotation.Extract;
 import com.gitee.starblues.utils.ObjectUtils;
 import org.springframework.beans.factory.ListableBeanFactory;
+import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.util.ClassUtils;
 
 import java.util.*;
@@ -184,7 +185,7 @@ public class DefaultOpExtractFactory implements OpExtractFactory {
     }
 
     private Extract getExtract(Object extractObject){
-        return extractObject.getClass().getAnnotation(Extract.class);
+        return AnnotationUtils.findAnnotation(extractObject.getClass(),Extract.class);
     }
 
 

@@ -32,7 +32,7 @@ import java.util.*;
  *
  * @author starBlues
  * @since 3.0.0
- * @version 3.1.1
+ * @version 3.1.2
  */
 public abstract class AbstractResourceStorage implements ResourceStorage {
 
@@ -69,6 +69,7 @@ public abstract class AbstractResourceStorage implements ResourceStorage {
             IOUtils.closeQuietly(inputStream);
         }
         inputStreams.clear();
+        hotUrls.clear();
         baseUrls.clear();
     }
 
@@ -171,11 +172,9 @@ public abstract class AbstractResourceStorage implements ResourceStorage {
                 addResource(resource);
                 return resource;
             } catch (Exception e) {
-                e.printStackTrace();
                 return null;
             }
         }
-
         return null;
     }
 
@@ -211,6 +210,7 @@ public abstract class AbstractResourceStorage implements ResourceStorage {
             resource = null;
             return r;
         }
+
         private boolean next() {
             if (resource != null) {
                 return true;
@@ -233,12 +233,19 @@ public abstract class AbstractResourceStorage implements ResourceStorage {
                 return null;
             }
             Resource resource = new DefaultResource(name, baseUrl, existUrl);
-            try {
-                addResource(resource);
-            } catch (Exception e){
-                // 忽略异常
-            }
+            addResourceWrapper(resource);
             return resource;
+        }
+    }
+
+    private void addResourceWrapper(Resource resource){
+        if(resource == null){
+            return;
+        }
+        try {
+            addResource(resource);
+        } catch (Exception e){
+            // 忽略异常
         }
     }
 

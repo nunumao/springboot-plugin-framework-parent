@@ -37,7 +37,7 @@ import static com.gitee.starblues.loader.LoaderConstant.PROD_CLASSES_URL_SIGN;
  *
  * @author starBlues
  * @since 3.0.2
- * @version 3.0.2
+ * @version 3.1.2
  */
 public class IsolationJarOuterLauncher extends IsolationBaseLauncher {
 
@@ -68,7 +68,12 @@ public class IsolationJarOuterLauncher extends IsolationBaseLauncher {
             baseResource.addAll(classpath);
         }
         for (URL url : baseResource) {
-            classLoader.addResource(url);
+            String path = url.getPath();
+            if(path.contains(PROD_CLASSES_URL_SIGN)){
+                classLoader.addResource(new MainJarResourceLoader(url));
+            } else {
+                classLoader.addResource(url);
+            }
         }
     }
 

@@ -20,6 +20,7 @@ import com.gitee.starblues.common.Constants;
 import com.gitee.starblues.integration.decrypt.DecryptConfiguration;
 import com.gitee.starblues.utils.Assert;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -30,12 +31,15 @@ import java.util.Set;
  *
  * @author starBlues
  * @since 3.0.0
- * @version 3.0.1
+ * @version 3.1.2
  */
 public abstract class DefaultIntegrationConfiguration implements IntegrationConfiguration{
 
     public static final String DEFAULT_PLUGIN_REST_PATH_PREFIX = "plugins";
     public static final Boolean DEFAULT_ENABLE_PLUGIN_ID_REST_PATH_PREFIX = Boolean.TRUE;
+
+    private static final String DEFAULT_TEMP_FILE =
+            new File(System.getProperty("java.io.tmpdir"), "spring-brick-temp").getPath();
 
     @Override
     public Boolean enable() {
@@ -51,7 +55,7 @@ public abstract class DefaultIntegrationConfiguration implements IntegrationConf
 
     @Override
     public String uploadTempPath(){
-        return "temp";
+        return DEFAULT_TEMP_FILE;
     }
 
     @Override
