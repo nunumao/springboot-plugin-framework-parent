@@ -61,7 +61,15 @@ public interface PluginManager {
      * @return 解析的插件信息
      * @throws PluginException 插件异常
      */
-    PluginInfo parse(Path pluginPath) throws PluginException;
+    PluginInsideInfo parse(Path pluginPath) throws PluginException;
+
+    /**
+     * 从某个目录扫描解析首个插件
+     * @param pluginPath 插件路径
+     * @return 解析的插件信息
+     * @throws PluginException 插件异常
+     */
+    PluginInsideInfo scanParse(Path pluginPath) throws PluginException;
 
     /**
      * 根据具体插件路径来加载插件.
@@ -70,7 +78,7 @@ public interface PluginManager {
      * @return 加载的插件信息
      * @throws PluginException 插件异常
      */
-    PluginInfo load(Path pluginPath, boolean unpackPlugin) throws PluginException;
+    PluginInsideInfo load(Path pluginPath, boolean unpackPlugin) throws PluginException;
 
     /**
      * 卸载加载插件

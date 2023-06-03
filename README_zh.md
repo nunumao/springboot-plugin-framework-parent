@@ -57,7 +57,7 @@
 - [spring-brick 功能测试+案例](https://gitee.com/starblues/springboot-plugin-framework-example)
 
 ### 交流 | Contact
-QQ交流群: 859570617
+QQ交流群: 859570617(群1, 已满), 536825438(群2)
 
 ### 支持 | Support
 如果您觉得框架使用起来不错的, 或者想支持本框架继续维护, 开源不易, 您可以通过如下方式进行支持:

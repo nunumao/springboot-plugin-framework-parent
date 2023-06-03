@@ -45,7 +45,7 @@ import java.util.zip.ZipFile;
  *
  * @author starBlues
  * @since 3.0.0
- * @version 3.1.0
+ * @version 3.1.2
  */
 public final class PluginFileUtils {
 
@@ -124,76 +124,110 @@ public final class PluginFileUtils {
     /**
      * 得到文件名称
      * @param file 原始文件
+     * @param includeSuffix 是否包含后缀
      * @return String
      */
-    public static String getFileName(File file){
-        String fileName = file.getName();
-        if(!file.exists() | file.isDirectory()){
-            return fileName;
+    public static String getFileName(File file, boolean includeSuffix){
+        if(file == null){
+            return null;
         }
-        return getFileName(fileName);
+        return getFileName(file.getName(), includeSuffix);
     }
 
 
     /**
-     * 得到文件名称
-     * @param fileName 原始文件名称. 比如: file.txt
+     * 获取不包含文件后缀的文件名称
+     * @param fileName 文件名称
      * @return String
      */
     public static String getFileName(String fileName){
+        return getFileName(fileName, false);
+    }
+
+    /**
+     * 得到文件名称
+     * @param fileName 原始文件名称. 比如: file.txt , 则返回 file
+     * @param includeSuffix 是否包含后缀
+     * @return String
+     */
+    public static String getFileName(String fileName, boolean includeSuffix){
         if(ObjectUtils.isEmpty(fileName)){
             return fileName;
         }
-        if(fileName.lastIndexOf(FILE_POINT) > 0){
-            return fileName.substring(0, fileName.lastIndexOf(FILE_POINT));
+        if(includeSuffix){
+            return fileName;
+        }
+        int i = fileName.lastIndexOf(FILE_POINT);
+        if(i > 0){
+            return fileName.substring(0, i);
         } else {
             return fileName;
         }
     }
 
-    public static Manifest getManifest(InputStream inputStream) throws IOException {
-        Manifest manifest = new Manifest();
-        Attributes attributes = manifest.getMainAttributes();
-        List<String> lines = IOUtils.readLines(inputStream, PackageStructure.CHARSET_NAME);
-        for (String line : lines) {
-            String[] split = line.split(":");
-            if(split.length == 2){
-                String key = split[0];
-                String value = split[1];
-                attributes.putValue(trim(key), trim(value));
+    /**
+     * 创建随机文件
+     * @param parentPath 父目录
+     * @param isFile 是否为文件，不为文件就创建目录
+     * @param fileSuffix 文件后缀
+     * @return 创建的File
+     * @throws Exception 创建异常
+     */
+    public static File createRandomFile(String parentPath, boolean isFile, String fileSuffix) throws Exception{
+        if(isFile){
+            if(ObjectUtils.isEmpty(fileSuffix)){
+                fileSuffix = "";
+            } else {
+                if(!fileSuffix.startsWith(".")){
+                    fileSuffix = "." + fileSuffix;
+                }
             }
-        }
-        return manifest;
-    }
-
-    private static String trim(String value){
-        if(ObjectUtils.isEmpty(value)){
-            return value;
-        }
-        return value.trim();
-    }
-
-    public static void deleteFile(File file) throws IOException {
-        if(file == null || !file.exists()){
-            return;
-        }
-        if(file.isDirectory()){
-            FileUtils.deleteDirectory(file);
+            File file = new File(parentPath, String.valueOf(System.currentTimeMillis()) + fileSuffix);
+            if(file.createNewFile()){
+                return file;
+            } else {
+                throw new IOException("Cannot create file '" + file + "'.");
+            }
         } else {
-            FileUtils.delete(file);
+            File file = new File(parentPath, String.valueOf(System.currentTimeMillis()));
+            FileUtils.forceMkdir(file);
+            return file;
         }
     }
 
-    public static void decompressZip(String zipPath, String targetDir) throws IOException {
+    /**
+     * 判断是否能解压
+     * @param zipPath zip路径
+     * @return boolean
+     */
+    public static boolean canDecompressZip(String zipPath){
+        return ResourceUtils.isZip(zipPath) || ResourceUtils.isJar(zipPath);
+    }
+
+    /**
+     * 解压zip 文件
+     * @param zipPath zip 文件
+     * @param targetDir 目标目录
+     * @return 解压后的目录
+     * @throws IOException 解压异常
+     */
+    public static File decompressZip(String zipPath, String targetDir) throws IOException {
         File zipFile = new File(zipPath);
-        if(!ResourceUtils.isZip(zipPath) && !ResourceUtils.isJar(zipPath)){
+        if(!canDecompressZip(zipPath)){
             throw new IOException("文件[" + zipFile.getName() + "]非压缩包, 不能解压");
         }
-        File targetDirFile = new File(targetDir);
+        File targetDirFile = new File(targetDir, getFileName(zipFile, false));
         if(!targetDirFile.exists()){
             if(!targetDirFile.mkdirs()){
                 throw new IOException("创建目录异常: " + targetDir);
             }
+            targetDir = targetDirFile.getAbsolutePath();
+        } else {
+            // 存在相同目录
+            targetDirFile = new File(targetDir, getFileName(zipFile, false)
+                    + "_" + System.currentTimeMillis());
+            FileUtils.forceMkdir(targetDirFile);
+            targetDir = targetDirFile.getAbsolutePath();
         }
         try (ZipFile zip = new ZipFile(zipFile, Charset.forName(PackageStructure.CHARSET_NAME))) {
             Enumeration<? extends ZipEntry> zipEnumeration = zip.entries();
@@ -205,7 +239,8 @@ public final class PluginFileUtils {
                 String currentTargetPath = FilesUtils.joiningFilePath(targetDir, currentZipPath);
                 //判断路径是否存在,不存在则创建文件路径
                 if (zipEntry.isDirectory()) {
-                    FileUtils.forceMkdir(new File(currentTargetPath));
+                    File file = new File(currentTargetPath);
+                    FileUtils.forceMkdir(file);
                     continue;
                 } else {
                     FilesUtils.createFile(currentTargetPath);
@@ -221,8 +256,8 @@ public final class PluginFileUtils {
                 }
             }
         }
+        return targetDirFile;
     }
-
 
     private static void resolveDecompressPluginType(InputStream inputStream, OutputStream outputStream) throws IOException{
         Manifest manifest = new Manifest(inputStream);
