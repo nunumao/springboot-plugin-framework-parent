@@ -34,7 +34,7 @@ import java.util.Set;
  *
  * @author starBlues
  * @since 3.0.0
- * @version 3.0.3
+ * @version 3.1.2
  */
 @EqualsAndHashCode(callSuper = true)
 @Component
@@ -73,7 +73,7 @@ public class AutoIntegrationConfiguration extends DefaultIntegrationConfiguratio
     /**
      * 上传的插件所存储的临时目录
      */
-    @Value("${uploadTempPath:temp}")
+    @Value("${uploadTempPath:}")
     private String uploadTempPath;
 
     /**
