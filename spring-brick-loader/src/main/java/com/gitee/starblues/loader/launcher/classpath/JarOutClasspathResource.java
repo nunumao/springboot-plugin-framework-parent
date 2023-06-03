@@ -20,7 +20,7 @@ import com.gitee.starblues.loader.archive.Archive;
 import com.gitee.starblues.loader.archive.ExplodedArchive;
 import com.gitee.starblues.loader.archive.JarFileArchive;
 import com.gitee.starblues.loader.utils.FilesUtils;
-import com.gitee.starblues.loader.utils.ObjectUtils;
+import com.gitee.starblues.loader.utils.ResourceUtils;
 import lombok.AllArgsConstructor;
 
 import java.io.File;
@@ -36,8 +36,8 @@ import static com.gitee.starblues.loader.LoaderConstant.*;
  * jar out 类型的 classpath 获取者
  *
  * @author starBlues
- * @version 3.1.0
  * @since 3.0.4
+ * @version 3.1.2
  */
 @AllArgsConstructor
 public class JarOutClasspathResource implements ClasspathResource{
@@ -93,8 +93,7 @@ public class JarOutClasspathResource implements ClasspathResource{
         if(!libJarDir.exists()){
             throw new IllegalStateException("主程序依赖目录不存在: " + libDir);
         }
-        List<String> libIndexes = getLibIndexes(manifest);
-        File[] libJarFile = getLibJarFile(libJarDir, libIndexes);
+        File[] libJarFile = getLibJarFile(libJarDir);
         List<URL> urls = new ArrayList<>(libJarFile.length);
         for (File file : libJarFile) {
             urls.add(file.toPath().toUri().toURL());
@@ -102,31 +101,11 @@ public class JarOutClasspathResource implements ClasspathResource{
         return urls;
     }
 
-    private List<String> getLibIndexes(Manifest manifest){
-        String libIndexes = manifest.getMainAttributes().getValue(MAIN_LIB_INDEXES);
-        if(ObjectUtils.isEmpty(libIndexes)){
-            return Collections.emptyList();
-        }
-        String[] indexSplit = libIndexes.split(MAIN_LIB_INDEXES_SPLIT);
-        List<String> indexes = new ArrayList<>(indexSplit.length);
-        for (String index : indexSplit) {
-            if(ObjectUtils.isEmpty(index)){
-                continue;
-            }
-            indexes.add(index);
-        }
-        if(indexes.isEmpty()){
-            throw new IllegalStateException("主程序依赖包未发现!");
-        }
-        return indexes;
-    }
-
-    private File[] getLibJarFile(File rootFile, List<String> libIndexes) {
-        Set<String> linIndexes = new HashSet<>(libIndexes);
+    private File[] getLibJarFile(File rootFile) {
         File[] listFiles = rootFile.listFiles(new FileFilter() {
             @Override
             public boolean accept(File pathname) {
-                return linIndexes.contains(pathname.getName());
+                return ResourceUtils.isJarFile(pathname);
             }
         });
         if(listFiles == null || listFiles.length == 0){

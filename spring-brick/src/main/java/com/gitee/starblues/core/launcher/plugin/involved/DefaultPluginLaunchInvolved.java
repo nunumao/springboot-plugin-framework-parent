@@ -19,6 +19,7 @@ package com.gitee.starblues.core.launcher.plugin.involved;
 import com.gitee.starblues.core.PluginInsideInfo;
 import com.gitee.starblues.core.descriptor.InsidePluginDescriptor;
 import com.gitee.starblues.core.PluginExtensionInfo;
+import com.gitee.starblues.core.descriptor.PluginLibInfo;
 import com.gitee.starblues.loader.PluginResourceStorage;
 import com.gitee.starblues.spring.ApplicationContext;
 import com.gitee.starblues.spring.SpringPluginHook;
@@ -30,12 +31,14 @@ import lombok.extern.slf4j.Slf4j;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * 默认的插件启动介入者
  * @author starBlues
  * @since 3.0.0
- * @version 3.1.0
+ * @version 3.1.2
  */
 @Slf4j
 public class DefaultPluginLaunchInvolved implements PluginLaunchInvolved{
@@ -43,7 +46,12 @@ public class DefaultPluginLaunchInvolved implements PluginLaunchInvolved{
     @Override
     public void before(PluginInsideInfo pluginInsideInfo, ClassLoader classLoader) throws Exception {
         InsidePluginDescriptor descriptor = pluginInsideInfo.getPluginDescriptor();
-        PluginResourceStorage.addPlugin(descriptor.getPluginId(), descriptor.getPluginFileName());
+        Set<PluginLibInfo> pluginLibInfo = descriptor.getPluginLibInfo();
+        List<String> libPath = null;
+        if(pluginLibInfo != null){
+            libPath = pluginLibInfo.stream().map(PluginLibInfo::getPath).collect(Collectors.toList());
+        }
+        PluginResourceStorage.addPlugin(descriptor.getPluginId(), descriptor.getPluginFileName(), libPath);
     }
 
     @Override
@@ -57,7 +65,6 @@ public class DefaultPluginLaunchInvolved implements PluginLaunchInvolved{
     public void close(PluginInsideInfo pluginInsideInfo, ClassLoader classLoader) throws Exception {
         InsidePluginDescriptor descriptor = pluginInsideInfo.getPluginDescriptor();
         String pluginId = descriptor.getPluginId();
-        PluginResourceStorage.removePlugin(pluginId);
         PluginStaticResourceResolver.remove(pluginId);
     }
 

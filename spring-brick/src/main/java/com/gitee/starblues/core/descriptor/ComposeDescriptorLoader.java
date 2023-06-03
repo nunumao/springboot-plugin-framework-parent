@@ -21,6 +21,7 @@ import com.gitee.starblues.core.descriptor.decrypt.EmptyPluginDescriptorDecrypt;
 import com.gitee.starblues.core.descriptor.decrypt.PluginDescriptorDecrypt;
 import com.gitee.starblues.core.exception.PluginException;
 import com.gitee.starblues.utils.SpringBeanUtils;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationContext;
 
 import java.nio.file.Path;
@@ -33,6 +34,7 @@ import java.util.List;
  * @since 3.0.0
  * @version 3.0.1
  */
+@Slf4j
 public class ComposeDescriptorLoader implements PluginDescriptorLoader{
     
     private final List<PluginDescriptorLoader> pluginDescriptorLoaders = new ArrayList<>();
@@ -73,10 +75,14 @@ public class ComposeDescriptorLoader implements PluginDescriptorLoader{
     @Override
     public InsidePluginDescriptor load(Path location) throws PluginException {
         for (PluginDescriptorLoader pluginDescriptorLoader : pluginDescriptorLoaders) {
-            InsidePluginDescriptor pluginDescriptor = pluginDescriptorLoader.load(location);
-            if(pluginDescriptor != null){
-                pluginChecker.checkDescriptor(pluginDescriptor);
-                return pluginDescriptor;
+            try {
+                InsidePluginDescriptor pluginDescriptor = pluginDescriptorLoader.load(location);
+                if(pluginDescriptor != null){
+                    pluginChecker.checkDescriptor(pluginDescriptor);
+                    return pluginDescriptor;
+                }
+            } catch (Exception e){
+                log.debug("非法路径插件: {}", location);
             }
         }
         return null;

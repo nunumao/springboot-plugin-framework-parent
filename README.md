@@ -48,6 +48,6 @@ The framework can be developed in the `spring-boot` project plugin, plugin can b
 - [spring-brick-example](https://gitee.com/starblues/springboot-plugin-framework-example)
 
 ### Contact
-QQ: 859570617(**After you like the framework, you can enter the group. Please note the Gitee/GitHub nickname before entering the group**)
+QQ: 859570617(QQ Group 1 is full), 536825438(QQ Group 2)(**After you like the framework, you can enter the group. Please note the Gitee/GitHub nickname before entering the group**)
 
 
