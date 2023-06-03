@@ -40,6 +40,7 @@ public abstract class UploadParam {
 
     /**
      * 是否解压插件文件
+     * 压缩包必须符合zip压缩包, 压缩包不允许出现多级目录, 建议将插件和依赖直接压缩为一个zip类型的压缩包
      */
     private boolean isUnpackPlugin = false;
 

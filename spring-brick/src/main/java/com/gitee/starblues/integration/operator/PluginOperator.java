@@ -62,7 +62,9 @@ public interface PluginOperator {
     /**
      * 通过路径安装启动插件 [适用于 dev、prod 环境]
      * @param pluginPath 插件路径
-     * @param unpackPlugin 是否解压插件包. (如果插件包为压缩包时生效)
+     * @param unpackPlugin 是否解压插件包. (如果插件包为压缩包时生效)。
+     *                     压缩包必须符合zip压缩包, 压缩包不允许出现多级目录
+     *                     建议将插件和依赖直接压缩为一个zip类型的压缩包
      * @return 成功: 返回插件信息PluginInfo; 失败: 抛出异常或者返回null
      * @throws PluginException 异常信息
      */
@@ -125,7 +127,7 @@ public interface PluginOperator {
      *      相同插件不在启动状态, 则进入覆盖模式, 会对旧插件进行备份(可根据isBackOldPlugin配置不备份), 然后上传新插件包到插件目录, 然后安装、启动。
      *   如果在插件根目录存在同文件名称插件, 系统会抛出异常, 建议重命名插件名称, 再上传。
      *
-     * @param uploadParam 上传参数
+     * @param uploadParam 上传参数. 如果需要解压文件。则压缩包必须符合zip压缩包, 压缩包不允许出现多级目录, 建议将插件和依赖直接压缩为一个zip类型的压缩包
      * @return 成功: 返回插件信息PluginInfo; 失败: 抛出异常或者返回null
      * @throws PluginException 异常信息
      * @see UploadByInputStreamParam
