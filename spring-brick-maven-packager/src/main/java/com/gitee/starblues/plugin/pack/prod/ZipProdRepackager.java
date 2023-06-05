@@ -183,7 +183,7 @@ public class ZipProdRepackager extends DevRepackager {
             File artifactFile = artifact.getFile();
             packageZip.writeDependency(artifactFile, libDirEntryName);
             // fix 解决依赖前缀携带, lib 配置的前缀
-            dependencyIndexNames.add(artifactFile.getName());
+            dependencyIndexNames.add(artifactFile.getName() + repackageMojo.resolveLoadToMain(artifact));
         }
         return dependencyIndexNames;
     }
