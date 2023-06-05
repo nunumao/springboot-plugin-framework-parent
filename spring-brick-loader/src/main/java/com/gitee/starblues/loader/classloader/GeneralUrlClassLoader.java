@@ -1,12 +1,12 @@
 /**
  * Copyright [2019-Present] [starBlues]
- *
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *        http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -17,6 +17,7 @@
 package com.gitee.starblues.loader.classloader;
 
 import com.gitee.starblues.loader.classloader.resource.Resource;
+import com.gitee.starblues.loader.classloader.resource.loader.JarResourceLoader;
 import com.gitee.starblues.loader.classloader.resource.loader.ResourceLoader;
 import com.gitee.starblues.loader.classloader.resource.loader.ResourceLoaderFactory;
 import com.gitee.starblues.loader.classloader.resource.storage.EmptyResourceStorage;
@@ -36,8 +37,8 @@ import java.util.List;
  * 通用的Url ClassLoader
  *
  * @author starBlues
- * @since 3.0.4
  * @version 3.1.0
+ * @since 3.0.4
  */
 public class GeneralUrlClassLoader extends URLClassLoader implements ResourceLoaderFactory {
 
@@ -63,7 +64,7 @@ public class GeneralUrlClassLoader extends URLClassLoader implements ResourceLoa
 
     @Override
     public void addResource(File file) throws Exception {
-        if(!file.exists()){
+        if (!file.exists()) {
             throw new FileNotFoundException("Not found file:" + file.getPath());
         }
         addURL(file.toPath().toUri().toURL());
@@ -86,7 +87,12 @@ public class GeneralUrlClassLoader extends URLClassLoader implements ResourceLoa
 
     @Override
     public void addResource(ResourceLoader resourceLoader) throws Exception {
-        resourceLoader.load(resourceStorage);
+
+        if (resourceLoader instanceof JarResourceLoader) {
+            addResource(resourceLoader.getBaseUrl());
+        } else {
+            resourceLoader.load(resourceStorage);
+        }
     }
 
     @Override
