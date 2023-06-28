@@ -44,18 +44,20 @@ public class PluginThymeleafInvolved implements PluginLaunchInvolved {
 
     private static final Logger logger = LoggerFactory.getLogger(PluginThymeleafInvolved.class);
 
-    private Set<ITemplateResolver> templateResolvers;
+//    private Set<ITemplateResolver> templateResolvers;
+    private SpringTemplateEngine springTemplateEngine;
 
     private final Map<String, ClassLoaderTemplateResolver> pluginTemplateResolver = new ConcurrentHashMap<>();
 
     @Override
     public void initialize(GenericApplicationContext applicationContext, IntegrationConfiguration configuration) {
-        this.templateResolvers = getTemplateResolvers(getSpringTemplateEngine(applicationContext));
+        this.springTemplateEngine = getSpringTemplateEngine(applicationContext);
+        getTemplateResolvers(this.springTemplateEngine);
     }
 
     @Override
     public void after(PluginInsideInfo pluginInsideInfo, ClassLoader classLoader, SpringPluginHook pluginHook) throws Exception {
-        if(templateResolvers == null){
+        if(springTemplateEngine == null){
             return;
         }
 
@@ -94,7 +96,10 @@ public class PluginThymeleafInvolved implements PluginLaunchInvolved {
             resolver.setOrder(order);
         }
         resolver.setCheckExistence(true);
-        templateResolvers.add(resolver);
+        // 修复，当上传插件时，会出现模板解析不到的问题
+        springTemplateEngine.getTemplateResolvers().add(resolver);
+        springTemplateEngine.getConfiguration().getTemplateResolvers().add(resolver);
+
         InsidePluginDescriptor descriptor = pluginInsideInfo.getPluginDescriptor();
         if(!pluginTemplateResolver.containsKey(descriptor.getPluginId())){
             pluginTemplateResolver.put(descriptor.getPluginId(), resolver);
@@ -103,7 +108,12 @@ public class PluginThymeleafInvolved implements PluginLaunchInvolved {
 
     @Override
     public void close(PluginInsideInfo pluginInsideInfo, ClassLoader classLoader) throws Exception {
+
+        ClassLoaderTemplateResolver resolver = pluginTemplateResolver.get(pluginInsideInfo.getPluginId());
         pluginTemplateResolver.remove(pluginInsideInfo.getPluginId());
+        // 这里删除干净
+        springTemplateEngine.getTemplateResolvers().remove(resolver);
+        springTemplateEngine.getConfiguration().getTemplateResolvers().remove(resolver);
     }
 
     private SpringTemplateEngine getSpringTemplateEngine(GenericApplicationContext context){
@@ -120,6 +130,7 @@ public class PluginThymeleafInvolved implements PluginLaunchInvolved {
     }
 
     private Set<ITemplateResolver> getTemplateResolvers(SpringTemplateEngine springTemplateEngine) {
+
         String errorMsg = "当前插件不能使用Thymeleaf, 主程序未发现Thymeleaf注册入口";
         if(springTemplateEngine == null){
             logger.error(errorMsg);
