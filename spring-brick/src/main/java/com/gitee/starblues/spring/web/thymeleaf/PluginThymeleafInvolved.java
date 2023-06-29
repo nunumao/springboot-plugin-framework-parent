@@ -26,10 +26,13 @@ import com.gitee.starblues.utils.ObjectUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.support.GenericApplicationContext;
+import org.thymeleaf.IEngineConfiguration;
+import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.spring5.SpringTemplateEngine;
 import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
 import org.thymeleaf.templateresolver.ITemplateResolver;
 
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -51,8 +54,23 @@ public class PluginThymeleafInvolved implements PluginLaunchInvolved {
 
     @Override
     public void initialize(GenericApplicationContext applicationContext, IntegrationConfiguration configuration) {
-        this.springTemplateEngine = getSpringTemplateEngine(applicationContext);
-        getTemplateResolvers(this.springTemplateEngine);
+        try{
+            this.springTemplateEngine = getSpringTemplateEngine(applicationContext);
+            getTemplateResolvers(this.springTemplateEngine);
+            modifiyEngineConfiguration(this.springTemplateEngine);
+        } catch (Exception e){
+            logger.error("Plugin thymeleaf initialize exception. {}", e.getMessage(), e);
+        }
+    }
+
+    /**
+     * 默认的templateResolvers不可以修改，所以这里需要重新创建一个
+     */
+    private void modifiyEngineConfiguration(TemplateEngine templateEngine) throws IllegalAccessException {
+
+        IEngineConfiguration configuration = templateEngine.getConfiguration();
+        Set<ITemplateResolver> templateResolverSet = configuration.getTemplateResolvers();
+        ClassUtils.setReflectionField(configuration, "templateResolvers", new HashSet<>(templateResolverSet));
     }
 
     @Override
@@ -97,8 +115,8 @@ public class PluginThymeleafInvolved implements PluginLaunchInvolved {
         }
         resolver.setCheckExistence(true);
         // 修复，当上传插件时，会出现模板解析不到的问题
-        springTemplateEngine.getTemplateResolvers().add(resolver);
-        springTemplateEngine.getConfiguration().getTemplateResolvers().add(resolver);
+        getTemplateResolvers(springTemplateEngine).add(resolver);
+        getConfigTemplateResolvers(springTemplateEngine).add(resolver);
 
         InsidePluginDescriptor descriptor = pluginInsideInfo.getPluginDescriptor();
         if(!pluginTemplateResolver.containsKey(descriptor.getPluginId())){
@@ -112,8 +130,8 @@ public class PluginThymeleafInvolved implements PluginLaunchInvolved {
         ClassLoaderTemplateResolver resolver = pluginTemplateResolver.get(pluginInsideInfo.getPluginId());
         pluginTemplateResolver.remove(pluginInsideInfo.getPluginId());
         // 这里删除干净
-        springTemplateEngine.getTemplateResolvers().remove(resolver);
-        springTemplateEngine.getConfiguration().getTemplateResolvers().remove(resolver);
+        getTemplateResolvers(springTemplateEngine).remove(resolver);
+        getConfigTemplateResolvers(springTemplateEngine).remove(resolver);
     }
 
     private SpringTemplateEngine getSpringTemplateEngine(GenericApplicationContext context){
@@ -145,6 +163,11 @@ public class PluginThymeleafInvolved implements PluginLaunchInvolved {
             logger.error("当前插件不能使用Thymeleaf, 获取主程序注册入口失败. {}", e.getMessage());
             return null;
         }
+    }
+
+    private Set<ITemplateResolver> getConfigTemplateResolvers(SpringTemplateEngine springTemplateEngine) {
+
+        return springTemplateEngine.getConfiguration().getTemplateResolvers();
     }
 
 }

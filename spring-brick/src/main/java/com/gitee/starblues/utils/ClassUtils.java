@@ -84,6 +84,16 @@ public class ClassUtils {
         return getReflectionField(templateResolversField, o);
     }
 
+    public static void setReflectionField(Object object, String fieldName, Object value) throws IllegalAccessException {
+        if (object == null) {
+            return;
+        }
+        Field field = ReflectionUtils.findField(object.getClass(),
+                fieldName);
+        field.setAccessible(true);
+        field.set(object, value);
+    }
+
     /**
      * 通过反射Field获取字段
      *
