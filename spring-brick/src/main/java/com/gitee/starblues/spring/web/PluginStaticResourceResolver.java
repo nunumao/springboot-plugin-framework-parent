@@ -66,6 +66,10 @@ public class PluginStaticResourceResolver extends AbstractResourceResolver {
         if(request != null){
             String requestUri = request.getRequestURI();
             String formatUri = UrlUtils.format(requestUri);
+            // fix 设置server.servlet.context-path无法访问静态资源
+            if(!Objects.equals("/", request.getContextPath())) {
+                formatUri = formatUri.replaceFirst(request.getContextPath().replaceFirst("/", ""), "");
+            }
             // fix https://gitee.com/starblues/springboot-plugin-framework-parent/issues/I53T9W
             requestPath = UrlUtils.format(formatUri.replaceFirst(config.getPathPrefix(), ""));
         }
